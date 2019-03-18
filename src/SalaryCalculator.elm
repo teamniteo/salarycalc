@@ -1,4 +1,4 @@
-module SalaryCalculator exposing (main)
+module SalaryCalculator exposing (ljubljana, main, salary, softwareEngineer)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Button as Button
@@ -797,3 +797,18 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
+
+
+
+-- TEST HELPERS
+-- Hopefully these can be removed
+
+
+softwareEngineer : Role
+softwareEngineer =
+    SoftwareEngineer
+
+
+ljubljana : City
+ljubljana =
+    Ljubljana
