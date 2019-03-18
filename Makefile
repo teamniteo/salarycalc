@@ -15,9 +15,11 @@ install:
 		> .installed
 
 # Testing and linting targets
+.PHONY: lint
 lint: .installed
 	@npx elm-analyse
 
+.PHONY: tests
 test: tests
 tests: .installed
 	@npx elm-test
