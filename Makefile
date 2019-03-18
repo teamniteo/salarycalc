@@ -1,7 +1,7 @@
 sources := "$(shell find src -type f | sort | xargs ls -l)"
 
 .PHONY: all
-all: .installed dist
+all: .installed lint test dist
 
 .PHONY: install
 install:
@@ -14,6 +14,14 @@ install:
 	@echo "This file is used by 'make' for keeping track of last install time. If package.json, package-lock.json or elm.json are newer then this file (.installed) then all 'make *' commands that depend on '.installed' know they need to run npm install first." \
 		> .installed
 
+# Testing and linting targets
+lint: .installed
+	@npx elm-analyse
+
+test: tests
+tests: .installed
+	@npx elm-test
+
 # Run development server
 .PHONY: run
 run: .installed
@@ -22,7 +30,6 @@ run: .installed
 # Build distribution files and place them where they are expected
 .PHONY: dist
 dist: .installed
-	@npx elm-analyse
 	@npx parcel build src/index.html
 	@npx parcel build src/index.js
 

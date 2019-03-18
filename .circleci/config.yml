@@ -10,18 +10,33 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
+            - v2-dependencies-{{ checksum "package.json" }}
+            - v2-dependencies-
 
       - run:
-          name: updating npm...
+          name: Updating npm
           command: npmv=$(echo $(npm -v) | head -c 1); if [ "$npmv" -lt "6" ]; then sudo npm i -g npm; else echo "Node.js Docker Team finally decided to include npm v6+ in latest image; you can remove this script now"; fi
 
-      - run: make dist
+      - run:
+          name: Installing dependencies
+          command: make .installed
+
+      - run:
+          name: Running linters
+          command: make lint
+
+      - run:
+          name: Running tests
+          command: make tests
+
+      - run:
+          name: Compiling elm.js
+          command: make dist
 
       - save_cache:
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v2-dependencies-{{ checksum "package.json" }}
           paths:
-            - node_modules
+            - /home/circleci/.npm
+            - /home/circleci/.elm
             - elm-stuff
             - tests/elm-stuff
