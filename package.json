@@ -1,0 +1,36 @@
+{
+  "name": "salary-calculator",
+  "version": "0.1.0",
+  "description": "Elm engine running the Niteo Salary Calculator",
+  "main": "dist/index.html",
+  "scripts": {
+    "install": "parcel build src/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/niteoweb/salarycalc.git"
+  },
+  "keywords": [
+    "Elm",
+    "Salary",
+    "Calculator",
+    "Niteo"
+  ],
+  "author": "Niteo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/niteoweb/salarycalc/issues"
+  },
+  "homepage": "https://github.com/niteoweb/salarycalc#readme",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "babel-plugin-transform-es2015-modules-strip": "^0.1.1",
+    "elm-hot": "^1.0.1",
+    "node-elm-compiler": "^5.0.3",
+    "parcel-bundler": "^1.12.0"
+  },
+  "dependencies": {
+    "elm-analyse": "^0.16.1"
+  }
+}
