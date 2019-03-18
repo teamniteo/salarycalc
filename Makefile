@@ -25,7 +25,6 @@ dist: .installed
 	@npx elm-analyse
 	@npx parcel build src/index.html
 	@npx parcel build src/index.js
-	cp dist/index.js ../../static/elm.js
 
 # Nuke from orbit
 clean:

@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:9.4.0
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+
+      - run:
+          name: updating npm...
+          command: npmv=$(echo $(npm -v) | head -c 1); if [ "$npmv" -lt "6" ]; then sudo npm i -g npm; else echo "Node.js Docker Team finally decided to include npm v6+ in latest image; you can remove this script now"; fi
+
+      - run: make dist
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - elm-stuff
+            - tests/elm-stuff
