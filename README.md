@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/niteoweb/salarycalc.svg?style=svg)](https://circleci.com/gh/niteoweb/salarycalc)
+
 # Elm engine running the Salary Calculator
 
 
