@@ -20,7 +20,7 @@ lint: .installed
 
 test: tests
 tests: .installed
-	@npx elm-test
+	@npx elm-coverage
 
 # Run development server
 .PHONY: run

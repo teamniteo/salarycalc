@@ -1,4 +1,5 @@
 .cache/
+.coverage/
 .installed
 dist/
 elm-stuff/
