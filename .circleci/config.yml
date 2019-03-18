@@ -10,8 +10,8 @@ jobs:
 
       - restore_cache:
           keys:
-            - v2-dependencies-{{ checksum "package.json" }}
-            - v2-dependencies-
+            - v3-dependencies-{{ checksum "package.json" }}
+            - v3-dependencies-
 
       - run:
           name: Updating npm
@@ -34,7 +34,7 @@ jobs:
           command: make dist
 
       - save_cache:
-          key: v2-dependencies-{{ checksum "package.json" }}
+          key: v3-dependencies-{{ checksum "package.json" }}
           paths:
             - /home/circleci/.npm
             - /home/circleci/.elm
