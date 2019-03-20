@@ -1,4 +1,4 @@
-module SalaryCalculator exposing (ljubljana, main, salary, softwareEngineer)
+module SalaryCalculator exposing (ljubljana, main, salary, softwareEngineer, tenureDetail)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Button as Button
