@@ -10,9 +10,9 @@ install:
 
 .installed: package.json package-lock.json elm.json
 	@echo "Dependencies files are newer than .installed; (re)installing."
+	@npm clean-install
 	@echo "This file is used by 'make' for keeping track of last install time. If package.json, package-lock.json or elm.json are newer then this file (.installed) then all 'make *' commands that depend on '.installed' know they need to run npm install first." \
 		> .installed
-	@npm ci
 
 # Testing and linting targets
 .PHONY: lint
