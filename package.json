@@ -4,7 +4,7 @@
   "description": "Elm engine running the Niteo Salary Calculator",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "make",
+    "prepare": "if test -z $MAKELEVEL; then make; fi ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
