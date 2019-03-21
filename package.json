@@ -2,9 +2,9 @@
   "name": "salary-calculator",
   "version": "0.1.0",
   "description": "Elm engine running the Niteo Salary Calculator",
-  "main": "dist/index.html",
+  "main": "dist/index.js",
   "scripts": {
-    "install": "parcel build src/index.html",
+    "prepare": "make",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
