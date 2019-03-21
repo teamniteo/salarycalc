@@ -1,0 +1,22 @@
+{
+  "name": "salarycalc-integration",
+  "version": "1.0.0",
+  "description": "An example of how to integrate salarycalc into another website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/niteoweb/salarycalc.git"
+  },
+  "author": "Niteo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/niteoweb/salarycalc/issues"
+  },
+  "homepage": "https://github.com/niteoweb/salarycalc#readme",
+  "dependencies": {
+    "salary-calculator": "file:.."
+  }
+}

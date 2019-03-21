@@ -1,9 +1,10 @@
 import { Elm } from "./SalaryCalculator.elm"
 
-const node = document.getElementById("app-container")
 const program = Elm.SalaryCalculator
 
-program.init({
-    flags: location.href,
-    node: node
-})
+export function init(node) {
+  program.init({
+      flags: location.href,
+      node: node
+  })
+}
