@@ -40,6 +40,13 @@ dist: .installed
 		src/salary-calculator.js \
 		src/index.html
 
+.PHONY: release
+publish: dist
+	@npm version \
+		--no-git-tag-version prerelease \
+		--preid $(shell date +%Y-%m-%dT%H-%M-%S)
+	npm publish --dry-run
+
 # Nuke from orbit
 clean:
 	@rm -rf elm-stuff/ dist/
