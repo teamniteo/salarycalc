@@ -48,8 +48,8 @@ publish: dist
 		--no-git-tag-version \
 		prerelease \
 		--preid $(release)
-	npm publish
-	git checkout HEAD package.json package-lock.json
+	@npm publish
+	@git checkout HEAD package.json package-lock.json
 
 # Nuke from orbit
 clean:
