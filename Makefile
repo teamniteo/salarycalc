@@ -40,12 +40,16 @@ dist: .installed
 		src/salary-calculator.js \
 		src/index.html
 
-.PHONY: release
+.PHONY: publish
+
+publish: release = $(shell date +%Y-%m-%dT%H-%M-%S)
 publish: dist
-	@npm version \
-		--no-git-tag-version prerelease \
-		--preid $(shell date +%Y-%m-%dT%H-%M-%S)
+	npm version \
+		--no-git-tag-version \
+		prerelease \
+		--preid $(release)
 	npm publish --dry-run
+	git checkout HEAD package.json package-lock.json
 
 # Nuke from orbit
 clean:
