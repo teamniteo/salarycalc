@@ -1,9 +1,26 @@
 version: 2
-jobs:
-  build:
+
+defaults: &defaults
     working_directory: ~/repo
     docker:
       - image: circleci/node:9.4.0
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - publish:
+          requires:
+            - build
+          # filters:
+          #   branches:
+          #     only: master
+
+
+jobs:
+  build:
+    <<: *defaults
 
     steps:
       - checkout
@@ -40,3 +57,29 @@ jobs:
             - /home/circleci/.elm
             - elm-stuff
             - tests/elm-stuff
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  publish:
+    <<: *defaults
+
+    filters:
+      branches:
+        only:
+          - master
+
+    steps:
+      - attach_workspace:
+            at: ~/repo
+
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_token"
+
+      - run:
+          name: Publish the package to NPM
+          command: make publish
+
+      - checkout
