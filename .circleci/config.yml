@@ -13,9 +13,9 @@ workflows:
       - publish:
           requires:
             - build
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
 
 
 jobs:
@@ -85,5 +85,3 @@ jobs:
       - run:
           name: Publish the package to NPM
           command: make publish
-
-      - checkout
