@@ -4,12 +4,12 @@
   "description": "Elm engine running the Niteo Salary Calculator",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "if test -z $MAKELEVEL; then make; fi ",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "if test -z $MAKELEVEL; then make; fi",
+    "test": "if test -z $MAKELEVEL; then make test; fi"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/niteoweb/salarycalc.git"
+    "url": "https://github.com/niteoweb/salarycalc.git"
   },
   "keywords": [
     "Elm",
@@ -28,9 +28,7 @@
     "babel-plugin-transform-es2015-modules-strip": "^0.1.1",
     "elm-hot": "^1.0.1",
     "node-elm-compiler": "^5.0.3",
-    "parcel-bundler": "^1.12.0"
-  },
-  "dependencies": {
+    "parcel-bundler": "^1.12.0",
     "elm-analyse": "^0.16.1",
     "elm-coverage": "^0.2.0"
   }
