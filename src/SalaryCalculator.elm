@@ -655,7 +655,7 @@ viewHeader model =
                 , cityItem SanFrancisco
                 ]
             }
-        , text " with a tenure of "
+        , text " with a tenure at Niteo of "
         , Dropdown.dropdown model.tenureDropdown
             { options = []
             , toggleMsg = TenureDropdownChanged
