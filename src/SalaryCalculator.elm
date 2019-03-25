@@ -687,6 +687,7 @@ viewHeader model =
     , p [ class "lead" ]
         [ viewSalary model
         ]
+    , p [] [ text (String.fromInt (sum 1 2)) ]
     ]
 
 
@@ -803,3 +804,8 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
+
+
+sum : Int -> Int -> Int
+sum a b =
+    a + b
