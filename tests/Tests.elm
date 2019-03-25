@@ -1,16 +1,11 @@
-module Tests exposing (commitmentBonus, defaultSalary)
+module Tests exposing (commitmentBonus, defaultSalary, tenureImpact)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
-import SalaryCalculator
-    exposing
-        ( City(..)
-        , Role(..)
-        , salary
-        , tenureDetail
-        )
+import List.Extra as List
+import SalaryCalculator exposing (City(..), Role(..), salary, tenureDetail)
 import Test exposing (..)
 
 
@@ -59,3 +54,78 @@ commitmentBonus =
                 tenureDetail 15
                     |> Expect.equal { name = "15 years", commitmentBonus = 0.2772588722239781 }
         ]
+
+
+cities =
+    [ SanFrancisco
+    , London
+    , Amsterdam
+    , Berlin
+    , Barcelona
+    , Lisbon
+    , Ljubljana
+    , Maribor
+    , Bucharest
+    , NoviSad
+    , Davao
+    , Delhi
+    , Kharkiv
+    ]
+
+
+roles =
+    [ PrincipalSoftwareEngineer
+    , LeadSoftwareEngineer
+    , SoftwareEngineer
+    , JuniorSoftwareEngineer
+    , JuniorProgrammer
+    , SeniorProductMarketingManager
+    , ProductMarketingManager
+    , SeniorDigitalMarketingSpecialist
+    , DigitalMarketingSpecialist
+    , MarketingAssociate
+    , PrincipalDesigner
+    , LeadDesigner
+    , SeniorDesigner
+    , Designer
+    , JuniorDesigner
+    , SeniorOperationsManager
+    , OperationsManager
+    , TechnicalSupportSpecialist
+    , CustomerSupportAssociate
+    , CustomerSupportSpecialist
+    ]
+
+
+tenureImpact : Test
+tenureImpact =
+    let
+        tenureTest : Role -> City -> Int -> Test
+        tenureTest role city tenure =
+            let
+                title =
+                    String.join " "
+                        [ (SalaryCalculator.roleDetail role).name
+                        , "living in"
+                        , (SalaryCalculator.cityDetail city).name
+                        , "with tenure of"
+                        , String.fromInt tenure
+                        , "earns more than with tenure of"
+                        , String.fromInt (tenure - 1)
+                        ]
+            in
+            test title
+                (\_ ->
+                    Expect.greaterThan
+                        (salary { defaults | role = role, tenure = tenure - 1 })
+                        (salary { defaults | role = role, tenure = tenure })
+                )
+
+        years =
+            List.range 1 25
+
+        ( defaults, _ ) =
+            SalaryCalculator.init "https://niteo.co/salary-calculator"
+    in
+    describe "Longer tenure always results in" <|
+        List.lift3 tenureTest roles cities years
