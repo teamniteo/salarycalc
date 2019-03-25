@@ -4,7 +4,13 @@ import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
-import SalaryCalculator exposing (ljubljana, salary, softwareEngineer, tenureDetail)
+import SalaryCalculator
+    exposing
+        ( City(..)
+        , Role(..)
+        , salary
+        , tenureDetail
+        )
 import Test exposing (..)
 
 
@@ -17,8 +23,8 @@ defaultSalary =
                 , cityDropdown = Dropdown.initialState
                 , tenureDropdown = Dropdown.initialState
                 , accordionState = Accordion.initialState
-                , role = softwareEngineer
-                , city = ljubljana
+                , role = SoftwareEngineer
+                , city = Ljubljana
                 , tenure = 2
                 }
                 |> Expect.equal 5017
