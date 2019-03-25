@@ -1,4 +1,9 @@
-module Tests exposing (commitmentBonus, defaultSalary, tenureImpact)
+module Tests exposing
+    ( cityImpact
+    , commitmentBonus
+    , defaultSalary
+    , tenureImpact
+    )
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
@@ -56,6 +61,8 @@ commitmentBonus =
         ]
 
 
+{-| Note: Cities are ordered from most to least expensive. This is significant for the cityImpact test below.
+-}
 cities =
     [ SanFrancisco
     , London
@@ -97,6 +104,15 @@ roles =
     ]
 
 
+years =
+    List.range 0 24
+
+
+defaults =
+    SalaryCalculator.init "https://niteo.co/salary-calculator"
+        |> Tuple.first
+
+
 tenureImpact : Test
 tenureImpact =
     let
@@ -117,15 +133,88 @@ tenureImpact =
             test title
                 (\_ ->
                     Expect.greaterThan
-                        (salary { defaults | role = role, tenure = tenure - 1 })
                         (salary { defaults | role = role, tenure = tenure })
+                        (salary { defaults | role = role, tenure = tenure + 1 })
                 )
-
-        years =
-            List.range 1 25
-
-        ( defaults, _ ) =
-            SalaryCalculator.init "https://niteo.co/salary-calculator"
     in
     describe "Longer tenure always results in" <|
         List.lift3 tenureTest roles cities years
+
+
+{-| Note: This suit depends on cities list above being ordered from most to least expenisve.
+-}
+cityImpact : Test
+cityImpact =
+    let
+        personaSuit : ( Role, Int ) -> Test
+        personaSuit ( role, tenure ) =
+            let
+                title =
+                    [ (SalaryCalculator.roleDetail role).name
+                    , "with a tenure of"
+                    , String.fromInt tenure
+                    , "years..."
+                    ]
+                        |> String.join " "
+            in
+            cities
+                |> pairs
+                |> List.map (citiesTest role tenure)
+                |> describe title
+
+        personas : List ( Role, Int )
+        personas =
+            List.lift2 Tuple.pair roles years
+
+        citiesTest : Role -> Int -> ( City, City ) -> Test
+        citiesTest role tenure ( a, b ) =
+            let
+                title =
+                    [ "...living in"
+                    , (SalaryCalculator.cityDetail a).name
+                    , "earns at least as much as if she would live in"
+                    , (SalaryCalculator.cityDetail b).name
+                    ]
+                        |> String.join " "
+            in
+            test title <|
+                \() ->
+                    Expect.atLeast
+                        (salary
+                            { defaults
+                                | role = role
+                                , tenure = tenure
+                                , city = b
+                            }
+                        )
+                        (salary
+                            { defaults
+                                | role = role
+                                , tenure = tenure
+                                , city = a
+                            }
+                        )
+    in
+    describe "Salaries are higher in more expensive cities" <|
+        List.map personaSuit personas
+
+
+{-| Helper that given a list of elements returns a list of tuples with two neighboring elements
+
+    pairs [ SanFrancisco, London, Amsterdam, Berlin ]
+    -- [( SanFrancisco, London ), ( London, Amsterdam ), ( Amsterdam, Berlin )]
+
+Used for comparing salaries in different cities.
+
+-}
+pairs : List a -> List ( a, a )
+pairs list =
+    case list of
+        [] ->
+            []
+
+        a :: [] ->
+            []
+
+        a :: b :: rest ->
+            ( a, b ) :: pairs (b :: rest)
