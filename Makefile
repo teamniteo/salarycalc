@@ -19,19 +19,27 @@ install:
 lint: .installed
 	@npx elm-analyse
 
-.PHONY: tests
+.PHONY: test
 test: tests
+
+.PHONY: tests
 tests: .installed
-	@npx elm-coverage
+	@npx elm-coverage --report codecov
+
+.coverage/codecov.json: .installed test
 
 # Run development server
 .PHONY: run
 run: .installed
 	@npx parcel --global SalaryCalculator src/index.html
 
+.PHONY: codecov
+codecov: .coverage/codecov.json
+	npx codecov --disable=gcov --file=.coverage/codecov.json
+
 # Build distribution files and place them where they are expected
 .PHONY: dist
-dist: .installed
+dist: .installed test
 	# For modules (commonjs or ES6)
 	@npx parcel build src/index.js
 	# For html script tags

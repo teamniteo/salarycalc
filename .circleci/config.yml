@@ -47,6 +47,10 @@ jobs:
           command: make tests
 
       - run:
+          name: Generating coverage report
+          command: make codecov
+
+      - run:
           name: Compiling elm.js
           command: make dist
 
