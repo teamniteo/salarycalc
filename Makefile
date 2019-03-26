@@ -56,7 +56,7 @@ publish: dist
 		--no-git-tag-version \
 		prerelease \
 		--preid $(release)
-	@npm publish
+	@npm publish --dry-run
 	@git checkout HEAD package.json package-lock.json
 
 # Nuke from orbit
