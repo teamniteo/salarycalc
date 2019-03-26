@@ -13,9 +13,9 @@ workflows:
       - publish:
           requires:
             - build
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
 
 
 jobs:
@@ -82,8 +82,9 @@ jobs:
           command: npmv=$(echo $(npm -v) | head -c 1); if [ "$npmv" -lt "6" ]; then sudo npm i -g npm; else echo "Node.js Docker Team finally decided to include npm v6+ in latest image; you can remove this script now"; fi
 
       - run:
-          name: (CI Troubleshooting) clean the dependencies cache
+          name: Clean the dependencies cache
           command: make clean
+          # See https://github.com/niteoweb/salarycalc/issues/14
 
       - run:
           name: Publish the package to NPM
