@@ -82,5 +82,9 @@ jobs:
           command: npmv=$(echo $(npm -v) | head -c 1); if [ "$npmv" -lt "6" ]; then sudo npm i -g npm; else echo "Node.js Docker Team finally decided to include npm v6+ in latest image; you can remove this script now"; fi
 
       - run:
+          name: Troubleshooting: clean the dependencies cache
+          command: make clean
+
+      - run:
           name: Publish the package to NPM
           command: make publish
