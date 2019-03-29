@@ -32,7 +32,7 @@ run: .installed
 .PHONY: dist
 dist: .installed
 	mkdir -p dist/
-	cp -r node_modules/salary-calculator/dist/ dist/
+	cp -r node_modules/salary-calculator/dist/* dist/
 	cp custom.html bootstrap-sketchy.min.css dist/
 
 # Nuke from orbit
