@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Niteo Salary Calculator integration example</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="/bootstrap-sketchy.min.css"
+    >
+  </head>
+  <body>
+    <h1>
+      This is a custom integration of Salary Calculator script.
+    </h1>
+    <p>
+      Check out <a href="/">index.html<a> for the straight-out-of-the-box experience.
+    </p>
+
+    <div id="salary-calculator-container">
+      <!-- the app goes here -->
+    </div>
+
+    <script type="text/javascript" src="salary-calculator.js">
+    </script>
+    <script type="text/javascript">
+      SalaryCalculator.init(
+        document.getElementById("salary-calculator-container"
+      ))
+    </script>
+  </body>
+</html>

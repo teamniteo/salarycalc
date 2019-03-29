@@ -60,9 +60,8 @@ publish: dist
 	@git checkout HEAD package.json package-lock.json
 
 .PHONY: website
-website:
-	mkdir -p website/dist/
-	echo "Hello, Netlify" > website/dist/index.html
+website: dist
+	make --directory website/
 
 # Nuke from orbit
 clean:
