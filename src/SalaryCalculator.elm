@@ -1,7 +1,10 @@
 module SalaryCalculator exposing
     ( City(..)
     , Role(..)
+    , cityDetail
+    , init
     , main
+    , roleDetail
     , salary
     , tenureDetail
     )
