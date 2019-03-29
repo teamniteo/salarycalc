@@ -51,7 +51,7 @@ jobs:
           command: make codecov
 
       - run:
-          name: Compiling elm.js
+          name: Compiling salary-calculator.js
           command: make dist
 
       - save_cache:
