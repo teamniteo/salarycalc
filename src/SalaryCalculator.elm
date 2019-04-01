@@ -379,6 +379,14 @@ type alias RoleDetail =
     }
 
 
+{-| Given a Role returns a RoleDetail record containing a human readable name of a role and a base salary.
+
+    roleDetail SoftwareEngineer
+    --> { name = "Software Engineer"
+    --> , baseSalary = 4919
+    --> }
+
+-}
 roleDetail : Role -> RoleDetail
 roleDetail role =
     case role of
@@ -489,6 +497,14 @@ type alias TenureDetail =
     }
 
 
+{-| Given an Int representing number of years returns a TenureDetail record containing a human readable description of the period and a commitment bonus.
+
+    tenureDetail 5
+    --> { name = "5 years"
+    --> , commitmentBonus = 0.1791759469228055
+    --> }
+
+-}
 tenureDetail : Int -> TenureDetail
 tenureDetail years =
     let
