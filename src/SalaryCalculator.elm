@@ -127,7 +127,10 @@ type City
     | Kharkiv
 
 
-{-| Parses a City from a String representation of it's name. Useful for parsing query parameters. If the name is not recognized returns Nothing.
+{-| Parses a City from a String representation of it's name.
+
+Useful for parsing query parameters. If the name is not recognized returns
+Nothing.
 
     cityFromString "NoviSad"
     --> Just NoviSad
@@ -188,7 +191,10 @@ type alias CityDetail =
     }
 
 
-{-| Given a City returns a CityDetail record containing a human readable name and a location factor for calculating salary.
+{-| Given a City returns a CityDetail record.
+
+The record contains a human readable name and a location factor for calculating
+salary.
 
     cityDetail NoviSad
     --> { name = "Novi Sad"
@@ -297,7 +303,10 @@ type Role
     | CustomerSupportSpecialist
 
 
-{-| Parses a Role from a String representation. Useful for parsing query parameters. If the name is not recognized returns Nothing.
+{-| Parses a Role from a String representation.
+
+Useful for parsing query parameters. If the name is not recognized returns
+Nothing.
 
     roleFromString "SeniorOperationsManager"
     --> Just SeniorOperationsManager
@@ -379,7 +388,9 @@ type alias RoleDetail =
     }
 
 
-{-| Given a Role returns a RoleDetail record containing a human readable name of a role and a base salary.
+{-| Given a Role returns a RoleDetail record.
+
+The record contains a human readable name of a role and a base salary.
 
     roleDetail SoftwareEngineer
     --> { name = "Software Engineer"
@@ -497,7 +508,10 @@ type alias TenureDetail =
     }
 
 
-{-| Given an Int representing number of years returns a TenureDetail record containing a human readable description of the period and a commitment bonus.
+{-| Given an Int representing number of years returns a TenureDetail record.
+
+The record contains a human readable description of the period and a commitment
+bonus.
 
     tenureDetail 5
     --> { name = "5 years"
