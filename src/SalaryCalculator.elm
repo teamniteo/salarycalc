@@ -6,6 +6,7 @@ module SalaryCalculator exposing
     , init
     , main
     , roleDetail
+    , roleFromString
     , salary
     , tenureDetail
     )
@@ -296,6 +297,15 @@ type Role
     | CustomerSupportSpecialist
 
 
+{-| Parses a Role from a String representation. Useful for parsing query parameters. If the name is not recognized returns Nothing.
+
+    roleFromString "SeniorOperationsManager"
+    --> Just SeniorOperationsManager
+
+    roleFromString "Ranger"
+    --> Nothing
+
+-}
 roleFromString : String -> Maybe Role
 roleFromString role =
     case role of
