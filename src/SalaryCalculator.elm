@@ -191,7 +191,7 @@ type alias CityDetail =
 
     cityDetail NoviSad
     --> { name = "Novi Sad"
-    --> , locationFactor = 0.82
+    --> , locationFactor = 0.81
     --> }
 
 -}
