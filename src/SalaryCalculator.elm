@@ -187,6 +187,14 @@ type alias CityDetail =
     }
 
 
+{-| Given a City returns a CityDetail record containing a human readable name and a location factor for calculating salary.
+
+    cityDetail NoviSad
+    --> { name = "Novi Sad"
+    --> , locationFactor = 0.82
+    --> }
+
+-}
 cityDetail : City -> CityDetail
 cityDetail city =
     case city of
