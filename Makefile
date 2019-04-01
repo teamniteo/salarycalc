@@ -46,7 +46,7 @@ codecov: .coverage/codecov.json
 
 # Build distribution files and place them where they are expected
 .PHONY: dist
-dist: .installed
+dist: .installed tests
 	# For modules (commonjs or ES6)
 	@npx parcel build src/index.js
 	# For html script tags
