@@ -25,6 +25,7 @@ test: tests
 .PHONY: tests
 tests: .installed
 	@npx elm-coverage --report codecov
+	@npx elm-verify-examples
 
 .coverage/codecov.json: .installed test
 

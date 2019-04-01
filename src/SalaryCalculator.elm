@@ -2,6 +2,7 @@ module SalaryCalculator exposing
     ( City(..)
     , Role(..)
     , cityDetail
+    , cityFromString
     , init
     , main
     , roleDetail
@@ -125,6 +126,15 @@ type City
     | Kharkiv
 
 
+{-| Parses a City from a String representation of it's name. Useful for parsing query parameters. If the name is not recognized returns Nothing.
+
+    cityFromString "NoviSad"
+    --> Just NoviSad
+
+    cityFromString "MinasTirith"
+    --> Nothing
+
+-}
 cityFromString : String -> Maybe City
 cityFromString city =
     case city of
