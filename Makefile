@@ -23,11 +23,17 @@ lint: .installed
 test: tests
 
 .PHONY: tests
-tests: .installed
+tests: .installed doc-tests coverage
+
+.PHONY: coverage
+coverage:
 	@npx elm-coverage --report codecov
+
+.PHONY: doc-tests
+doc-tests: .installed
 	@npx elm-verify-examples
 
-.coverage/codecov.json: .installed test
+.coverage/codecov.json: .installed coverage
 
 # Run development server
 .PHONY: run
