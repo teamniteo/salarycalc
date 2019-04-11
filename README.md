@@ -72,6 +72,10 @@ import * as SalaryCalculator from "salary-calculator"
 
 This way it won't set any globals. The variable will be scoped to the module. Also you don't need to copy anything - just install and import. Otherwise it works the same as the HTML `script` tag.
 
+## What is the purpose of this project?
+
+At Niteo we believe in [open and fair way of doing business](https://niteo.co/about). That's why the salary system is completely transparent. Using this app you can see who earns how much and why. We hope other companies can use it for the same purpose.
+
 ## Hacking
 
 Contributions are welcome.
