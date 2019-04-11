@@ -20,7 +20,10 @@
     <script type="text/javascript" src="./salary-calculator.js">
     </script>
     <script type="text/javascript">
-      SalaryCalculator.init(document.getElementById("app-container"))
+      SalaryCalculator.init(
+        document.getElementById("app-container"),
+        SalaryCalculator.defaults
+      )
     </script>
   </body>
 </html>
