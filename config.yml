@@ -1,0 +1,100 @@
+cities:
+  - name: San Francisco
+    locationFactor: 1.59
+
+  - name: London
+    locationFactor: 1.3
+
+  - name: Amsterdam
+    locationFactor: 1.2
+
+  - name: Berlin
+    locationFactor: 0.99
+
+  - name: Barcelona
+    locationFactor: 0.97
+
+  - name: Lisbon
+    locationFactor: 0.94
+
+  - name: Ljubljana
+    locationFactor: 0.91
+
+  - name: Maribor
+    locationFactor: 0.86
+
+  - name: Bucharest
+    locationFactor: 0.84
+
+  - name: Novi Sad
+    locationFactor: 0.81
+
+  - name: Davao
+    locationFactor: 0.81
+
+  - name: Delhi
+    locationFactor: 0.79
+
+  - name: Kharkiv
+    locationFactor: 0.79
+
+roles:
+  - name: Principal Software Engineer
+    baseSalary: 6184
+
+  - name: Lead Software Engineer
+    baseSalary: 5791
+
+  - name: Software Engineer
+    baseSalary: 4919
+
+  - name: Junior Software Engineer
+    baseSalary: 3795
+
+  - name: Junior Programmer
+    baseSalary: 2506
+
+  - name: Senior Product Marketing Manager
+    baseSalary: 6140
+
+  - name: Product Marketing Manager
+    baseSalary: 5243
+
+  - name: Senior Digital Marketing Specialist
+    baseSalary: 3693
+
+  - name: Digital Marketing Specialist
+    baseSalary: 2955
+
+  - name: Marketing Associate
+    baseSalary: 2446
+
+  - name: Principal Designer
+    baseSalary: 5371
+
+  - name: Lead Designer
+    baseSalary: 4206
+
+  - name: Senior Designer
+    baseSalary: 4066
+
+  - name: Designer
+    baseSalary: 3119
+
+  - name: Junior Designer
+    baseSalary: 2649
+
+  - name: Senior Operations Manager
+    baseSalary: 3903
+
+  - name: Operations Manager
+    baseSalary: 2720
+
+  - name: Technical Support Specialist
+    baseSalary: 1979
+
+  - name: Customer Support Associate
+    baseSalary: 1792
+
+  - name: Customer Support Specialist
+    baseSalary: 1711
