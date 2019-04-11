@@ -3,7 +3,7 @@
 
 # Niteo Salary Calculator
 
-A web app to calculate a salry of a [Niteo](https://niteo.co/) employee. Written in [Elm programming language](https://elm-lang.org/) it runs entirely on the client side.
+A web app to calculate a salary of a [Niteo](https://niteo.co/) employee. Written in [Elm programming language](https://elm-lang.org/) it runs entirely on the client side.
 
 ## Installation
 
