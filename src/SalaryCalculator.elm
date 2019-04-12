@@ -1,12 +1,9 @@
 module SalaryCalculator exposing
-    ( City(..)
-    , Role(..)
-    , cityDetail
+    ( City
+    , Role
     , init
     , main
-    , roleDetail
     , salary
-    , tenureDetail
     )
 
 import Bootstrap.Accordion as Accordion
@@ -16,6 +13,7 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Dropdown as Dropdown
 import Bootstrap.ListGroup as ListGroup
 import Browser
+import Dict exposing (Dict)
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, rowspan)
 import Html.Events exposing (onClick)
@@ -29,11 +27,11 @@ import Url.Parser.Query as QueryParser exposing (int, map3, string)
 -- MODEL
 
 
-init : String -> ( Model, Cmd Msg )
-init locationHref =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     let
         maybeUrl =
-            Url.fromString locationHref
+            Url.fromString flags.location
 
         queryParser =
             QueryParser.map3 Query
@@ -58,20 +56,33 @@ init locationHref =
 
                 Nothing ->
                     { role = Nothing, city = Nothing, years = Nothing }
+
+        roles : Dict String Role
+        roles =
+            flags.config.roles
+                |> List.foldl
+                    (\role dict -> Dict.insert role.name role dict)
+                    Dict.empty
+
+        cities : Dict String City
+        cities =
+            flags.config.cities
+                |> List.foldl
+                    (\role dict -> Dict.insert role.name role dict)
+                    Dict.empty
     in
-    ( { roleDropdown = Dropdown.initialState
+    ( { config = flags.config
+      , roleDropdown = Dropdown.initialState
       , cityDropdown = Dropdown.initialState
       , tenureDropdown = Dropdown.initialState
       , role =
             query.role
-                |> Maybe.map roleFromString
+                |> Maybe.map (\name -> Dict.get name roles)
                 |> Maybe.join
-                |> Maybe.withDefault SoftwareEngineer
       , city =
             query.city
-                |> Maybe.map cityFromString
+                |> Maybe.map (\name -> Dict.get name cities)
                 |> Maybe.join
-                |> Maybe.withDefault Ljubljana
       , tenure =
             query.years
                 |> Maybe.withDefault 2
@@ -79,6 +90,18 @@ init locationHref =
       }
     , Cmd.none
     )
+
+
+type alias Flags =
+    { location : String
+    , config : Config
+    }
+
+
+type alias Config =
+    { cities : List City
+    , roles : List Role
+    }
 
 
 type alias Query =
@@ -99,409 +122,49 @@ type Msg
 
 
 type alias Model =
-    { roleDropdown : Dropdown.State
+    { config : Config
+    , roleDropdown : Dropdown.State
     , cityDropdown : Dropdown.State
     , tenureDropdown : Dropdown.State
-    , role : Role
-    , city : City
+    , role : Maybe Role
+    , city : Maybe City
     , tenure : Int
     , accordionState : Accordion.State
     }
 
 
-type City
-    = SanFrancisco
-    | London
-    | Amsterdam
-    | Berlin
-    | Barcelona
-    | Lisbon
-    | Ljubljana
-    | Maribor
-    | Bucharest
-    | NoviSad
-    | Davao
-    | Delhi
-    | Kharkiv
-
-
-cityFromString : String -> Maybe City
-cityFromString city =
-    case city of
-        "SanFrancisco" ->
-            Just SanFrancisco
-
-        "London" ->
-            Just London
-
-        "Amsterdam" ->
-            Just Amsterdam
-
-        "Berlin" ->
-            Just Berlin
-
-        "Barcelona" ->
-            Just Barcelona
-
-        "Lisbon" ->
-            Just Lisbon
-
-        "Ljubljana" ->
-            Just Ljubljana
-
-        "Maribor" ->
-            Just Maribor
-
-        "Bucharest" ->
-            Just Bucharest
-
-        "NoviSad" ->
-            Just NoviSad
-
-        "Davao" ->
-            Just Davao
-
-        "Delhi" ->
-            Just Delhi
-
-        "Kharkiv" ->
-            Just Kharkiv
-
-        _ ->
-            Nothing
-
-
-type alias CityDetail =
+type alias City =
     { name : String
     , locationFactor : Float
     }
 
 
-cityDetail : City -> CityDetail
-cityDetail city =
-    case city of
-        SanFrancisco ->
-            { name = "San Francisco"
-            , locationFactor = 1.59
-            }
-
-        London ->
-            { name = "London"
-            , locationFactor = 1.3
-            }
-
-        Amsterdam ->
-            { name = "Amsterdam"
-            , locationFactor = 1.2
-            }
-
-        Berlin ->
-            { name = "Berlin"
-            , locationFactor = 0.99
-            }
-
-        Barcelona ->
-            { name = "Barcelona"
-            , locationFactor = 0.97
-            }
-
-        Lisbon ->
-            { name = "Lisbon"
-            , locationFactor = 0.94
-            }
-
-        Ljubljana ->
-            { name = "Ljubljana"
-            , locationFactor = 0.91
-            }
-
-        Maribor ->
-            { name = "Maribor"
-            , locationFactor = 0.86
-            }
-
-        Bucharest ->
-            { name = "Bucharest"
-            , locationFactor = 0.84
-            }
-
-        NoviSad ->
-            { name = "Novi Sad"
-            , locationFactor = 0.81
-            }
-
-        Davao ->
-            { name = "Davao"
-            , locationFactor = 0.81
-            }
-
-        Delhi ->
-            { name = "Delhi"
-            , locationFactor = 0.79
-            }
-
-        Kharkiv ->
-            { name = "Kharkiv"
-            , locationFactor = 0.79
-            }
-
-
-locationFactor : City -> Float
-locationFactor city =
-    let
-        detail =
-            cityDetail city
-    in
-    detail.locationFactor
-
-
-type Role
-    = PrincipalSoftwareEngineer
-    | LeadSoftwareEngineer
-    | SoftwareEngineer
-    | JuniorSoftwareEngineer
-    | JuniorProgrammer
-    | SeniorProductMarketingManager
-    | ProductMarketingManager
-    | SeniorDigitalMarketingSpecialist
-    | DigitalMarketingSpecialist
-    | MarketingAssociate
-    | PrincipalDesigner
-    | LeadDesigner
-    | SeniorDesigner
-    | Designer
-    | JuniorDesigner
-    | SeniorOperationsManager
-    | OperationsManager
-    | TechnicalSupportSpecialist
-    | CustomerSupportAssociate
-    | CustomerSupportSpecialist
-
-
-roleFromString : String -> Maybe Role
-roleFromString role =
-    case role of
-        "PrincipalSoftwareEngineer" ->
-            Just PrincipalSoftwareEngineer
-
-        "LeadSoftwareEngineer" ->
-            Just LeadSoftwareEngineer
-
-        "SoftwareEngineer" ->
-            Just SoftwareEngineer
-
-        "JuniorSoftwareEngineer" ->
-            Just JuniorSoftwareEngineer
-
-        "JuniorProgrammer" ->
-            Just JuniorProgrammer
-
-        "SeniorProductMarketingManager" ->
-            Just SeniorProductMarketingManager
-
-        "ProductMarketingManager" ->
-            Just ProductMarketingManager
-
-        "SeniorDigitalMarketingSpecialist" ->
-            Just SeniorDigitalMarketingSpecialist
-
-        "DigitalMarketingSpecialist" ->
-            Just DigitalMarketingSpecialist
-
-        "MarketingAssociate" ->
-            Just MarketingAssociate
-
-        "PrincipalDesigner" ->
-            Just PrincipalDesigner
-
-        "LeadDesigner" ->
-            Just LeadDesigner
-
-        "SeniorDesigner" ->
-            Just SeniorDesigner
-
-        "Designer" ->
-            Just Designer
-
-        "JuniorDesigner" ->
-            Just JuniorDesigner
-
-        "SeniorOperationsManager" ->
-            Just SeniorOperationsManager
-
-        "OperationsManager" ->
-            Just OperationsManager
-
-        "TechnicalSupportSpecialist" ->
-            Just TechnicalSupportSpecialist
-
-        "CustomerSupportAssociate" ->
-            Just CustomerSupportAssociate
-
-        "CustomerSupportSpecialist" ->
-            Just CustomerSupportSpecialist
-
-        _ ->
-            Nothing
-
-
-type alias RoleDetail =
+type alias Role =
     { name : String
-    , baseSalary : Int
+    , baseSalary : Float
     }
 
 
-roleDetail : Role -> RoleDetail
-roleDetail role =
-    case role of
-        PrincipalSoftwareEngineer ->
-            { name = "Principal Software Engineer"
-            , baseSalary = 6184
-            }
-
-        LeadSoftwareEngineer ->
-            { name = "Lead Software Engineer"
-            , baseSalary = 5791
-            }
-
-        SoftwareEngineer ->
-            { name = "Software Engineer"
-            , baseSalary = 4919
-            }
-
-        JuniorSoftwareEngineer ->
-            { name = "Junior Software Engineer"
-            , baseSalary = 3795
-            }
-
-        JuniorProgrammer ->
-            { name = "Junior Programmer"
-            , baseSalary = 2506
-            }
-
-        SeniorProductMarketingManager ->
-            { name = "Senior Product Marketing Manager"
-            , baseSalary = 6140
-            }
-
-        ProductMarketingManager ->
-            { name = "Product Marketing Manager"
-            , baseSalary = 5243
-            }
-
-        SeniorDigitalMarketingSpecialist ->
-            { name = "Senior Digital Marketing Specialist"
-            , baseSalary = 3693
-            }
-
-        DigitalMarketingSpecialist ->
-            { name = "Digital Marketing Specialist"
-            , baseSalary = 2955
-            }
-
-        MarketingAssociate ->
-            { name = "Marketing Associate"
-            , baseSalary = 2446
-            }
-
-        PrincipalDesigner ->
-            { name = "Principal Designer"
-            , baseSalary = 5371
-            }
-
-        LeadDesigner ->
-            { name = "Lead Designer"
-            , baseSalary = 4206
-            }
-
-        SeniorDesigner ->
-            { name = "Senior Designer"
-            , baseSalary = 4066
-            }
-
-        Designer ->
-            { name = "Designer"
-            , baseSalary = 3119
-            }
-
-        JuniorDesigner ->
-            { name = "Junior Designer"
-            , baseSalary = 2649
-            }
-
-        SeniorOperationsManager ->
-            { name = "Senior Operations Manager"
-            , baseSalary = 3903
-            }
-
-        OperationsManager ->
-            { name = "Operations Manager"
-            , baseSalary = 2720
-            }
-
-        TechnicalSupportSpecialist ->
-            { name = "Technical Support Specialist"
-            , baseSalary = 1979
-            }
-
-        CustomerSupportAssociate ->
-            { name = "Customer Support Associate"
-            , baseSalary = 1792
-            }
-
-        CustomerSupportSpecialist ->
-            { name = "Customer Support Specialist"
-            , baseSalary = 1711
-            }
+commitmentBonus : Int -> Float
+commitmentBonus years =
+    logBase e (toFloat years + 1) / 10
 
 
-type alias TenureDetail =
-    { name : String
-    , commitmentBonus : Float
-    }
-
-
-tenureDetail : Int -> TenureDetail
-tenureDetail years =
-    let
-        commitmentBonus =
-            logBase e (toFloat years + 1) / 10
-    in
+tenureDescription : Int -> String
+tenureDescription years =
     if years < 1 then
-        { name = "Just started"
-        , commitmentBonus = 0
-        }
+        "Just started"
 
     else if years == 1 then
-        { name = String.fromInt years ++ " year"
-        , commitmentBonus = commitmentBonus
-        }
+        String.fromInt years ++ " year"
 
     else
-        { name = String.fromInt years ++ " years"
-        , commitmentBonus = commitmentBonus
-        }
+        String.fromInt years ++ " years"
 
 
-baseSalary : Role -> Int
-baseSalary role =
-    let
-        detail =
-            roleDetail role
-    in
-    detail.baseSalary
-
-
-salary : Model -> Int
-salary model =
-    let
-        detail =
-            tenureDetail model.tenure
-
-        commitmentBonus =
-            detail.commitmentBonus
-    in
-    round (toFloat (baseSalary model.role) * locationFactor model.city + toFloat (baseSalary model.role) * commitmentBonus)
+salary : Role -> City -> Int -> Int
+salary role city tenure =
+    round (role.baseSalary * city.locationFactor + role.baseSalary * commitmentBonus tenure)
 
 
 
@@ -527,10 +190,10 @@ update msg model =
             )
 
         RoleSelected role ->
-            ( { model | role = role }, Cmd.none )
+            ( { model | role = Just role }, Cmd.none )
 
         CitySelected city ->
-            ( { model | city = city }, Cmd.none )
+            ( { model | city = Just city }, Cmd.none )
 
         TenureSelected years ->
             ( { model | tenure = years }, Cmd.none )
@@ -563,13 +226,35 @@ view model =
                 , options = [ Card.outlineLight ]
                 , header =
                     Accordion.header []
-                        (Accordion.toggle [ class "p-0" ] [ span [] [ text "Okay, let's break that down ..." ] ])
+                        (Accordion.toggle [ class "p-0" ]
+                            [ span []
+                                [ if model.role /= Nothing && model.city /= Nothing then
+                                    text "Okay, let's break that down ..."
+
+                                  else
+                                    Html.text ""
+                                ]
+                            ]
+                        )
                         |> Accordion.prependHeader
                             (viewHeader model)
                 , blocks =
-                    [ Accordion.block []
-                        [ Block.text [] [ viewBreakdown model ] ]
-                    ]
+                    case ( model.role, model.city ) of
+                        ( Nothing, Nothing ) ->
+                            []
+
+                        ( Nothing, _ ) ->
+                            []
+
+                        ( _, Nothing ) ->
+                            []
+
+                        ( Just role, Just city ) ->
+                            [ Accordion.block []
+                                [ Block.text []
+                                    [ viewBreakdown role city model.tenure ]
+                                ]
+                            ]
                 }
             ]
         |> Accordion.view model.accordionState
@@ -578,35 +263,16 @@ view model =
 viewHeader : Model -> List (Html Msg)
 viewHeader model =
     let
-        roleName role =
-            let
-                detail =
-                    roleDetail role
-            in
-            detail.name
-
         roleItem role =
-            Dropdown.buttonItem [ onClick (RoleSelected role) ] [ text (roleName role) ]
-
-        cityName city =
-            let
-                detail =
-                    cityDetail city
-            in
-            detail.name
+            Dropdown.buttonItem [ onClick (RoleSelected role) ] [ text role.name ]
 
         cityItem city =
-            Dropdown.buttonItem [ onClick (CitySelected city) ] [ text (cityName city) ]
-
-        tenureName years =
-            let
-                detail =
-                    tenureDetail years
-            in
-            detail.name
+            Dropdown.buttonItem [ onClick (CitySelected city) ] [ text city.name ]
 
         tenureItem years =
-            Dropdown.buttonItem [ onClick (TenureSelected years) ] [ text (tenureName years) ]
+            Dropdown.buttonItem [ onClick (TenureSelected years) ]
+                [ text (tenureDescription years)
+                ]
     in
     [ p [ class "lead" ]
         [ text "I'm a "
@@ -614,62 +280,68 @@ viewHeader model =
             { options = []
             , toggleMsg = RoleDropdownChanged
             , toggleButton =
-                Dropdown.toggle [ Button.outlinePrimary ] [ viewRole model.role ]
+                Dropdown.toggle [ Button.outlinePrimary ]
+                    [ model.role
+                        |> Maybe.map .name
+                        |> Maybe.withDefault "select role"
+                        |> text
+                    ]
             , items =
-                [ Dropdown.header [ text "Design Career" ]
-                , roleItem JuniorDesigner
-                , roleItem Designer
-                , roleItem SeniorDesigner
-                , roleItem LeadDesigner
-                , roleItem PrincipalDesigner
-                , Dropdown.header [ text "Marketing Career" ]
-                , roleItem MarketingAssociate
-                , roleItem DigitalMarketingSpecialist
-                , roleItem SeniorDigitalMarketingSpecialist
-                , roleItem ProductMarketingManager
-                , roleItem SeniorProductMarketingManager
-                , Dropdown.header [ text "Operations Career" ]
-                , roleItem CustomerSupportSpecialist
-                , roleItem CustomerSupportAssociate
-                , roleItem TechnicalSupportSpecialist
-                , roleItem OperationsManager
-                , roleItem SeniorOperationsManager
-                , Dropdown.header [ text "Technical Career" ]
-                , roleItem JuniorProgrammer
-                , roleItem JuniorSoftwareEngineer
-                , roleItem SoftwareEngineer
-                , roleItem LeadSoftwareEngineer
-                , roleItem PrincipalSoftwareEngineer
-                ]
+                model.config.roles
+                    |> List.map roleItem
+
+            -- TODO: Career groups
+            -- [ Dropdown.header [ text "Design Career" ]
+            -- , roleItem JuniorDesigner
+            -- , roleItem Designer
+            -- , roleItem SeniorDesigner
+            -- , roleItem LeadDesigner
+            -- , roleItem PrincipalDesigner
+            -- , Dropdown.header [ text "Marketing Career" ]
+            -- , roleItem MarketingAssociate
+            -- , roleItem DigitalMarketingSpecialist
+            -- , roleItem SeniorDigitalMarketingSpecialist
+            -- , roleItem ProductMarketingManager
+            -- , roleItem SeniorProductMarketingManager
+            -- , Dropdown.header [ text "Operations Career" ]
+            -- , roleItem CustomerSupportSpecialist
+            -- , roleItem CustomerSupportAssociate
+            -- , roleItem TechnicalSupportSpecialist
+            -- , roleItem OperationsManager
+            -- , roleItem SeniorOperationsManager
+            -- , Dropdown.header [ text "Technical Career" ]
+            -- , roleItem JuniorProgrammer
+            -- , roleItem JuniorSoftwareEngineer
+            -- , roleItem SoftwareEngineer
+            -- , roleItem LeadSoftwareEngineer
+            -- , roleItem PrincipalSoftwareEngineer
+            -- ]
             }
         , text " living in "
         , Dropdown.dropdown model.cityDropdown
             { options = []
             , toggleMsg = CityDropdownChanged
             , toggleButton =
-                Dropdown.toggle [ Button.outlinePrimary ] [ viewCity model.city ]
+                Dropdown.toggle [ Button.outlinePrimary ]
+                    [ model.city
+                        |> Maybe.map .name
+                        |> Maybe.withDefault "select a city"
+                        |> text
+                    ]
             , items =
-                [ cityItem Amsterdam
-                , cityItem Barcelona
-                , cityItem Berlin
-                , cityItem Bucharest
-                , cityItem Davao
-                , cityItem Delhi
-                , cityItem Kharkiv
-                , cityItem Lisbon
-                , cityItem Ljubljana
-                , cityItem London
-                , cityItem Maribor
-                , cityItem NoviSad
-                , cityItem SanFrancisco
-                ]
+                model.config.cities
+                    |> List.map cityItem
             }
         , text " with a tenure at Niteo of "
         , Dropdown.dropdown model.tenureDropdown
             { options = []
             , toggleMsg = TenureDropdownChanged
             , toggleButton =
-                Dropdown.toggle [ Button.outlinePrimary ] [ viewTenure model.tenure ]
+                Dropdown.toggle [ Button.outlinePrimary ]
+                    [ model.tenure
+                        |> String.fromInt
+                        |> text
+                    ]
             , items =
                 [ tenureItem 0
                 , tenureItem 1
@@ -707,28 +379,99 @@ viewPluralizedYears years =
 
 viewSalary : Model -> Html Msg
 viewSalary model =
-    span []
-        [ text "My monthly gross salary is "
-        , span [ class "font-weight-bold" ] [ String.fromInt (salary model) ++ " €." |> text ]
-        ]
+    case ( model.role, model.city ) of
+        ( Nothing, Nothing ) ->
+            text "Please select a role and a city."
+
+        ( Nothing, _ ) ->
+            text "Please select a role."
+
+        ( _, Nothing ) ->
+            text "Please select a city."
+
+        ( Just role, Just city ) ->
+            span []
+                [ text "My monthly gross salary is "
+                , span [ class "font-weight-bold" ]
+                    [ salary role city model.tenure
+                        |> String.fromInt
+                        |> text
+                    , text " €"
+                    ]
+                , text "."
+                ]
 
 
-viewBreakdown : Model -> Html Msg
-viewBreakdown model =
+viewBreakdown : Role -> City -> Int -> Html Msg
+viewBreakdown role city tenure =
     div []
         [ table [ class "table" ]
             [ tr []
-                [ td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text "(" ]
-                , td [ class "border-0 p-0 text-center lead" ] [ viewBaseSalary model.role ]
-                , td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text "x" ]
-                , td [ class "border-0 p-0 text-center lead" ] [ viewLocationFactor model.city ]
-                , td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text ")" ]
-                , td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text "+" ]
-                , td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text "(" ]
-                , td [ class "border-0 p-0 text-center lead" ] [ viewBaseSalary model.role ]
-                , td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text "x" ]
-                , td [ class "border-0 p-0 text-center lead" ] [ viewCommitmentBonus model.tenure ]
-                , td [ class "border-0 p-0 text-center align-middle display-4", rowspan 2 ] [ text ")" ]
+                [ td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text "(" ]
+                , td
+                    [ class "border-0 p-0 text-center lead"
+                    ]
+                    [ role.baseSalary
+                        |> String.fromFloat
+                        |> text
+                    ]
+                , td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text "x" ]
+                , td
+                    [ class "border-0 p-0 text-center lead"
+                    ]
+                    [ city.locationFactor
+                        |> String.fromFloat
+                        |> text
+                    ]
+                , td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text ")" ]
+                , td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text "+" ]
+                , td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text "(" ]
+                , td
+                    [ class "border-0 p-0 text-center lead"
+                    ]
+                    [ role.baseSalary
+                        |> String.fromFloat
+                        |> text
+                    ]
+                , td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text "x" ]
+                , td
+                    [ class "border-0 p-0 text-center lead"
+                    ]
+                    [ tenure
+                        |> commitmentBonus
+                        |> toPrecision 2
+                        |> String.fromFloat
+                        |> text
+                    ]
+                , td
+                    [ class "border-0 p-0 text-center align-middle display-4"
+                    , rowspan 2
+                    ]
+                    [ text ")" ]
                 ]
             , tr []
                 [ td [ class "border-0 p-0 text-center text-muted" ] [ text "(base salary)" ]
@@ -738,67 +481,68 @@ viewBreakdown model =
                 ]
             ]
         , ListGroup.ul
-            [ ListGroup.li [] [ span [ class "font-weight-bold" ] [ text "Base Salary: " ], text "San Francisco 50th percentile for ", mark [] [ viewRole model.role ], text " on Glassdoor, discounted by our Affordability Ratio of 0.53." ]
-            , ListGroup.li [] [ span [ class "font-weight-bold" ] [ text "Location Factor: " ], text "Numbeo Cost of Living in ", mark [] [ viewCity model.city ], text " compared to San Francisco, compressed and normalized against our Affordability Ratio of 0.53." ]
-            , ListGroup.li [] [ span [ class "font-weight-bold" ] [ text "Commitment Bonus: " ], text "Natural logarithm of ", mark [] [ viewTenure model.tenure ], text " years of your tenure, divided by 10." ]
-            , ListGroup.li [] [ span [ class "font-weight-bold" ] [ text "Affordability Ratio: " ], text "Average Cost of Living index compared to San Francisco, for four major European tech hubs: Amsterdam, Berlin, Barcelona, Lisbon." ]
+            [ ListGroup.li []
+                [ span
+                    [ class "font-weight-bold"
+                    ]
+                    [ text "Base Salary: " ]
+                , text "San Francisco 50th percentile for "
+                , mark [] [ text role.name ]
+                , text " on Glassdoor, discounted by our Affordability Ratio of 0.53."
+                ]
+            , ListGroup.li []
+                [ span
+                    [ class "font-weight-bold"
+                    ]
+                    [ text "Location Factor: " ]
+                , text "Numbeo Cost of Living in "
+                , mark [] [ text city.name ]
+                , text " compared to San Francisco, compressed and normalized against our Affordability Ratio of 0.53."
+                ]
+            , ListGroup.li []
+                [ span
+                    [ class "font-weight-bold"
+                    ]
+                    [ text "Commitment Bonus: " ]
+                , text "Natural logarithm of "
+                , mark []
+                    [ tenure
+                        |> String.fromInt
+                        |> text
+                    ]
+                , text " years of your tenure, divided by 10."
+                ]
+            , ListGroup.li []
+                [ span
+                    [ class "font-weight-bold"
+                    ]
+                    [ text "Affordability Ratio: " ]
+                , text "Average Cost of Living index compared to San Francisco, for four major European tech hubs: Amsterdam, Berlin, Barcelona, Lisbon."
+                ]
             ]
         ]
 
 
-viewRole : Role -> Html Msg
-viewRole role =
+toPrecision : Int -> Float -> Float
+toPrecision precision number =
     let
-        detail =
-            roleDetail role
+        factor =
+            precision
+                |> toFloat
+                |> (^) 10
     in
-    text detail.name
-
-
-viewCity : City -> Html Msg
-viewCity city =
-    let
-        detail =
-            cityDetail city
-    in
-    text detail.name
-
-
-viewTenure : Int -> Html Msg
-viewTenure years =
-    String.fromInt years
-        |> text
-
-
-viewBaseSalary : Role -> Html Msg
-viewBaseSalary role =
-    String.fromInt (baseSalary role)
-        |> text
-
-
-viewLocationFactor : City -> Html Msg
-viewLocationFactor city =
-    String.fromFloat (locationFactor city)
-        |> text
-
-
-viewCommitmentBonus : Int -> Html Msg
-viewCommitmentBonus years =
-    let
-        detail =
-            tenureDetail years
-
-        percentage =
-            toFloat (round (detail.commitmentBonus * 1000)) / 10
-    in
-    text (String.fromFloat percentage ++ "%")
+    number
+        * factor
+        |> Basics.truncate
+        |> toFloat
+        |> (\n -> n / factor)
 
 
 
 -- MAIN
 
 
-main : Program String Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init

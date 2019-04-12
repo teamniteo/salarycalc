@@ -6,7 +6,7 @@ const program = Elm.SalaryCalculator
 export function init(node, config = config) {
   program.init({
       flags: {
-        url: location.href,
+        location: location.href,
         config
       },
       node
