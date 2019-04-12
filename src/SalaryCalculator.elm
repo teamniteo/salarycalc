@@ -59,7 +59,9 @@ init flags =
 
         roles : Dict String Role
         roles =
-            flags.config.roles
+            flags.config.careers
+                |> List.map .roles
+                |> List.concat
                 |> List.foldl
                     (\role dict -> Dict.insert role.name role dict)
                     Dict.empty
@@ -100,6 +102,12 @@ type alias Flags =
 
 type alias Config =
     { cities : List City
+    , careers : List Career
+    }
+
+
+type alias Career =
+    { name : String
     , roles : List Role
     }
 
@@ -287,35 +295,13 @@ viewHeader model =
                         |> text
                     ]
             , items =
-                model.config.roles
-                    |> List.map roleItem
-
-            -- TODO: Career groups
-            -- [ Dropdown.header [ text "Design Career" ]
-            -- , roleItem JuniorDesigner
-            -- , roleItem Designer
-            -- , roleItem SeniorDesigner
-            -- , roleItem LeadDesigner
-            -- , roleItem PrincipalDesigner
-            -- , Dropdown.header [ text "Marketing Career" ]
-            -- , roleItem MarketingAssociate
-            -- , roleItem DigitalMarketingSpecialist
-            -- , roleItem SeniorDigitalMarketingSpecialist
-            -- , roleItem ProductMarketingManager
-            -- , roleItem SeniorProductMarketingManager
-            -- , Dropdown.header [ text "Operations Career" ]
-            -- , roleItem CustomerSupportSpecialist
-            -- , roleItem CustomerSupportAssociate
-            -- , roleItem TechnicalSupportSpecialist
-            -- , roleItem OperationsManager
-            -- , roleItem SeniorOperationsManager
-            -- , Dropdown.header [ text "Technical Career" ]
-            -- , roleItem JuniorProgrammer
-            -- , roleItem JuniorSoftwareEngineer
-            -- , roleItem SoftwareEngineer
-            -- , roleItem LeadSoftwareEngineer
-            -- , roleItem PrincipalSoftwareEngineer
-            -- ]
+                model.config.careers
+                    |> List.map
+                        (\{ name, roles } ->
+                            Dropdown.header [ text (name ++ " Career") ]
+                                :: List.map roleItem roles
+                        )
+                    |> List.concat
             }
         , text " living in "
         , Dropdown.dropdown model.cityDropdown

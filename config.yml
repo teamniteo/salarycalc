@@ -38,63 +38,71 @@ cities:
   - name: Kharkiv
     locationFactor: 0.79
 
-roles:
-  - name: Principal Software Engineer
-    baseSalary: 6184
+careers:
+  - name: Technical
+    roles:
+      - name: Principal Software Engineer
+        baseSalary: 6184
 
-  - name: Lead Software Engineer
-    baseSalary: 5791
+      - name: Lead Software Engineer
+        baseSalary: 5791
 
-  - name: Software Engineer
-    baseSalary: 4919
+      - name: Software Engineer
+        baseSalary: 4919
 
-  - name: Junior Software Engineer
-    baseSalary: 3795
+      - name: Junior Software Engineer
+        baseSalary: 3795
 
-  - name: Junior Programmer
-    baseSalary: 2506
+      - name: Junior Programmer
+        baseSalary: 2506
 
-  - name: Senior Product Marketing Manager
-    baseSalary: 6140
+  - name: Marketing
+    roles:
+      - name: Senior Product Marketing Manager
+        baseSalary: 6140
 
-  - name: Product Marketing Manager
-    baseSalary: 5243
+      - name: Product Marketing Manager
+        baseSalary: 5243
 
-  - name: Senior Digital Marketing Specialist
-    baseSalary: 3693
+      - name: Senior Digital Marketing Specialist
+        baseSalary: 3693
 
-  - name: Digital Marketing Specialist
-    baseSalary: 2955
+      - name: Digital Marketing Specialist
+        baseSalary: 2955
 
-  - name: Marketing Associate
-    baseSalary: 2446
+      - name: Marketing Associate
+        baseSalary: 2446
 
-  - name: Principal Designer
-    baseSalary: 5371
+  - name: Design
+    roles:
+      - name: Principal Designer
+        baseSalary: 5371
 
-  - name: Lead Designer
-    baseSalary: 4206
+      - name: Lead Designer
+        baseSalary: 4206
 
-  - name: Senior Designer
-    baseSalary: 4066
+      - name: Senior Designer
+        baseSalary: 4066
 
-  - name: Designer
-    baseSalary: 3119
+      - name: Designer
+        baseSalary: 3119
 
-  - name: Junior Designer
-    baseSalary: 2649
+      - name: Junior Designer
+        baseSalary: 2649
 
-  - name: Senior Operations Manager
-    baseSalary: 3903
+  - name: Operations
+    roles:
+      - name: Senior Operations Manager
+        baseSalary: 3903
 
-  - name: Operations Manager
-    baseSalary: 2720
+      - name: Operations Manager
+        baseSalary: 2720
 
-  - name: Technical Support Specialist
-    baseSalary: 1979
+      - name: Technical Support Specialist
+        baseSalary: 1979
 
-  - name: Customer Support Associate
-    baseSalary: 1792
+      - name: Customer Support Associate
+        baseSalary: 1792
 
-  - name: Customer Support Specialist
-    baseSalary: 1711
+      - name: Customer Support Specialist
+        baseSalary: 1711
