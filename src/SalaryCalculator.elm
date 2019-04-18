@@ -4,6 +4,7 @@ module SalaryCalculator exposing
     , commitmentBonus
     , humanizeCommitmentBonus
     , init
+    , lookupByName
     , main
     , salary
     )
