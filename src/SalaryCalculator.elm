@@ -12,6 +12,7 @@ module SalaryCalculator exposing
     , main
     , salary
     , update
+    , viewPluralizedYears
     )
 
 import Bootstrap.Accordion as Accordion
