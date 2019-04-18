@@ -2,6 +2,7 @@ module SalaryCalculator exposing
     ( City
     , Role
     , commitmentBonus
+    , humanizeCommitmentBonus
     , init
     , main
     , salary
@@ -534,6 +535,16 @@ viewSalary model =
                 ]
 
 
+humanizeCommitmentBonus : Float -> String
+humanizeCommitmentBonus bonus =
+    (bonus
+        |> (*) 100
+        |> round
+        |> String.fromInt
+    )
+        ++ "%"
+
+
 viewBreakdown : Role -> City -> Int -> Html Msg
 viewBreakdown role city tenure =
     div []
@@ -595,8 +606,7 @@ viewBreakdown role city tenure =
                     ]
                     [ tenure
                         |> commitmentBonus
-                        |> toPrecision 2
-                        |> String.fromFloat
+                        |> humanizeCommitmentBonus
                         |> text
                     ]
                 , td
@@ -653,21 +663,6 @@ viewBreakdown role city tenure =
                 ]
             ]
         ]
-
-
-toPrecision : Int -> Float -> Float
-toPrecision precision number =
-    let
-        factor =
-            precision
-                |> toFloat
-                |> (^) 10
-    in
-    number
-        * factor
-        |> Basics.truncate
-        |> toFloat
-        |> (\n -> n / factor)
 
 
 
