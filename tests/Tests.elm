@@ -1,6 +1,7 @@
 module Tests exposing
     ( testCommitmentBonus
     , testHumanizeCommitmentBonus
+    , testHumanizeTenure
     , testLookupByName
     , testSalary
     )
@@ -10,7 +11,7 @@ import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import List.Extra as List
-import SalaryCalculator exposing (City, Role, commitmentBonus, humanizeCommitmentBonus, lookupByName, salary)
+import SalaryCalculator exposing (City, Role, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary)
 import Test exposing (..)
 
 
@@ -87,4 +88,22 @@ testLookupByName =
             \_ ->
                 lookupByName "bla" [ { name = "foo" }, { name = "bar" } ]
                     |> Expect.equal Nothing
+        ]
+
+
+testHumanizeTenure : Test
+testHumanizeTenure =
+    describe "Tenure has a properly pluralized 'years' suffix"
+        [ test "0" <|
+            \_ ->
+                humanizeTenure 0
+                    |> Expect.equal "Just started"
+        , test "0.011" <|
+            \_ ->
+                humanizeTenure 1
+                    |> Expect.equal "1 year"
+        , test "0.125" <|
+            \_ ->
+                humanizeTenure 5
+                    |> Expect.equal "5 years"
         ]

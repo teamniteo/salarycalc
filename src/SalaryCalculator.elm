@@ -3,6 +3,7 @@ module SalaryCalculator exposing
     , Role
     , commitmentBonus
     , humanizeCommitmentBonus
+    , humanizeTenure
     , init
     , lookupByName
     , main
@@ -271,8 +272,8 @@ commitmentBonus years =
     logBase e (toFloat years + 1) / 10
 
 
-tenureDescription : Int -> String
-tenureDescription years =
+humanizeTenure : Int -> String
+humanizeTenure years =
     if years < 1 then
         "Just started"
 
@@ -427,8 +428,7 @@ viewHeader model =
 
         tenureItem years =
             Dropdown.buttonItem [ onClick (TenureSelected years) ]
-                [ text (tenureDescription years)
-                ]
+                [ humanizeTenure years |> text ]
     in
     [ p [ class "lead" ]
         [ text "I'm a "
