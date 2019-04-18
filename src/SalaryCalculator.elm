@@ -94,7 +94,7 @@ init flags =
                             case query.role of
                                 Just roleName ->
                                     lookupByName roleName roles
-                                        |> Result.fromMaybe ("Invalid role: " ++ roleName)
+                                        |> Result.fromMaybe (Warning ("Invalid role provided via URL: " ++ roleName ++ ". Please choose one from the dropdown below.") RoleField)
                                         |> Result.map Just
 
                                 Nothing ->
@@ -105,7 +105,7 @@ init flags =
                             case query.city of
                                 Just cityName ->
                                     lookupByName cityName config.cities
-                                        |> Result.fromMaybe ("Invalid city: " ++ cityName)
+                                        |> Result.fromMaybe (Warning ("Invalid city provided via URL: " ++ cityName ++ ". Please choose one from the dropdown below.") CityField)
                                         |> Result.map Just
 
                                 Nothing ->
@@ -237,8 +237,15 @@ type Msg
     | AccordionMsg Accordion.State
 
 
+type Field
+    = RoleField
+    | CityField
+
+
 type alias Warning =
-    String
+    { msg : String
+    , field : Field
+    }
 
 
 type alias Model =
@@ -301,10 +308,24 @@ update msg model =
             )
 
         RoleSelected role ->
-            ( { model | role = Just role, warnings = [] }, Cmd.none )
+            ( { model
+                | role = Just role
+                , warnings =
+                    model.warnings
+                        |> List.filter (\warning -> warning.field /= RoleField)
+              }
+            , Cmd.none
+            )
 
         CitySelected city ->
-            ( { model | city = Just city }, Cmd.none )
+            ( { model
+                | city = Just city
+                , warnings =
+                    model.warnings
+                        |> List.filter (\warning -> warning.field /= CityField)
+              }
+            , Cmd.none
+            )
 
         TenureSelected years ->
             ( { model | tenure = years }, Cmd.none )
@@ -385,6 +406,7 @@ view model =
 viewWarnings : List Warning -> Html Msg
 viewWarnings warnings =
     warnings
+        |> List.map .msg
         |> List.map text
         |> List.map List.singleton
         |> List.map (Alert.simpleWarning [])
@@ -414,7 +436,7 @@ viewHeader model =
                 Dropdown.toggle [ Button.outlinePrimary ]
                     [ model.role
                         |> Maybe.map .name
-                        |> Maybe.withDefault "select role"
+                        |> Maybe.withDefault "select a role"
                         |> text
                     ]
             , items =
