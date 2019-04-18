@@ -1,9 +1,7 @@
 module Tests exposing
     ( testCommitmentBonus
-    ,  testHumanizeCommitmentBonus
-       --, cityImpact
-       --, tenureImpact
-
+    , testHumanizeCommitmentBonus
+    , testLookupByName
     , testSalary
     )
 
@@ -12,7 +10,7 @@ import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import List.Extra as List
-import SalaryCalculator exposing (City, Role, commitmentBonus, humanizeCommitmentBonus, salary)
+import SalaryCalculator exposing (City, Role, commitmentBonus, humanizeCommitmentBonus, lookupByName, salary)
 import Test exposing (..)
 
 
@@ -75,4 +73,18 @@ testHumanizeCommitmentBonus =
             \_ ->
                 humanizeCommitmentBonus 0.125
                     |> Expect.equal "13%"
+        ]
+
+
+testLookupByName : Test
+testLookupByName =
+    describe "Get item in list based on name"
+        [ test "item exists" <|
+            \_ ->
+                lookupByName "foo" [ { name = "foo" }, { name = "bar" } ]
+                    |> Expect.equal (Just { name = "foo" })
+        , test "item does not exist" <|
+            \_ ->
+                lookupByName "bla" [ { name = "foo" }, { name = "bar" } ]
+                    |> Expect.equal Nothing
         ]
