@@ -1,6 +1,7 @@
 module SalaryCalculator exposing
     ( City
     , Role
+    , commitmentBonus
     , init
     , main
     , salary
