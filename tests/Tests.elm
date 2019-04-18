@@ -4,15 +4,19 @@ module Tests exposing
     , testHumanizeTenure
     , testLookupByName
     , testSalary
+    , testViewPluralizedYears
     )
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
+import Html
 import List.Extra as List
-import SalaryCalculator exposing (City, Field(..), Msg(..), Role, Warning, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary, update)
+import SalaryCalculator exposing (City, Field(..), Msg(..), Role, Warning, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary, update, viewPluralizedYears)
 import Test exposing (..)
+import Test.Html.Query as Query
+import Test.Html.Selector exposing (tag, text)
 
 
 testSalary : Test
@@ -148,4 +152,25 @@ hideWarnings =
                     |> Tuple.first
                     |> .warnings
                     |> Expect.equal [ Warning "foo" RoleField ]
+        ]
+
+
+testViewPluralizedYears : Test
+testViewPluralizedYears =
+    describe "HTML for tenure dropdown suffix"
+        [ test "0" <|
+            \_ ->
+                viewPluralizedYears 0
+                    |> Query.fromHtml
+                    |> Query.has [ text " years." ]
+        , test "1" <|
+            \_ ->
+                viewPluralizedYears 1
+                    |> Query.fromHtml
+                    |> Query.has [ text " year." ]
+        , test "5" <|
+            \_ ->
+                viewPluralizedYears 5
+                    |> Query.fromHtml
+                    |> Query.has [ text " years." ]
         ]
