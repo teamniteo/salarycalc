@@ -7,6 +7,7 @@ module SalaryCalculator exposing
     )
 
 import Bootstrap.Accordion as Accordion
+import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
@@ -19,6 +20,7 @@ import Html.Attributes exposing (class, rowspan)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
+import Result.Extra as Result
 import Url exposing (fromString)
 import Url.Parser as UrlParser exposing ((<?>), parse)
 import Url.Parser.Query as QueryParser exposing (int, map3, string)
@@ -42,6 +44,7 @@ init flags =
             case Decode.decodeValue configDecoder flags.config of
                 Err error ->
                     { error = Just error
+                    , warnings = []
                     , cities = []
                     , careers = []
                     , role = Nothing
@@ -87,13 +90,16 @@ init flags =
                                 |> List.map .roles
                                 |> List.concat
 
+                        role : Result Warning (Maybe Role)
                         role =
                             case query.role of
                                 Just roleName ->
                                     lookupByName roleName roles
+                                        |> Result.fromMaybe ("Invalid role: " ++ roleName)
+                                        |> Result.map Just
 
                                 Nothing ->
-                                    List.head roles
+                                    Ok (List.head roles)
 
                         city =
                             case query.city of
@@ -102,11 +108,28 @@ init flags =
 
                                 Nothing ->
                                     List.head config.cities
+
+                        warnings =
+                            [ case role of
+                                Ok _ ->
+                                    Nothing
+
+                                Err warning ->
+                                    Just warning
+                            , case city of
+                                Ok _ ->
+                                    Nothing
+
+                                Err warning ->
+                                    Just warning
+                            ]
+                                |> Maybe.values
                     in
                     { error = Nothing
+                    , warnings = warnings
                     , cities = config.cities
                     , careers = config.careers
-                    , role = role
+                    , role = role |> Result.extract (\_ -> Nothing)
                     , city = city
                     , tenure =
                         query.years
@@ -212,8 +235,13 @@ type Msg
     | AccordionMsg Accordion.State
 
 
+type alias Warning =
+    String
+
+
 type alias Model =
     { error : Maybe Decode.Error
+    , warnings : List Warning
     , careers : List Career
     , cities : List City
     , role : Maybe Role
@@ -271,7 +299,7 @@ update msg model =
             )
 
         RoleSelected role ->
-            ( { model | role = Just role }, Cmd.none )
+            ( { model | role = Just role, warnings = [] }, Cmd.none )
 
         CitySelected city ->
             ( { model | city = Just city }, Cmd.none )
@@ -307,46 +335,58 @@ view model =
                 |> text
 
         Nothing ->
-            Accordion.config AccordionMsg
-                |> Accordion.withAnimation
-                |> Accordion.cards
-                    [ Accordion.card
-                        { id = "card1"
-                        , options = [ Card.outlineLight ]
-                        , header =
-                            Accordion.header []
-                                (Accordion.toggle [ class "p-0" ]
-                                    [ span []
-                                        [ if model.role /= Nothing && model.city /= Nothing then
-                                            text "Okay, let's break that down ..."
+            div []
+                [ viewWarnings model.warnings
+                , Accordion.config AccordionMsg
+                    |> Accordion.withAnimation
+                    |> Accordion.cards
+                        [ Accordion.card
+                            { id = "card1"
+                            , options = [ Card.outlineLight ]
+                            , header =
+                                Accordion.header []
+                                    (Accordion.toggle [ class "p-0" ]
+                                        [ span []
+                                            [ if model.role /= Nothing && model.city /= Nothing then
+                                                text "Okay, let's break that down ..."
 
-                                          else
-                                            Html.text ""
+                                              else
+                                                Html.text ""
+                                            ]
                                         ]
-                                    ]
-                                )
-                                |> Accordion.prependHeader
-                                    (viewHeader model)
-                        , blocks =
-                            case ( model.role, model.city ) of
-                                ( Nothing, Nothing ) ->
-                                    []
+                                    )
+                                    |> Accordion.prependHeader
+                                        (viewHeader model)
+                            , blocks =
+                                case ( model.role, model.city ) of
+                                    ( Nothing, Nothing ) ->
+                                        []
 
-                                ( Nothing, _ ) ->
-                                    []
+                                    ( Nothing, _ ) ->
+                                        []
 
-                                ( _, Nothing ) ->
-                                    []
+                                    ( _, Nothing ) ->
+                                        []
 
-                                ( Just role, Just city ) ->
-                                    [ Accordion.block []
-                                        [ Block.text []
-                                            [ viewBreakdown role city model.tenure ]
+                                    ( Just role, Just city ) ->
+                                        [ Accordion.block []
+                                            [ Block.text []
+                                                [ viewBreakdown role city model.tenure ]
+                                            ]
                                         ]
-                                    ]
-                        }
-                    ]
-                |> Accordion.view model.accordionState
+                            }
+                        ]
+                    |> Accordion.view model.accordionState
+                ]
+
+
+viewWarnings : List Warning -> Html Msg
+viewWarnings warnings =
+    warnings
+        |> List.map text
+        |> List.map List.singleton
+        |> List.map (Alert.simpleWarning [])
+        |> div []
 
 
 viewHeader : Model -> List (Html Msg)
