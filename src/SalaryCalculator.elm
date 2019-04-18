@@ -1,6 +1,9 @@
 module SalaryCalculator exposing
     ( City
+    , Field(..)
+    , Msg(..)
     , Role
+    , Warning
     , commitmentBonus
     , humanizeCommitmentBonus
     , humanizeTenure
@@ -8,6 +11,7 @@ module SalaryCalculator exposing
     , lookupByName
     , main
     , salary
+    , update
     )
 
 import Bootstrap.Accordion as Accordion

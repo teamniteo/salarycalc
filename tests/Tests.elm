@@ -11,7 +11,7 @@ import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import List.Extra as List
-import SalaryCalculator exposing (City, Role, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary)
+import SalaryCalculator exposing (City, Field(..), Msg(..), Role, Warning, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary, update)
 import Test exposing (..)
 
 
@@ -106,4 +106,46 @@ testHumanizeTenure =
             \_ ->
                 humanizeTenure 5
                     |> Expect.equal "5 years"
+        ]
+
+
+hideWarnings : Test
+hideWarnings =
+    describe "Warnings are hidden when role or city is selected"
+        [ test "role is selected" <|
+            \_ ->
+                update (RoleSelected (Role "foo" 5000))
+                    { error = Nothing
+                    , warnings = [ Warning "foo" RoleField, Warning "bar" CityField ]
+                    , cities = []
+                    , careers = []
+                    , role = Nothing
+                    , city = Nothing
+                    , tenure = 0
+                    , accordionState = Accordion.initialState
+                    , roleDropdown = Dropdown.initialState
+                    , cityDropdown = Dropdown.initialState
+                    , tenureDropdown = Dropdown.initialState
+                    }
+                    |> Tuple.first
+                    |> .warnings
+                    |> Expect.equal [ Warning "bar" CityField ]
+        , test "city is selected" <|
+            \_ ->
+                update (CitySelected (City "foo" 1.1))
+                    { error = Nothing
+                    , warnings = [ Warning "foo" RoleField, Warning "bar" CityField ]
+                    , cities = []
+                    , careers = []
+                    , role = Nothing
+                    , city = Nothing
+                    , tenure = 0
+                    , accordionState = Accordion.initialState
+                    , roleDropdown = Dropdown.initialState
+                    , cityDropdown = Dropdown.initialState
+                    , tenureDropdown = Dropdown.initialState
+                    }
+                    |> Tuple.first
+                    |> .warnings
+                    |> Expect.equal [ Warning "foo" RoleField ]
         ]
