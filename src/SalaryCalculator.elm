@@ -86,18 +86,28 @@ init flags =
                             config.careers
                                 |> List.map .roles
                                 |> List.concat
+
+                        role =
+                            case query.role of
+                                Just roleName ->
+                                    lookupByName roleName roles
+
+                                Nothing ->
+                                    List.head roles
+
+                        city =
+                            case query.city of
+                                Just cityName ->
+                                    lookupByName cityName config.cities
+
+                                Nothing ->
+                                    List.head config.cities
                     in
                     { error = Nothing
                     , cities = config.cities
                     , careers = config.careers
-                    , role =
-                        query.role
-                            |> Maybe.map (\roleName -> lookupByName roleName roles)
-                            |> Maybe.join
-                    , city =
-                        query.city
-                            |> Maybe.map (\name -> lookupByName name config.cities)
-                            |> Maybe.join
+                    , role = role
+                    , city = city
                     , tenure =
                         query.years
                             |> Maybe.withDefault 2
