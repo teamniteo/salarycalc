@@ -17,6 +17,7 @@ import Dict exposing (Dict)
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, rowspan)
 import Html.Events exposing (onClick)
+import Json.Decode as Decode
 import Maybe.Extra as Maybe
 import Url exposing (fromString)
 import Url.Parser as UrlParser exposing ((<?>), parse)
@@ -30,79 +31,156 @@ import Url.Parser.Query as QueryParser exposing (int, map3, string)
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        maybeUrl =
-            Url.fromString flags.location
+        model =
+            case Decode.decodeValue configDecoder flags.config of
+                Err error ->
+                    { error = Just error
+                    , cities = []
+                    , careers = []
+                    , role = Nothing
+                    , city = Nothing
+                    , tenure = 0
+                    , accordionState = Accordion.initialState
+                    , roleDropdown = Dropdown.initialState
+                    , cityDropdown = Dropdown.initialState
+                    , tenureDropdown = Dropdown.initialState
+                    }
 
-        queryParser =
-            QueryParser.map3 Query
-                (QueryParser.string "role")
-                (QueryParser.string "city")
-                (QueryParser.int "years")
+                Ok config ->
+                    let
+                        maybeUrl =
+                            Url.fromString flags.location
 
-        parser =
-            UrlParser.top <?> queryParser
+                        queryParser =
+                            QueryParser.map3 Query
+                                (QueryParser.string "role")
+                                (QueryParser.string "city")
+                                (QueryParser.int "years")
 
-        query : Query
-        query =
-            case maybeUrl of
-                Just url ->
-                    { url | path = "/" }
-                        |> UrlParser.parse parser
-                        |> Maybe.withDefault
-                            { role = Nothing
-                            , city = Nothing
-                            , years = Nothing
-                            }
+                        parser =
+                            UrlParser.top <?> queryParser
 
-                Nothing ->
-                    { role = Nothing, city = Nothing, years = Nothing }
+                        query : Query
+                        query =
+                            case maybeUrl of
+                                Just url ->
+                                    { url | path = "/" }
+                                        |> UrlParser.parse parser
+                                        |> Maybe.withDefault
+                                            { role = Nothing
+                                            , city = Nothing
+                                            , years = Nothing
+                                            }
 
-        roles : Dict String Role
-        roles =
-            flags.config.careers
-                |> List.map .roles
-                |> List.concat
-                |> List.foldl
-                    (\role dict -> Dict.insert role.name role dict)
-                    Dict.empty
+                                Nothing ->
+                                    { role = Nothing, city = Nothing, years = Nothing }
 
-        cities : Dict String City
-        cities =
-            flags.config.cities
-                |> List.foldl
-                    (\role dict -> Dict.insert role.name role dict)
-                    Dict.empty
+                        roles : Dict String Role
+                        roles =
+                            config
+                                |> .careers
+                                |> List.map .roles
+                                |> List.concat
+                                |> List.foldl
+                                    (\role dict -> Dict.insert role.name role dict)
+                                    Dict.empty
+
+                        cities : Dict String City
+                        cities =
+                            config.cities
+                                |> List.foldl
+                                    (\role dict -> Dict.insert role.name role dict)
+                                    Dict.empty
+                    in
+                    { error = Nothing
+                    , cities = config.cities
+                    , careers = config.careers
+                    , role =
+                        query.role
+                            |> Maybe.map (\name -> Dict.get name roles)
+                            |> Maybe.join
+                    , city =
+                        query.city
+                            |> Maybe.map (\name -> Dict.get name cities)
+                            |> Maybe.join
+                    , tenure =
+                        query.years
+                            |> Maybe.withDefault 2
+                    , accordionState = Accordion.initialState
+                    , roleDropdown = Dropdown.initialState
+                    , cityDropdown = Dropdown.initialState
+                    , tenureDropdown = Dropdown.initialState
+                    }
     in
-    ( { config = flags.config
-      , roleDropdown = Dropdown.initialState
-      , cityDropdown = Dropdown.initialState
-      , tenureDropdown = Dropdown.initialState
-      , role =
-            query.role
-                |> Maybe.map (\name -> Dict.get name roles)
-                |> Maybe.join
-      , city =
-            query.city
-                |> Maybe.map (\name -> Dict.get name cities)
-                |> Maybe.join
-      , tenure =
-            query.years
-                |> Maybe.withDefault 2
-      , accordionState = Accordion.initialState
-      }
+    ( model
     , Cmd.none
     )
 
 
+configDecoder : Decode.Decoder Config
+configDecoder =
+    Decode.map2 Config
+        (Decode.field "cities" citiesDecoder)
+        (Decode.field "careers" careersDecoder)
+
+
+citiesDecoder : Decode.Decoder (List City)
+citiesDecoder =
+    Decode.list cityDecoder
+
+
+cityDecoder : Decode.Decoder City
+cityDecoder =
+    Decode.map2 City
+        (Decode.field "name" Decode.string)
+        (Decode.field "locationFactor" Decode.float)
+
+
+careersDecoder : Decode.Decoder (List Career)
+careersDecoder =
+    Decode.list careerDecoder
+
+
+careerDecoder : Decode.Decoder Career
+careerDecoder =
+    Decode.map2 Career
+        (Decode.field "name" Decode.string)
+        (Decode.field "roles" rolesDecoder)
+
+
+rolesDecoder : Decode.Decoder (List Role)
+rolesDecoder =
+    Decode.list roleDecoder
+
+
+roleDecoder : Decode.Decoder Role
+roleDecoder =
+    Decode.map2 Role
+        (Decode.field "name" Decode.string)
+        (Decode.field "baseSalary" Decode.int |> Decode.map toFloat)
+
+
 type alias Flags =
     { location : String
-    , config : Config
+    , config : Decode.Value
     }
 
 
 type alias Config =
     { cities : List City
     , careers : List Career
+    }
+
+
+type alias City =
+    { name : String
+    , locationFactor : Float
+    }
+
+
+type alias Role =
+    { name : String
+    , baseSalary : Float
     }
 
 
@@ -130,26 +208,16 @@ type Msg
 
 
 type alias Model =
-    { config : Config
-    , roleDropdown : Dropdown.State
-    , cityDropdown : Dropdown.State
-    , tenureDropdown : Dropdown.State
+    { error : Maybe Decode.Error
+    , careers : List Career
+    , cities : List City
     , role : Maybe Role
     , city : Maybe City
     , tenure : Int
     , accordionState : Accordion.State
-    }
-
-
-type alias City =
-    { name : String
-    , locationFactor : Float
-    }
-
-
-type alias Role =
-    { name : String
-    , baseSalary : Float
+    , roleDropdown : Dropdown.State
+    , cityDropdown : Dropdown.State
+    , tenureDropdown : Dropdown.State
     }
 
 
@@ -226,46 +294,54 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    Accordion.config AccordionMsg
-        |> Accordion.withAnimation
-        |> Accordion.cards
-            [ Accordion.card
-                { id = "card1"
-                , options = [ Card.outlineLight ]
-                , header =
-                    Accordion.header []
-                        (Accordion.toggle [ class "p-0" ]
-                            [ span []
-                                [ if model.role /= Nothing && model.city /= Nothing then
-                                    text "Okay, let's break that down ..."
+    case model.error of
+        Just error ->
+            error
+                |> Decode.errorToString
+                |> (++) "App initialization failed: "
+                |> text
 
-                                  else
-                                    Html.text ""
-                                ]
-                            ]
-                        )
-                        |> Accordion.prependHeader
-                            (viewHeader model)
-                , blocks =
-                    case ( model.role, model.city ) of
-                        ( Nothing, Nothing ) ->
-                            []
+        Nothing ->
+            Accordion.config AccordionMsg
+                |> Accordion.withAnimation
+                |> Accordion.cards
+                    [ Accordion.card
+                        { id = "card1"
+                        , options = [ Card.outlineLight ]
+                        , header =
+                            Accordion.header []
+                                (Accordion.toggle [ class "p-0" ]
+                                    [ span []
+                                        [ if model.role /= Nothing && model.city /= Nothing then
+                                            text "Okay, let's break that down ..."
 
-                        ( Nothing, _ ) ->
-                            []
+                                          else
+                                            Html.text ""
+                                        ]
+                                    ]
+                                )
+                                |> Accordion.prependHeader
+                                    (viewHeader model)
+                        , blocks =
+                            case ( model.role, model.city ) of
+                                ( Nothing, Nothing ) ->
+                                    []
 
-                        ( _, Nothing ) ->
-                            []
+                                ( Nothing, _ ) ->
+                                    []
 
-                        ( Just role, Just city ) ->
-                            [ Accordion.block []
-                                [ Block.text []
-                                    [ viewBreakdown role city model.tenure ]
-                                ]
-                            ]
-                }
-            ]
-        |> Accordion.view model.accordionState
+                                ( _, Nothing ) ->
+                                    []
+
+                                ( Just role, Just city ) ->
+                                    [ Accordion.block []
+                                        [ Block.text []
+                                            [ viewBreakdown role city model.tenure ]
+                                        ]
+                                    ]
+                        }
+                    ]
+                |> Accordion.view model.accordionState
 
 
 viewHeader : Model -> List (Html Msg)
@@ -295,7 +371,7 @@ viewHeader model =
                         |> text
                     ]
             , items =
-                model.config.careers
+                model.careers
                     |> List.map
                         (\{ name, roles } ->
                             Dropdown.header [ text (name ++ " Career") ]
@@ -315,7 +391,7 @@ viewHeader model =
                         |> text
                     ]
             , items =
-                model.config.cities
+                model.cities
                     |> List.map cityItem
             }
         , text " with a tenure at Niteo of "
