@@ -1,5 +1,6 @@
 module Tests exposing
-    (  testCommitmentBonus
+    ( testCommitmentBonus
+    ,  testHumanizeCommitmentBonus
        --, cityImpact
        --, tenureImpact
 
@@ -11,7 +12,7 @@ import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import List.Extra as List
-import SalaryCalculator exposing (City, Role, commitmentBonus, salary)
+import SalaryCalculator exposing (City, Role, commitmentBonus, humanizeCommitmentBonus, salary)
 import Test exposing (..)
 
 
@@ -56,4 +57,22 @@ testCommitmentBonus =
                 commitmentBonus 15
                     |> String.fromFloat
                     |> Expect.equal "0.2772588722239781"
+        ]
+
+
+testHumanizeCommitmentBonus : Test
+testHumanizeCommitmentBonus =
+    describe "Commitment Bonus is viewed as percentages"
+        [ test "0" <|
+            \_ ->
+                humanizeCommitmentBonus 0
+                    |> Expect.equal "0%"
+        , test "0.011" <|
+            \_ ->
+                humanizeCommitmentBonus 0.011
+                    |> Expect.equal "1%"
+        , test "0.125" <|
+            \_ ->
+                humanizeCommitmentBonus 0.125
+                    |> Expect.equal "13%"
         ]
