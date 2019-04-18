@@ -5,6 +5,8 @@ module Tests exposing
     , testLookupByName
     , testSalary
     , testViewPluralizedYears
+    , testViewSalary
+    , testViewWarnings
     )
 
 import Bootstrap.Accordion as Accordion
@@ -13,19 +15,62 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html
 import List.Extra as List
-import SalaryCalculator exposing (City, Field(..), Msg(..), Role, Warning, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary, update, viewPluralizedYears)
+import SalaryCalculator exposing (City, Field(..), Msg(..), Role, Warning, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary, update, viewPluralizedYears, viewSalary, viewWarnings)
 import Test exposing (..)
 import Test.Html.Query as Query
-import Test.Html.Selector exposing (tag, text)
+import Test.Html.Selector exposing (classes, tag, text)
 
 
 testSalary : Test
 testSalary =
+    let
+        role =
+            { name = "FooRole", baseSalary = 4919 }
+
+        city =
+            { name = "FooCity", locationFactor = 0.91 }
+
+        tenure =
+            2
+    in
     test "Salary for Software Engineer from Ljubljana with a 2 year tenure"
         (\_ ->
-            salary { name = "FooRole", baseSalary = 4919 } { name = "FooCity", locationFactor = 0.91 } 2
+            salary role city tenure
                 |> Expect.equal 5017
         )
+
+
+testViewSalary : Test
+testViewSalary =
+    let
+        role =
+            Just (Role "foo" 500)
+
+        city =
+            Just (City "bar" 1.1)
+    in
+    describe "Correct handling when role or city is not available"
+        [ test "nothing is set" <|
+            \_ ->
+                viewSalary Nothing Nothing 0
+                    |> Query.fromHtml
+                    |> Query.has [ text "Please select a role and a city." ]
+        , test "only city is set" <|
+            \_ ->
+                viewSalary Nothing city 0
+                    |> Query.fromHtml
+                    |> Query.has [ text "Please select a role." ]
+        , test "only role is set" <|
+            \_ ->
+                viewSalary role Nothing 0
+                    |> Query.fromHtml
+                    |> Query.has [ text "Please select a city." ]
+        , test "role and city are set" <|
+            \_ ->
+                viewSalary role city 2
+                    |> Query.fromHtml
+                    |> Query.has [ text "605 €" ]
+        ]
 
 
 testCommitmentBonus : Test
@@ -174,3 +219,17 @@ testViewPluralizedYears =
                     |> Query.fromHtml
                     |> Query.has [ text " years." ]
         ]
+
+
+testViewWarnings : Test
+testViewWarnings =
+    let
+        warnings =
+            [ Warning "Invalid role" RoleField ]
+    in
+    test "Warnings are displayed as Bootstrap alerts"
+        (\_ ->
+            viewWarnings warnings
+                |> Query.fromHtml
+                |> Query.has [ tag "div", classes [ "alert" ], text "Invalid role" ]
+        )

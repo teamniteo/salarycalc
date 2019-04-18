@@ -13,6 +13,8 @@ module SalaryCalculator exposing
     , salary
     , update
     , viewPluralizedYears
+    , viewSalary
+    , viewWarnings
     )
 
 import Bootstrap.Accordion as Accordion
@@ -499,7 +501,7 @@ viewHeader model =
         , viewPluralizedYears model.tenure
         ]
     , p [ class "lead" ]
-        [ viewSalary model
+        [ viewSalary model.role model.city model.tenure
         ]
     ]
 
@@ -516,9 +518,9 @@ viewPluralizedYears years =
         text " years."
 
 
-viewSalary : Model -> Html Msg
-viewSalary model =
-    case ( model.role, model.city ) of
+viewSalary : Maybe Role -> Maybe City -> Int -> Html Msg
+viewSalary maybeRole maybeCity tenure =
+    case ( maybeRole, maybeCity ) of
         ( Nothing, Nothing ) ->
             text "Please select a role and a city."
 
@@ -532,10 +534,11 @@ viewSalary model =
             span []
                 [ text "My monthly gross salary is "
                 , span [ class "font-weight-bold" ]
-                    [ salary role city model.tenure
+                    [ (salary role city tenure
                         |> String.fromInt
+                      )
+                        ++ " €"
                         |> text
-                    , text " €"
                     ]
                 , text "."
                 ]
