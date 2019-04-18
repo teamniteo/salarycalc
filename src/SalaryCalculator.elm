@@ -28,6 +28,13 @@ import Url.Parser.Query as QueryParser exposing (int, map3, string)
 -- MODEL
 
 
+lookupByName : String -> List { a | name : String } -> Maybe { a | name : String }
+lookupByName name rolesOrCities =
+    rolesOrCities
+        |> List.filter (\record -> record.name == name)
+        |> List.head
+
+
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
@@ -75,33 +82,21 @@ init flags =
                                 Nothing ->
                                     { role = Nothing, city = Nothing, years = Nothing }
 
-                        roles : Dict String Role
                         roles =
-                            config
-                                |> .careers
+                            config.careers
                                 |> List.map .roles
                                 |> List.concat
-                                |> List.foldl
-                                    (\role dict -> Dict.insert role.name role dict)
-                                    Dict.empty
-
-                        cities : Dict String City
-                        cities =
-                            config.cities
-                                |> List.foldl
-                                    (\role dict -> Dict.insert role.name role dict)
-                                    Dict.empty
                     in
                     { error = Nothing
                     , cities = config.cities
                     , careers = config.careers
                     , role =
                         query.role
-                            |> Maybe.map (\name -> Dict.get name roles)
+                            |> Maybe.map (\roleName -> lookupByName roleName roles)
                             |> Maybe.join
                     , city =
                         query.city
-                            |> Maybe.map (\name -> Dict.get name cities)
+                            |> Maybe.map (\name -> lookupByName name config.cities)
                             |> Maybe.join
                     , tenure =
                         query.years
