@@ -14,7 +14,6 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Dropdown as Dropdown
 import Bootstrap.ListGroup as ListGroup
 import Browser
-import Dict exposing (Dict)
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, rowspan)
 import Html.Events exposing (onClick)
@@ -101,13 +100,16 @@ init flags =
                                 Nothing ->
                                     Ok (List.head roles)
 
+                        city : Result Warning (Maybe City)
                         city =
                             case query.city of
                                 Just cityName ->
                                     lookupByName cityName config.cities
+                                        |> Result.fromMaybe ("Invalid city: " ++ cityName)
+                                        |> Result.map Just
 
                                 Nothing ->
-                                    List.head config.cities
+                                    Ok (List.head config.cities)
 
                         warnings =
                             [ case role of
@@ -130,7 +132,7 @@ init flags =
                     , cities = config.cities
                     , careers = config.careers
                     , role = role |> Result.extract (\_ -> Nothing)
-                    , city = city
+                    , city = city |> Result.extract (\_ -> Nothing)
                     , tenure =
                         query.years
                             |> Maybe.withDefault 2
