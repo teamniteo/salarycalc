@@ -1,5 +1,6 @@
 module SalaryCalculator exposing
-    ( City
+    ( Career
+    , City
     , Field(..)
     , Flags
     , Msg(..)
@@ -54,7 +55,7 @@ init flags =
         model =
             case Decode.decodeValue configDecoder flags.config of
                 Err error ->
-                    { error = Just error
+                    { error = Just (Decode.errorToString error)
                     , warnings = []
                     , cities = []
                     , careers = []
@@ -169,6 +170,14 @@ configDecoder =
 citiesDecoder : Decode.Decoder (List City)
 citiesDecoder =
     Decode.list cityDecoder
+        |> Decode.andThen
+            (\cities ->
+                if List.length cities == 0 then
+                    Decode.fail "There must be at least one city in your config."
+
+                else
+                    Decode.succeed cities
+            )
 
 
 cityDecoder : Decode.Decoder City
@@ -181,6 +190,14 @@ cityDecoder =
 careersDecoder : Decode.Decoder (List Career)
 careersDecoder =
     Decode.list careerDecoder
+        |> Decode.andThen
+            (\careers ->
+                if List.length careers == 0 then
+                    Decode.fail "There must be at least one career in your config."
+
+                else
+                    Decode.succeed careers
+            )
 
 
 careerDecoder : Decode.Decoder Career
@@ -193,6 +210,14 @@ careerDecoder =
 rolesDecoder : Decode.Decoder (List Role)
 rolesDecoder =
     Decode.list roleDecoder
+        |> Decode.andThen
+            (\roles ->
+                if List.length roles == 0 then
+                    Decode.fail "There must be at least one role in your config."
+
+                else
+                    Decode.succeed roles
+            )
 
 
 roleDecoder : Decode.Decoder Role
@@ -261,7 +286,7 @@ type alias Warning =
 
 
 type alias Model =
-    { error : Maybe Decode.Error
+    { error : Maybe String
     , warnings : List Warning
     , careers : List Career
     , cities : List City
@@ -365,7 +390,6 @@ view model =
     case model.error of
         Just error ->
             error
-                |> Decode.errorToString
                 |> (++) "App initialization failed: "
                 |> text
 

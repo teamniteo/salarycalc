@@ -2,7 +2,13 @@ module Tests exposing
     ( testCommitmentBonus
     , testHumanizeCommitmentBonus
     , testHumanizeTenure
-    , testInit
+    , testInitHappyPath
+    , testInitInvalidConfig
+    , testInitInvalidQueryString
+    , testInitMissingCareers
+    , testInitMissingCities
+    , testInitMissingRoles
+    , testInitQueryString
     , testLookupByName
     , testSalary
     , testViewPluralizedYears
@@ -20,7 +26,8 @@ import Json.Encode as Encode
 import List.Extra as List
 import SalaryCalculator
     exposing
-        ( City
+        ( Career
+        , City
         , Field(..)
         , Flags
         , Msg(..)
@@ -43,25 +50,33 @@ import Test.Html.Selector exposing (classes, tag, text)
 import Url exposing (Protocol(..), Url)
 
 
-testInit : Test
-testInit =
+testInitHappyPath : Test
+testInitHappyPath =
     let
         json =
             """
-              { 
+              {
                 "cities": [
-                  { 
+                  {
                     "name": "Amsterdam",
                     "locationFactor": 1.3
+                  },
+                  {
+                    "name": "Berlin",
+                    "locationFactor": 1.2
                   }
                 ],
                 "careers": [
-                  { 
+                  {
                     "name": "Technical",
                     "roles": [
-                      { 
+                      {
                         "name": "Software Developer",
                         "baseSalary": 3500
+                      },
+                      {
+                        "name": "Junior Software Developer",
+                        "baseSalary": 2500
                       }
                     ]
                   }
@@ -69,7 +84,7 @@ testInit =
               }
             """
     in
-    test "Init returns a correct model"
+    test "Init returns a correct model with default values"
         (\_ ->
             case Decode.decodeString Decode.value json of
                 Err error ->
@@ -88,26 +103,349 @@ testInit =
                             { error = Nothing
                             , warnings = []
                             , cities =
-                                [ { locationFactor = 1.3
-                                  , name = "Amsterdam"
-                                  }
+                                [ City "Amsterdam" 1.3
+                                , City "Berlin" 1.2
                                 ]
                             , careers =
-                                [ { name = "Technical"
-                                  , roles =
-                                        [ { baseSalary = 3500
-                                          , name = "Software Developer"
-                                          }
-                                        ]
-                                  }
+                                [ Career "Technical"
+                                    [ Role "Software Developer" 3500
+                                    , Role "Junior Software Developer" 2500
+                                    ]
                                 ]
-                            , role =
-                                Just
-                                    { baseSalary = 3500
-                                    , name = "Software Developer"
-                                    }
-                            , city = Just { locationFactor = 1.3, name = "Amsterdam" }
+                            , role = Just (Role "Software Developer" 3500)
+                            , city = Just (City "Amsterdam" 1.3)
                             , tenure = 2
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
+                            }
+        )
+
+
+testInitQueryString : Test
+testInitQueryString =
+    let
+        json =
+            """
+              {
+                "cities": [
+                  {
+                    "name": "Amsterdam",
+                    "locationFactor": 1.3
+                  },
+                  {
+                    "name": "Berlin",
+                    "locationFactor": 1.2
+                  }
+                ],
+                "careers": [
+                  {
+                    "name": "Technical",
+                    "roles": [
+                      {
+                        "name": "Software Developer",
+                        "baseSalary": 3500
+                      },
+                      {
+                        "name": "Junior Software Developer",
+                        "baseSalary": 2500
+                      }
+                    ]
+                  }
+                ]
+              }
+            """
+    in
+    test "Role and City are read from querystring "
+        (\_ ->
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator?role=Junior Software Developer&city=Berlin"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Nothing
+                            , warnings = []
+                            , cities =
+                                [ City "Amsterdam" 1.3
+                                , City "Berlin" 1.2
+                                ]
+                            , careers =
+                                [ Career "Technical"
+                                    [ Role "Software Developer" 3500
+                                    , Role "Junior Software Developer" 2500
+                                    ]
+                                ]
+                            , role = Just (Role "Junior Software Developer" 2500)
+                            , city = Just (City "Berlin" 1.2)
+                            , tenure = 2
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
+                            }
+        )
+
+
+testInitInvalidQueryString : Test
+testInitInvalidQueryString =
+    let
+        json =
+            """
+              {
+                "cities": [
+                  {
+                    "name": "Amsterdam",
+                    "locationFactor": 1.3
+                  },
+                  {
+                    "name": "Berlin",
+                    "locationFactor": 1.2
+                  }
+                ],
+                "careers": [
+                  {
+                    "name": "Technical",
+                    "roles": [
+                      {
+                        "name": "Software Developer",
+                        "baseSalary": 3500
+                      },
+                      {
+                        "name": "Junior Software Developer",
+                        "baseSalary": 2500
+                      }
+                    ]
+                  }
+                ]
+              }
+            """
+    in
+    test "Role and City are given querystring but the values are bad"
+        (\_ ->
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator?role=Foo&city=Bar"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Nothing
+                            , warnings =
+                                [ Warning "Invalid role provided via URL: Foo. Please choose one from the dropdown below." RoleField
+                                , Warning "Invalid city provided via URL: Bar. Please choose one from the dropdown below." CityField
+                                ]
+                            , cities =
+                                [ City "Amsterdam" 1.3
+                                , City "Berlin" 1.2
+                                ]
+                            , careers =
+                                [ Career "Technical"
+                                    [ Role "Software Developer" 3500
+                                    , Role "Junior Software Developer" 2500
+                                    ]
+                                ]
+                            , role = Nothing
+                            , city = Nothing
+                            , tenure = 2
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
+                            }
+        )
+
+
+testInitMissingCities : Test
+testInitMissingCities =
+    let
+        json =
+            """
+              {
+                "cities": [],
+                "careers": []
+              }
+            """
+    in
+    test "Cities need to be given"
+        (\_ ->
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Just "Problem with the value at json.cities:\n\n    []\n\nThere must be at least one city in your config."
+                            , warnings = []
+                            , cities = []
+                            , careers = []
+                            , role = Nothing
+                            , city = Nothing
+                            , tenure = 0
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
+                            }
+        )
+
+
+testInitMissingCareers : Test
+testInitMissingCareers =
+    let
+        json =
+            """
+              {
+                "cities": [
+                  {
+                    "name": "Amsterdam",
+                    "locationFactor": 1.3
+                  }
+                ],
+                "careers": []
+              }
+            """
+    in
+    test "Careers need to be given"
+        (\_ ->
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Just "Problem with the value at json.careers:\n\n    []\n\nThere must be at least one career in your config."
+                            , warnings = []
+                            , cities = []
+                            , careers = []
+                            , role = Nothing
+                            , city = Nothing
+                            , tenure = 0
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
+                            }
+        )
+
+
+testInitMissingRoles : Test
+testInitMissingRoles =
+    let
+        json =
+            """
+              {
+                "cities": [
+                  {
+                    "name": "Amsterdam",
+                    "locationFactor": 1.3
+                  }
+                ],
+                "careers": [
+                  {
+                    "name": "Technical",
+                    "roles": []
+                  }
+                ]
+              }
+            """
+    in
+    test "Roles need to be given"
+        (\_ ->
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Just "Problem with the value at json.careers[0].roles:\n\n    []\n\nThere must be at least one role in your config."
+                            , warnings = []
+                            , cities = []
+                            , careers = []
+                            , role = Nothing
+                            , city = Nothing
+                            , tenure = 0
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
+                            }
+        )
+
+
+testInitInvalidConfig : Test
+testInitInvalidConfig =
+    let
+        json =
+            """
+              {
+                "foo": "bar"
+              }
+            """
+    in
+    test "Config is broken"
+        (\_ ->
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Just "Problem with the given value:\n\n{\n        \"foo\": \"bar\"\n    }\n\nExpecting an OBJECT with a field named `cities`"
+                            , warnings = []
+                            , cities = []
+                            , careers = []
+                            , role = Nothing
+                            , city = Nothing
+                            , tenure = 0
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
                             , cityDropdown = Dropdown.initialState
