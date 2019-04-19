@@ -2,6 +2,7 @@ module Tests exposing
     ( testCommitmentBonus
     , testHumanizeCommitmentBonus
     , testHumanizeTenure
+    , testInit
     , testLookupByName
     , testSalary
     , testViewPluralizedYears
@@ -14,11 +15,126 @@ import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html
+import Json.Encode as Encode
 import List.Extra as List
-import SalaryCalculator exposing (City, Field(..), Msg(..), Role, Warning, commitmentBonus, humanizeCommitmentBonus, humanizeTenure, lookupByName, salary, update, viewPluralizedYears, viewSalary, viewWarnings)
+import SalaryCalculator
+    exposing
+        ( City
+        , Field(..)
+        , Flags
+        , Msg(..)
+        , Role
+        , Warning
+        , commitmentBonus
+        , humanizeCommitmentBonus
+        , humanizeTenure
+        , init
+        , lookupByName
+        , salary
+        , update
+        , viewPluralizedYears
+        , viewSalary
+        , viewWarnings
+        )
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (classes, tag, text)
+import Url exposing (Protocol(..), Url)
+
+
+testInit : Test
+testInit =
+    let
+        flags : Flags
+        flags =
+            { location = "https://example.com/salary-calculator/"
+            , config = config
+            }
+
+        config : Encode.Value
+        config =
+            [ ( "cities"
+              , [ ( "Amsterdam", 1.3 )
+                ]
+                    |> Encode.list encodeCity
+              )
+            , ( "careers"
+              , [ ( "technical"
+                  , [ ( "Software Developer", 3500 ) ]
+                  )
+                ]
+                    |> Encode.list encodeCareer
+              )
+            ]
+                |> Encode.object
+
+        encodeCity : ( String, Float ) -> Encode.Value
+        encodeCity ( name, locationFactor ) =
+            [ ( "name"
+              , name |> Encode.string
+              )
+            , ( "locationFactor"
+              , locationFactor |> Encode.float
+              )
+            ]
+                |> Encode.object
+
+        encodeCareer : ( String, List ( String, Int ) ) -> Encode.Value
+        encodeCareer ( name, roles ) =
+            [ ( "name"
+              , name |> Encode.string
+              )
+            , ( "roles"
+              , roles |> Encode.list encodeRole
+              )
+            ]
+                |> Encode.object
+
+        encodeRole : ( String, Int ) -> Encode.Value
+        encodeRole ( name, baseSalary ) =
+            [ ( "name"
+              , name |> Encode.string
+              )
+            , ( "baseSalary"
+              , baseSalary |> Encode.int
+              )
+            ]
+                |> Encode.object
+    in
+    test "Init returns a correct model"
+        (\_ ->
+            init flags
+                |> Tuple.first
+                |> Expect.equal
+                    { error = Nothing
+                    , warnings = []
+                    , cities =
+                        [ { locationFactor = 1.3
+                          , name = "Amsterdam"
+                          }
+                        ]
+                    , careers =
+                        [ { name = "technical"
+                          , roles =
+                                [ { baseSalary = 3500
+                                  , name = "Software Developer"
+                                  }
+                                ]
+                          }
+                        ]
+                    , role =
+                        Just
+                            { baseSalary = 3500
+                            , name = "Software Developer"
+                            }
+                    , city = Just { locationFactor = 1.3, name = "Amsterdam" }
+                    , tenure = 2
+                    , accordionState = Accordion.initialState
+                    , roleDropdown = Dropdown.initialState
+                    , cityDropdown = Dropdown.initialState
+                    , tenureDropdown = Dropdown.initialState
+                    }
+        )
 
 
 testSalary : Test
