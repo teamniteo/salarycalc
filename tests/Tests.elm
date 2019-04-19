@@ -753,3 +753,73 @@ tenureImpact =
     in
     describe "Longer tenure always results in higher salary" <|
         List.lift3 tenureTest roles cities years
+
+
+cityImpact : Test
+cityImpact =
+    let
+        personaSuit : ( Role, Int ) -> Test
+        personaSuit ( role, tenure ) =
+            let
+                title =
+                    [ role.name
+                    , "with a tenure of"
+                    , String.fromInt tenure
+                    , "years..."
+                    ]
+                        |> String.join " "
+            in
+            cities
+                |> List.sortBy .locationFactor
+                |> List.reverse
+                |> pairs
+                |> List.map (citiesTest role tenure)
+                |> describe title
+
+        personas : List ( Role, Int )
+        personas =
+            List.lift2 Tuple.pair roles years
+
+        citiesTest : Role -> Int -> ( City, City ) -> Test
+        citiesTest role tenure ( a, b ) =
+            let
+                title =
+                    [ "...living in"
+                    , a.name
+                    , "earns at least as much as if she would live in"
+                    , b.name
+                    ]
+                        |> String.join " "
+            in
+            test title <|
+                \() ->
+                    Expect.atLeast
+                        (salary role a tenure)
+                        (salary role b tenure)
+    in
+    describe "Salaries are higher in more expensive cities" <|
+        List.map personaSuit personas
+
+
+{-| Helper that given a list of elements returns a list of tuples with two neighboring elements paired together
+
+    pairs [ SanFrancisco, London, Amsterdam, Berlin ]
+    --> [ ( SanFrancisco, London )
+    --> , ( London, Amsterdam )
+    --> , ( Amsterdam, Berlin )
+    --> ]
+
+Used for comparing salaries in different cities.
+
+-}
+pairs : List a -> List ( a, a )
+pairs list =
+    case list of
+        [] ->
+            []
+
+        a :: [] ->
+            []
+
+        a :: b :: rest ->
+            ( a, b ) :: pairs (b :: rest)
