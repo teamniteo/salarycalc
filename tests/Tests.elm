@@ -1,5 +1,6 @@
 module Tests exposing
-    ( testCommitmentBonus
+    ( tenureImpact
+    , testCommitmentBonus
     , testHumanizeCommitmentBonus
     , testHumanizeTenure
     , testInitHappyPath
@@ -666,3 +667,89 @@ testViewWarnings =
                 |> Query.fromHtml
                 |> Query.has [ tag "div", classes [ "alert" ], text "Invalid role" ]
         )
+
+
+
+-- Generated tests
+
+
+cities =
+    [ { name = "San Francisco"
+      , locationFactor = 1.59
+      }
+    , { name = "Amsterdam"
+      , locationFactor = 1.2
+      }
+    , { name = "Lisbon"
+      , locationFactor = 0.94
+      }
+    , { name = "Ljubljana"
+      , locationFactor = 0.91
+      }
+    , { name = "Novi Sad"
+      , locationFactor = 0.81
+      }
+    , { name = "Davao"
+      , locationFactor = 0.81
+      }
+    , { name = "Delhi"
+      , locationFactor = 0.79
+      }
+    ]
+
+
+roles =
+    [ { name = "Principal Software Engineer"
+      , baseSalary = 6184
+      }
+    , { name = "Software Engineer"
+      , baseSalary = 4919
+      }
+    , { name = "Junior Software Engineer"
+      , baseSalary = 2506
+      }
+    , { name = "Junior Programmer"
+      , baseSalary = 3000
+      }
+    , { name = "Senior Product Marketing Manager"
+      , baseSalary = 6140
+      }
+    , { name = "Product Marketing Manager"
+      , baseSalary = 5243
+      }
+    , { name = "Digital Marketing Specialist"
+      , baseSalary = 2955
+      }
+    ]
+
+
+years =
+    List.range 0 24
+
+
+tenureImpact : Test
+tenureImpact =
+    let
+        tenureTest : Role -> City -> Int -> Test
+        tenureTest role city tenure =
+            let
+                title =
+                    String.join " "
+                        [ role.name
+                        , "living in"
+                        , city.name
+                        , "with tenure of"
+                        , String.fromInt tenure
+                        , "earns more than with tenure of"
+                        , String.fromInt (tenure - 1)
+                        ]
+            in
+            test title
+                (\_ ->
+                    Expect.greaterThan
+                        (salary role city tenure)
+                        (salary role city tenure + 1)
+                )
+    in
+    describe "Longer tenure always results in higher salary" <|
+        List.lift3 tenureTest roles cities years
