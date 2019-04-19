@@ -1,7 +1,7 @@
 cities:
 
-  - name: Amsterdam
-    locationFactor: 1.2
+  - name: Maribor
+    locationFactor: 0.8
 
   - name: Barcelona
     locationFactor: 0.97
@@ -61,8 +61,8 @@ careers:
 
   - name: Marketing
     roles:
-      - name: Marketing Associate
-        baseSalary: 2446
+      - name: Lead Joker
+        baseSalary: 666
 
       - name: Digital Marketing Specialist
         baseSalary: 2955
