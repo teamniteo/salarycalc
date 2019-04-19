@@ -1,6 +1,7 @@
 module SalaryCalculator exposing
     ( City
     , Field(..)
+    , Flags
     , Msg(..)
     , Role
     , Warning
