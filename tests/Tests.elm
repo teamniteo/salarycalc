@@ -15,6 +15,7 @@ import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html
+import Json.Decode as Decode
 import Json.Encode as Encode
 import List.Extra as List
 import SalaryCalculator
@@ -45,95 +46,73 @@ import Url exposing (Protocol(..), Url)
 testInit : Test
 testInit =
     let
-        flags : Flags
-        flags =
-            { location = "https://example.com/salary-calculator/"
-            , config = config
-            }
-
-        config : Encode.Value
-        config =
-            [ ( "cities"
-              , [ ( "Amsterdam", 1.3 )
+        json =
+            """
+              { 
+                "cities": [
+                  { 
+                    "name": "Amsterdam",
+                    "locationFactor": 1.3
+                  }
+                ],
+                "careers": [
+                  { 
+                    "name": "Technical",
+                    "roles": [
+                      { 
+                        "name": "Software Developer",
+                        "baseSalary": 3500
+                      }
+                    ]
+                  }
                 ]
-                    |> Encode.list encodeCity
-              )
-            , ( "careers"
-              , [ ( "technical"
-                  , [ ( "Software Developer", 3500 ) ]
-                  )
-                ]
-                    |> Encode.list encodeCareer
-              )
-            ]
-                |> Encode.object
-
-        encodeCity : ( String, Float ) -> Encode.Value
-        encodeCity ( name, locationFactor ) =
-            [ ( "name"
-              , name |> Encode.string
-              )
-            , ( "locationFactor"
-              , locationFactor |> Encode.float
-              )
-            ]
-                |> Encode.object
-
-        encodeCareer : ( String, List ( String, Int ) ) -> Encode.Value
-        encodeCareer ( name, roles ) =
-            [ ( "name"
-              , name |> Encode.string
-              )
-            , ( "roles"
-              , roles |> Encode.list encodeRole
-              )
-            ]
-                |> Encode.object
-
-        encodeRole : ( String, Int ) -> Encode.Value
-        encodeRole ( name, baseSalary ) =
-            [ ( "name"
-              , name |> Encode.string
-              )
-            , ( "baseSalary"
-              , baseSalary |> Encode.int
-              )
-            ]
-                |> Encode.object
+              }
+            """
     in
     test "Init returns a correct model"
         (\_ ->
-            init flags
-                |> Tuple.first
-                |> Expect.equal
-                    { error = Nothing
-                    , warnings = []
-                    , cities =
-                        [ { locationFactor = 1.3
-                          , name = "Amsterdam"
-                          }
-                        ]
-                    , careers =
-                        [ { name = "technical"
-                          , roles =
-                                [ { baseSalary = 3500
-                                  , name = "Software Developer"
+            case Decode.decodeString Decode.value json of
+                Err error ->
+                    error
+                        |> Decode.errorToString
+                        |> (++) "The JSON string provided in your test is invalid. Here is the message from decoder:\n\n"
+                        |> Expect.fail
+
+                Ok config ->
+                    { location = "https://example.com/salary-calculator/"
+                    , config = config
+                    }
+                        |> init
+                        |> Tuple.first
+                        |> Expect.equal
+                            { error = Nothing
+                            , warnings = []
+                            , cities =
+                                [ { locationFactor = 1.3
+                                  , name = "Amsterdam"
                                   }
                                 ]
-                          }
-                        ]
-                    , role =
-                        Just
-                            { baseSalary = 3500
-                            , name = "Software Developer"
+                            , careers =
+                                [ { name = "Technical"
+                                  , roles =
+                                        [ { baseSalary = 3500
+                                          , name = "Software Developer"
+                                          }
+                                        ]
+                                  }
+                                ]
+                            , role =
+                                Just
+                                    { baseSalary = 3500
+                                    , name = "Software Developer"
+                                    }
+                            , city = Just { locationFactor = 1.3, name = "Amsterdam" }
+                            , tenure = 2
+                            , accordionState = Accordion.initialState
+                            , roleDropdown = Dropdown.initialState
+                            , cityDropdown = Dropdown.initialState
+                            , tenureDropdown = Dropdown.initialState
                             }
-                    , city = Just { locationFactor = 1.3, name = "Amsterdam" }
-                    , tenure = 2
-                    , accordionState = Accordion.initialState
-                    , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
-                    , tenureDropdown = Dropdown.initialState
-                    }
         )
 
 
