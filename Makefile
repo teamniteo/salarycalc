@@ -23,8 +23,15 @@ lint: .installed
 test: tests
 
 .PHONY: tests
-tests: .installed
+tests: .installed verify-examples coverage
+
+.PHONY: coverage
+coverage: .installed
 	@npx elm-coverage --report codecov
+
+.PHONY: verify-examples
+verify-examples: .installed
+	@npx elm-verify-examples
 
 .coverage/codecov.json: .installed test
 
