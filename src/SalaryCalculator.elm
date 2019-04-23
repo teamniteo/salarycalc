@@ -466,7 +466,7 @@ type alias Model =
 
     Ok (commitmentBonus 3)
     --> Ok 0.13862943611198905
-    -- Note: the value is tagged with `Ok` (i.e. wrapped in a `Result` type) to bypass a limitation of Elm Verify Examples. See ...
+    -- Note: the value is tagged with `Ok` (i.e. wrapped in a `Result` type) to bypass a limitation of Elm Verify Examples. See https://github.com/stoeffel/elm-verify-examples/issues/83
 
 -}
 commitmentBonus : Int -> Float
@@ -797,6 +797,9 @@ viewSalary maybeRole maybeCity tenure =
 
     humanizeCommitmentBonus 0.126
     --> "13%"
+
+    humanizeCommitmentBonus 3.0
+    --> "300%"
 
 -}
 humanizeCommitmentBonus : Float -> String
