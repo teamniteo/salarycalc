@@ -1,19 +1,33 @@
 module SalaryCalculator exposing
     ( Career
     , City
+    , Config
     , Field(..)
     , Flags
+    , Model
     , Msg(..)
+    , Query
     , Role
     , Warning
+    , careerDecoder
+    , careersDecoder
+    , citiesDecoder
+    , cityDecoder
     , commitmentBonus
+    , configDecoder
     , humanizeCommitmentBonus
     , humanizeTenure
     , init
     , lookupByName
     , main
+    , roleDecoder
+    , rolesDecoder
     , salary
+    , subscriptions
     , update
+    , view
+    , viewBreakdown
+    , viewHeader
     , viewPluralizedYears
     , viewSalary
     , viewWarnings
@@ -42,6 +56,21 @@ import Url.Parser.Query as QueryParser exposing (int, map3, string)
 -- MODEL
 
 
+{-| Given a list of records with a name field returns first item with a matching name. If no item has a matching name then returns Nothing.
+
+    lookupByName "Amsterdam"
+        [ { name = "Amsterdam", locationFactor = 1.4 }
+        , { name = "Ljubljana", locationFactor = 1.0 }
+        ]
+    --> Just { name = "Amsterdam", locationFactor = 1.4 }
+
+    lookupByName "Warsaw"
+        [ { name = "Amsterdam", locationFactor = 1.4 }
+        , { name = "Ljubljana", locationFactor = 1.0 }
+        ]
+    --> Nothing
+
+-}
 lookupByName : String -> List { a | name : String } -> Maybe { a | name : String }
 lookupByName name rolesOrCities =
     rolesOrCities
@@ -160,13 +189,63 @@ init flags =
     )
 
 
+{-| Used in `init` function to decode config passed in `Flags`
+
+    import Json.Decode as Decode
+
+    Decode.decodeString configDecoder """
+      {
+        "cities" : [
+          {
+            "name": "Keren",
+            "locationFactor": 1.87
+          }
+        ],
+        "careers" : [
+          {
+            "name": "Design",
+            "roles": [
+              {
+                "name": "Junior Designer",
+                "baseSalary": 2345
+              }
+            ]
+          }
+        ]
+      }
+    """
+    --> Ok
+    -->     { cities = [ City "Keren" 1.87 ]
+    -->     , careers =
+    -->         [ Career "Design"
+    -->             [ Role "Junior Designer" 2345 ]
+    -->         ]
+    -->     }
+
+-}
 configDecoder : Decode.Decoder Config
 configDecoder =
-    Decode.map2 Config
+    Decode.map2
+        Config
         (Decode.field "cities" citiesDecoder)
         (Decode.field "careers" careersDecoder)
 
 
+{-| A helper for configDecoder
+
+    import Json.Decode as Decode
+
+    Decode.decodeString citiesDecoder """
+      [
+        {
+          "name": "Keren",
+          "locationFactor": 1.87
+        }
+      ]
+    """
+    --> Ok [ City "Keren" 1.87 ]
+
+-}
 citiesDecoder : Decode.Decoder (List City)
 citiesDecoder =
     Decode.list cityDecoder
@@ -180,6 +259,19 @@ citiesDecoder =
             )
 
 
+{-| A helper for configDecoder
+
+    import Json.Decode as Decode
+
+    Decode.decodeString cityDecoder """
+      {
+        "name": "Keren",
+        "locationFactor": 1.87
+      }
+    """
+    --> Ok (City "Keren" 1.87)
+
+-}
 cityDecoder : Decode.Decoder City
 cityDecoder =
     Decode.map2 City
@@ -187,6 +279,26 @@ cityDecoder =
         (Decode.field "locationFactor" Decode.float)
 
 
+{-| A helper for configDecoder
+
+    import Json.Decode as Decode
+
+    Decode.decodeString careersDecoder """
+      [
+        {
+          "name": "Design",
+          "roles": [
+            {
+              "name": "Junior Designer",
+              "baseSalary": 2345
+            }
+          ]
+        }
+      ]
+    """
+    --> Ok [ Career "Design" [ Role "Junior Designer" 2345 ] ]
+
+-}
 careersDecoder : Decode.Decoder (List Career)
 careersDecoder =
     Decode.list careerDecoder
@@ -200,13 +312,50 @@ careersDecoder =
             )
 
 
+{-| A helper for configDecoder
+
+    import Json.Decode as Decode
+
+    Decode.decodeString careerDecoder """
+      {
+        "name": "Design",
+        "roles": [
+          {
+            "name": "Junior Designer",
+            "baseSalary": 2345
+          }
+        ]
+      }
+    """
+    --> Ok
+    -->     (Career "Design"
+    -->         [ Role "Junior Designer" 2345 ]
+    -->     )
+
+-}
 careerDecoder : Decode.Decoder Career
 careerDecoder =
-    Decode.map2 Career
+    Decode.map2
+        Career
         (Decode.field "name" Decode.string)
         (Decode.field "roles" rolesDecoder)
 
 
+{-| A helper for configDecoder
+
+    import Json.Decode as Decode
+
+    Decode.decodeString rolesDecoder """
+      [
+        {
+          "name": "Junior Designer",
+          "baseSalary": 2345
+        }
+      ]
+    """
+    --> Ok [ Role "Junior Designer" 2345 ]
+
+-}
 rolesDecoder : Decode.Decoder (List Role)
 rolesDecoder =
     Decode.list roleDecoder
@@ -220,6 +369,19 @@ rolesDecoder =
             )
 
 
+{-| A helper for configDecoder
+
+    import Json.Decode as Decode
+
+    Decode.decodeString roleDecoder """
+      {
+        "name": "Junior Designer",
+        "baseSalary": 2345
+      }
+    """
+    --> Ok (Role "Junior Designer" 2345)
+
+-}
 roleDecoder : Decode.Decoder Role
 roleDecoder =
     Decode.map2 Role
@@ -300,11 +462,30 @@ type alias Model =
     }
 
 
+{-| Given a tenure returns a commitmentBonus.
+
+    Ok (commitmentBonus 3)
+    --> Ok 0.13862943611198905
+    -- Note: the value is tagged with `Ok` (i.e. wrapped in a `Result` type) to bypass a limitation of Elm Verify Examples. See ...
+
+-}
 commitmentBonus : Int -> Float
-commitmentBonus years =
-    logBase e (toFloat years + 1) / 10
+commitmentBonus tenure =
+    logBase e (toFloat tenure + 1) / 10
 
 
+{-| Format tenure given as an integer as a human readable string.
+
+    humanizeTenure 0
+    --> "Just started"
+
+    humanizeTenure 1
+    --> "1 year"
+
+    humanizeTenure 3
+    --> "3 years"
+
+-}
 humanizeTenure : Int -> String
 humanizeTenure years =
     if years < 1 then
@@ -317,6 +498,15 @@ humanizeTenure years =
         String.fromInt years ++ " years"
 
 
+{-| Calculate a salary based on a role, city and tenure
+
+    salary (Role "Designer" 2500) (City "Warsaw" 1) 0
+    --> 2500
+
+    salary (Role "Designer" 2500) (City "Amsterdam" 1.5) 0
+    --> 3750
+
+-}
 salary : Role -> City -> Int -> Int
 salary role city tenure =
     round (role.baseSalary * city.locationFactor + role.baseSalary * commitmentBonus tenure)
@@ -531,6 +721,20 @@ viewHeader model =
     ]
 
 
+{-| Displays a plural or singular form of word "year"
+
+    import Html
+
+    viewPluralizedYears 0
+    --> Html.text " years."
+
+    viewPluralizedYears 1
+    --> Html.text " year."
+
+    viewPluralizedYears 34
+    --> Html.text " years."
+
+-}
 viewPluralizedYears : Int -> Html Msg
 viewPluralizedYears years =
     if years == 0 then
@@ -543,6 +747,20 @@ viewPluralizedYears years =
         text " years."
 
 
+{-| Displays monthly salary when provided with role and city. Otherwise displays a prompt for missing data.
+
+    import Html
+
+    viewSalary Nothing Nothing 3
+    --> Html.text "Please select a role and a city."
+
+    viewSalary Nothing (Just (City "Keren" 1.87)) 3
+    --> Html.text "Please select a role."
+
+    viewSalary (Just (Role "Junior Designer" 2345)) Nothing 3
+    --> Html.text "Please select a city."
+
+-}
 viewSalary : Maybe Role -> Maybe City -> Int -> Html Msg
 viewSalary maybeRole maybeCity tenure =
     case ( maybeRole, maybeCity ) of
@@ -569,6 +787,18 @@ viewSalary maybeRole maybeCity tenure =
                 ]
 
 
+{-| Formats commitment bonus as percentage rounded to a percent.
+
+    humanizeCommitmentBonus 0.3
+    --> "30%"
+
+    humanizeCommitmentBonus 0.12345
+    --> "12%"
+
+    humanizeCommitmentBonus 0.126
+    --> "13%"
+
+-}
 humanizeCommitmentBonus : Float -> String
 humanizeCommitmentBonus bonus =
     (bonus
