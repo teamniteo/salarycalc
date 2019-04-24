@@ -56,7 +56,8 @@ import Url.Parser.Query as QueryParser exposing (int, map3, string)
 -- MODEL
 
 
-{-| Given a list of records with a name field returns first item with a matching name. If no item has a matching name then returns Nothing.
+{-| Given a list of records with a name field returns first item with a
+matching name. If no item has a matching name then returns Nothing.
 
     lookupByName "Amsterdam"
         [ { name = "Amsterdam", locationFactor = 1.4 }
@@ -136,7 +137,14 @@ init flags =
                             case query.role of
                                 Just roleName ->
                                     lookupByName roleName roles
-                                        |> Result.fromMaybe (Warning ("Invalid role provided via URL: " ++ roleName ++ ". Please choose one from the dropdown below.") RoleField)
+                                        |> Result.fromMaybe
+                                            (Warning
+                                                ("Invalid role provided via URL: "
+                                                    ++ roleName
+                                                    ++ ". Please choose one from the dropdown below."
+                                                )
+                                                RoleField
+                                            )
                                         |> Result.map Just
 
                                 Nothing ->
@@ -147,7 +155,14 @@ init flags =
                             case query.city of
                                 Just cityName ->
                                     lookupByName cityName config.cities
-                                        |> Result.fromMaybe (Warning ("Invalid city provided via URL: " ++ cityName ++ ". Please choose one from the dropdown below.") CityField)
+                                        |> Result.fromMaybe
+                                            (Warning
+                                                ("Invalid city provided via URL: "
+                                                    ++ cityName
+                                                    ++ ". Please choose one from the dropdown below."
+                                                )
+                                                CityField
+                                            )
                                         |> Result.map Just
 
                                 Nothing ->
