@@ -466,7 +466,9 @@ type alias Model =
 
     Ok (commitmentBonus 3)
     --> Ok 0.13862943611198905
-    -- Note: the value is tagged with `Ok` (i.e. wrapped in a `Result` type) to bypass a limitation of Elm Verify Examples. See https://github.com/stoeffel/elm-verify-examples/issues/83
+    -- Note: the value is tagged with `Ok` (i.e. wrapped in a `Result` type) to
+    -- bypass a limitation of Elm Verify Examples.
+    -- See https://github.com/stoeffel/elm-verify-examples/issues/83
 
 -}
 commitmentBonus : Int -> Float
@@ -509,7 +511,12 @@ humanizeTenure years =
 -}
 salary : Role -> City -> Int -> Int
 salary role city tenure =
-    round (role.baseSalary * city.locationFactor + role.baseSalary * commitmentBonus tenure)
+    round
+        (role.baseSalary
+            * city.locationFactor
+            + role.baseSalary
+            * commitmentBonus tenure
+        )
 
 
 
@@ -596,7 +603,12 @@ view model =
                                 Accordion.header []
                                     (Accordion.toggle [ class "p-0" ]
                                         [ span []
-                                            [ if model.role /= Nothing && model.city /= Nothing then
+                                            [ if
+                                                model.role
+                                                    /= Nothing
+                                                    && model.city
+                                                    /= Nothing
+                                              then
                                                 text "Okay, let's break that down ..."
 
                                               else
@@ -747,7 +759,8 @@ viewPluralizedYears years =
         text " years."
 
 
-{-| Displays monthly salary when provided with role and city. Otherwise displays a prompt for missing data.
+{-| Displays monthly salary when provided with role and city. Otherwise
+displays a prompt for missing data.
 
     import Html
 
@@ -883,10 +896,18 @@ viewBreakdown role city tenure =
                     [ text ")" ]
                 ]
             , tr []
-                [ td [ class "border-0 p-0 text-center text-muted" ] [ text "(base salary)" ]
-                , td [ class "border-0 p-0 text-center text-muted" ] [ text "(location factor)" ]
-                , td [ class "border-0 p-0 text-center text-muted" ] [ text "(base salary)" ]
-                , td [ class "border-0 p-0 text-center text-muted" ] [ text "(commitment bonus)" ]
+                [ td
+                    [ class "border-0 p-0 text-center text-muted" ]
+                    [ text "(base salary)" ]
+                , td
+                    [ class "border-0 p-0 text-center text-muted" ]
+                    [ text "(location factor)" ]
+                , td
+                    [ class "border-0 p-0 text-center text-muted" ]
+                    [ text "(base salary)" ]
+                , td
+                    [ class "border-0 p-0 text-center text-muted" ]
+                    [ text "(commitment bonus)" ]
                 ]
             ]
         , ListGroup.ul
