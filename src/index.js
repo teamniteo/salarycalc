@@ -1,7 +1,7 @@
-import { Elm } from "./SalaryCalculator.elm"
+import { Elm } from "./Main.elm"
 import config from "../config.yml"
 
-const program = Elm.SalaryCalculator
+const program = Elm.Main
 
 export function init(node, config = config) {
   program.init({

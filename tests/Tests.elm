@@ -19,32 +19,31 @@ module Tests exposing
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
+import Career exposing (Career, Role)
+import City exposing (City)
+import Config exposing (Config)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html
 import Json.Decode as Decode
 import Json.Encode as Encode
 import List.Extra as List
-import SalaryCalculator
+import Main
     exposing
-        ( Career
-        , City
-        , Field(..)
+        ( Field(..)
         , Flags
         , Msg(..)
-        , Role
         , Warning
-        , commitmentBonus
         , humanizeCommitmentBonus
         , humanizeTenure
         , init
         , lookupByName
-        , salary
         , update
         , viewPluralizedYears
         , viewSalary
         , viewWarnings
         )
+import Salary
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (classes, tag, text)
@@ -469,7 +468,7 @@ testSalary =
     in
     test "Salary for Software Engineer from Ljubljana with a 2 year tenure"
         (\_ ->
-            salary role city tenure
+            Salary.calculate role city tenure
                 |> Expect.equal 5017
         )
 
@@ -512,31 +511,31 @@ testCommitmentBonus =
     describe "Commitment Bonus is calculated correctly"
         [ test "0 years" <|
             \_ ->
-                commitmentBonus 0
+                Salary.commitmentBonus 0
                     |> Expect.equal 0
         , test "1 year" <|
             \_ ->
-                commitmentBonus 1
+                Salary.commitmentBonus 1
                     |> String.fromFloat
                     |> Expect.equal "0.06931471805599453"
         , test "2 year" <|
             \_ ->
-                commitmentBonus 2
+                Salary.commitmentBonus 2
                     |> String.fromFloat
                     |> Expect.equal "0.10986122886681096"
         , test "5 year" <|
             \_ ->
-                commitmentBonus 5
+                Salary.commitmentBonus 5
                     |> String.fromFloat
                     |> Expect.equal "0.1791759469228055"
         , test "10 year" <|
             \_ ->
-                commitmentBonus 10
+                Salary.commitmentBonus 10
                     |> String.fromFloat
                     |> Expect.equal "0.23978952727983707"
         , test "15 year" <|
             \_ ->
-                commitmentBonus 15
+                Salary.commitmentBonus 15
                     |> String.fromFloat
                     |> Expect.equal "0.2772588722239781"
         ]
@@ -747,8 +746,8 @@ tenureImpact =
             test title
                 (\_ ->
                     Expect.greaterThan
-                        (salary role city tenure)
-                        (salary role city tenure + 1)
+                        (Salary.calculate role city tenure)
+                        (Salary.calculate role city tenure + 1)
                 )
     in
     describe "Longer tenure always results in higher salary" <|
@@ -794,8 +793,8 @@ cityImpact =
             test title <|
                 \() ->
                     Expect.atLeast
-                        (salary role a tenure)
-                        (salary role b tenure)
+                        (Salary.calculate role a tenure)
+                        (Salary.calculate role b tenure)
     in
     describe "Salaries are higher in more expensive cities" <|
         List.map personaSuit personas

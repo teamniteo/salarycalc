@@ -1,28 +1,15 @@
-module SalaryCalculator exposing
-    ( Career
-    , City
-    , Config
-    , Field(..)
+module Main exposing
+    ( Field(..)
     , Flags
     , Model
     , Msg(..)
     , Query
-    , Role
     , Warning
-    , careerDecoder
-    , careersDecoder
-    , citiesDecoder
-    , cityDecoder
-    , commitmentBonus
-    , configDecoder
     , humanizeCommitmentBonus
     , humanizeTenure
     , init
     , lookupByName
     , main
-    , roleDecoder
-    , rolesDecoder
-    , salary
     , subscriptions
     , update
     , view
@@ -41,12 +28,16 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Dropdown as Dropdown
 import Bootstrap.ListGroup as ListGroup
 import Browser
+import Career exposing (Career, Role)
+import City exposing (City)
+import Config
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, rowspan)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
 import Result.Extra as Result
+import Salary
 import Url exposing (fromString)
 import Url.Parser as UrlParser exposing ((<?>), parse)
 import Url.Parser.Query as QueryParser exposing (int, map3, string)
@@ -56,34 +47,11 @@ import Url.Parser.Query as QueryParser exposing (int, map3, string)
 -- MODEL
 
 
-{-| Given a list of records with a name field returns first item with a
-matching name. If no item has a matching name then returns Nothing.
-
-    lookupByName "Amsterdam"
-        [ { name = "Amsterdam", locationFactor = 1.4 }
-        , { name = "Ljubljana", locationFactor = 1.0 }
-        ]
-    --> Just { name = "Amsterdam", locationFactor = 1.4 }
-
-    lookupByName "Warsaw"
-        [ { name = "Amsterdam", locationFactor = 1.4 }
-        , { name = "Ljubljana", locationFactor = 1.0 }
-        ]
-    --> Nothing
-
--}
-lookupByName : String -> List { a | name : String } -> Maybe { a | name : String }
-lookupByName name rolesOrCities =
-    rolesOrCities
-        |> List.filter (\record -> record.name == name)
-        |> List.head
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         model =
-            case Decode.decodeValue configDecoder flags.config of
+            case Decode.decodeValue Config.configDecoder flags.config of
                 Err error ->
                     { error = Just (Decode.errorToString error)
                     , warnings = []
@@ -204,233 +172,9 @@ init flags =
     )
 
 
-{-| Used in `init` function to decode config passed in `Flags`
-
-    import Json.Decode as Decode
-
-    Decode.decodeString configDecoder """
-      {
-        "cities" : [
-          {
-            "name": "Keren",
-            "locationFactor": 1.87
-          }
-        ],
-        "careers" : [
-          {
-            "name": "Design",
-            "roles": [
-              {
-                "name": "Junior Designer",
-                "baseSalary": 2345
-              }
-            ]
-          }
-        ]
-      }
-    """
-    --> Ok
-    -->     { cities = [ City "Keren" 1.87 ]
-    -->     , careers =
-    -->         [ Career "Design"
-    -->             [ Role "Junior Designer" 2345 ]
-    -->         ]
-    -->     }
-
--}
-configDecoder : Decode.Decoder Config
-configDecoder =
-    Decode.map2
-        Config
-        (Decode.field "cities" citiesDecoder)
-        (Decode.field "careers" careersDecoder)
-
-
-{-| A helper for configDecoder
-
-    import Json.Decode as Decode
-
-    Decode.decodeString citiesDecoder """
-      [
-        {
-          "name": "Keren",
-          "locationFactor": 1.87
-        }
-      ]
-    """
-    --> Ok [ City "Keren" 1.87 ]
-
--}
-citiesDecoder : Decode.Decoder (List City)
-citiesDecoder =
-    Decode.list cityDecoder
-        |> Decode.andThen
-            (\cities ->
-                if List.length cities == 0 then
-                    Decode.fail "There must be at least one city in your config."
-
-                else
-                    Decode.succeed cities
-            )
-
-
-{-| A helper for configDecoder
-
-    import Json.Decode as Decode
-
-    Decode.decodeString cityDecoder """
-      {
-        "name": "Keren",
-        "locationFactor": 1.87
-      }
-    """
-    --> Ok (City "Keren" 1.87)
-
--}
-cityDecoder : Decode.Decoder City
-cityDecoder =
-    Decode.map2 City
-        (Decode.field "name" Decode.string)
-        (Decode.field "locationFactor" Decode.float)
-
-
-{-| A helper for configDecoder
-
-    import Json.Decode as Decode
-
-    Decode.decodeString careersDecoder """
-      [
-        {
-          "name": "Design",
-          "roles": [
-            {
-              "name": "Junior Designer",
-              "baseSalary": 2345
-            }
-          ]
-        }
-      ]
-    """
-    --> Ok [ Career "Design" [ Role "Junior Designer" 2345 ] ]
-
--}
-careersDecoder : Decode.Decoder (List Career)
-careersDecoder =
-    Decode.list careerDecoder
-        |> Decode.andThen
-            (\careers ->
-                if List.length careers == 0 then
-                    Decode.fail "There must be at least one career in your config."
-
-                else
-                    Decode.succeed careers
-            )
-
-
-{-| A helper for configDecoder
-
-    import Json.Decode as Decode
-
-    Decode.decodeString careerDecoder """
-      {
-        "name": "Design",
-        "roles": [
-          {
-            "name": "Junior Designer",
-            "baseSalary": 2345
-          }
-        ]
-      }
-    """
-    --> Ok
-    -->     (Career "Design"
-    -->         [ Role "Junior Designer" 2345 ]
-    -->     )
-
--}
-careerDecoder : Decode.Decoder Career
-careerDecoder =
-    Decode.map2
-        Career
-        (Decode.field "name" Decode.string)
-        (Decode.field "roles" rolesDecoder)
-
-
-{-| A helper for configDecoder
-
-    import Json.Decode as Decode
-
-    Decode.decodeString rolesDecoder """
-      [
-        {
-          "name": "Junior Designer",
-          "baseSalary": 2345
-        }
-      ]
-    """
-    --> Ok [ Role "Junior Designer" 2345 ]
-
--}
-rolesDecoder : Decode.Decoder (List Role)
-rolesDecoder =
-    Decode.list roleDecoder
-        |> Decode.andThen
-            (\roles ->
-                if List.length roles == 0 then
-                    Decode.fail "There must be at least one role in your config."
-
-                else
-                    Decode.succeed roles
-            )
-
-
-{-| A helper for configDecoder
-
-    import Json.Decode as Decode
-
-    Decode.decodeString roleDecoder """
-      {
-        "name": "Junior Designer",
-        "baseSalary": 2345
-      }
-    """
-    --> Ok (Role "Junior Designer" 2345)
-
--}
-roleDecoder : Decode.Decoder Role
-roleDecoder =
-    Decode.map2 Role
-        (Decode.field "name" Decode.string)
-        (Decode.field "baseSalary" Decode.int |> Decode.map toFloat)
-
-
 type alias Flags =
     { location : String
     , config : Decode.Value
-    }
-
-
-type alias Config =
-    { cities : List City
-    , careers : List Career
-    }
-
-
-type alias City =
-    { name : String
-    , locationFactor : Float
-    }
-
-
-type alias Role =
-    { name : String
-    , baseSalary : Float
-    }
-
-
-type alias Career =
-    { name : String
-    , roles : List Role
     }
 
 
@@ -475,63 +219,6 @@ type alias Model =
     , cityDropdown : Dropdown.State
     , tenureDropdown : Dropdown.State
     }
-
-
-{-| Given a tenure returns a commitmentBonus.
-
-    Ok (commitmentBonus 3)
-    --> Ok 0.13862943611198905
-    -- Note: the value is tagged with `Ok` (i.e. wrapped in a `Result` type) to
-    -- bypass a limitation of Elm Verify Examples.
-    -- See https://github.com/stoeffel/elm-verify-examples/issues/83
-
--}
-commitmentBonus : Int -> Float
-commitmentBonus tenure =
-    logBase e (toFloat tenure + 1) / 10
-
-
-{-| Format tenure given as an integer as a human readable string.
-
-    humanizeTenure 0
-    --> "Just started"
-
-    humanizeTenure 1
-    --> "1 year"
-
-    humanizeTenure 3
-    --> "3 years"
-
--}
-humanizeTenure : Int -> String
-humanizeTenure years =
-    if years < 1 then
-        "Just started"
-
-    else if years == 1 then
-        String.fromInt years ++ " year"
-
-    else
-        String.fromInt years ++ " years"
-
-
-{-| Calculate a salary based on a role, city and tenure
-
-    salary (Role "Designer" 2500) (City "Warsaw" 1) 0
-    --> 2500
-
-    salary (Role "Designer" 2500) (City "Amsterdam" 1.5) 0
-    --> 3750
-
--}
-salary : Role -> City -> Int -> Int
-salary role city tenure =
-    round
-        (role.baseSalary
-            * city.locationFactor
-            + role.baseSalary
-            * commitmentBonus tenure
-        )
 
 
 
@@ -778,6 +465,8 @@ viewPluralizedYears years =
 displays a prompt for missing data.
 
     import Html
+    import City exposing (City)
+    import Career exposing (Role)
 
     viewSalary Nothing Nothing 3
     --> Html.text "Please select a role and a city."
@@ -805,7 +494,7 @@ viewSalary maybeRole maybeCity tenure =
             span []
                 [ text "My monthly gross salary is "
                 , span [ class "font-weight-bold" ]
-                    [ (salary role city tenure
+                    [ (Salary.calculate role city tenure
                         |> String.fromInt
                       )
                         ++ " €"
@@ -813,31 +502,6 @@ viewSalary maybeRole maybeCity tenure =
                     ]
                 , text "."
                 ]
-
-
-{-| Formats commitment bonus as percentage rounded to a percent.
-
-    humanizeCommitmentBonus 0.3
-    --> "30%"
-
-    humanizeCommitmentBonus 0.12345
-    --> "12%"
-
-    humanizeCommitmentBonus 0.126
-    --> "13%"
-
-    humanizeCommitmentBonus 3.0
-    --> "300%"
-
--}
-humanizeCommitmentBonus : Float -> String
-humanizeCommitmentBonus bonus =
-    (bonus
-        |> (*) 100
-        |> round
-        |> String.fromInt
-    )
-        ++ "%"
 
 
 viewBreakdown : Role -> City -> Int -> Html Msg
@@ -900,7 +564,7 @@ viewBreakdown role city tenure =
                     [ class "border-0 p-0 text-center lead"
                     ]
                     [ tenure
-                        |> commitmentBonus
+                        |> Salary.commitmentBonus
                         |> humanizeCommitmentBonus
                         |> text
                     ]
@@ -980,3 +644,79 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
+
+
+
+-- HELPERS
+
+
+{-| Given a list of records with a name field returns first item with a
+matching name. If no item has a matching name then returns Nothing.
+
+    lookupByName "Amsterdam"
+        [ { name = "Amsterdam", locationFactor = 1.4 }
+        , { name = "Ljubljana", locationFactor = 1.0 }
+        ]
+    --> Just { name = "Amsterdam", locationFactor = 1.4 }
+
+    lookupByName "Warsaw"
+        [ { name = "Amsterdam", locationFactor = 1.4 }
+        , { name = "Ljubljana", locationFactor = 1.0 }
+        ]
+    --> Nothing
+
+-}
+lookupByName : String -> List { a | name : String } -> Maybe { a | name : String }
+lookupByName name rolesOrCities =
+    rolesOrCities
+        |> List.filter (\record -> record.name == name)
+        |> List.head
+
+
+{-| Format tenure given as an integer as a human readable string.
+
+    humanizeTenure 0
+    --> "Just started"
+
+    humanizeTenure 1
+    --> "1 year"
+
+    humanizeTenure 3
+    --> "3 years"
+
+-}
+humanizeTenure : Int -> String
+humanizeTenure years =
+    if years < 1 then
+        "Just started"
+
+    else if years == 1 then
+        String.fromInt years ++ " year"
+
+    else
+        String.fromInt years ++ " years"
+
+
+{-| Formats commitment bonus as percentage rounded to a percent.
+
+    humanizeCommitmentBonus 0.3
+    --> "30%"
+
+    humanizeCommitmentBonus 0.12345
+    --> "12%"
+
+    humanizeCommitmentBonus 0.126
+    --> "13%"
+
+    humanizeCommitmentBonus 3.0
+    --> "300%"
+
+-}
+humanizeCommitmentBonus : Float -> String
+humanizeCommitmentBonus bonus =
+    (bonus
+        |> (*) 100
+        |> round
+        |> String.fromInt
+    )
+        ++ "%"
