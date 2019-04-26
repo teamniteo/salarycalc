@@ -1,5 +1,3 @@
-sources := "$(shell find src -type f | sort | xargs ls -l)"
-
 .PHONY: all
 all: .installed lint test dist
 
