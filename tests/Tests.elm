@@ -17,8 +17,6 @@ module Tests exposing
     , testViewWarnings
     )
 
-import Bootstrap.Accordion as Accordion
-import Bootstrap.Dropdown as Dropdown
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html
@@ -116,10 +114,8 @@ testInitHappyPath =
                             , role = Just (Role "Software Developer" 3500)
                             , city = Just (City "Amsterdam" 1.3)
                             , tenure = 2
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -189,10 +185,8 @@ testInitQueryString =
                             , role = Just (Role "Junior Software Developer" 2500)
                             , city = Just (City "Berlin" 1.2)
                             , tenure = 2
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -249,8 +243,12 @@ testInitInvalidQueryString =
                         |> Expect.equal
                             { error = Nothing
                             , warnings =
-                                [ Warning "Invalid role provided via URL: Foo. Please choose one from the dropdown below." RoleField
-                                , Warning "Invalid city provided via URL: Bar. Please choose one from the dropdown below." CityField
+                                [ Warning
+                                    RoleField
+                                    "Invalid role provided via URL: Foo. Please choose one from the dropdown below."
+                                , Warning
+                                    CityField
+                                    "Invalid city provided via URL: Bar. Please choose one from the dropdown below."
                                 ]
                             , cities =
                                 [ City "Amsterdam" 1.3
@@ -265,10 +263,8 @@ testInitInvalidQueryString =
                             , role = Nothing
                             , city = Nothing
                             , tenure = 2
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -307,10 +303,8 @@ testInitMissingCities =
                             , role = Nothing
                             , city = Nothing
                             , tenure = 0
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -354,10 +348,8 @@ testInitMissingCareers =
                             , role = Nothing
                             , city = Nothing
                             , tenure = 0
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -406,10 +398,8 @@ testInitMissingRoles =
                             , role = Nothing
                             , city = Nothing
                             , tenure = 0
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -447,10 +437,8 @@ testInitInvalidConfig =
                             , role = Nothing
                             , city = Nothing
                             , tenure = 0
-                            , accordionState = Accordion.initialState
-                            , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
-                            , tenureDropdown = Dropdown.initialState
+                            , activeField = Nothing
+                            , breakdownVisible = False
                             }
         )
 
@@ -597,40 +585,45 @@ hideWarnings =
     describe "Warnings are hidden when role or city is selected"
         [ test "role is selected" <|
             \_ ->
-                update (RoleSelected (Role "foo" 5000))
+                update (RoleItemSelected (Role "foo" 5000))
                     { error = Nothing
-                    , warnings = [ Warning "foo" RoleField, Warning "bar" CityField ]
+                    , warnings =
+                        [ Warning RoleField "foo"
+                        , Warning CityField "bar"
+                        ]
                     , cities = []
                     , careers = []
                     , role = Nothing
                     , city = Nothing
                     , tenure = 0
-                    , accordionState = Accordion.initialState
-                    , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
-                    , tenureDropdown = Dropdown.initialState
+                    , activeField = Nothing
+                    , breakdownVisible = False
                     }
                     |> Tuple.first
                     |> .warnings
-                    |> Expect.equal [ Warning "bar" CityField ]
+                    |> Expect.equal [ Warning CityField "bar" ]
         , test "city is selected" <|
             \_ ->
-                update (CitySelected (City "foo" 1.1))
+                update (CityItemSelected (City "foo" 1.1))
                     { error = Nothing
-                    , warnings = [ Warning "foo" RoleField, Warning "bar" CityField ]
+                    , warnings =
+                        [ Warning RoleField "foo"
+                        , Warning CityField "bar"
+                        ]
                     , cities = []
                     , careers = []
                     , role = Nothing
                     , city = Nothing
                     , tenure = 0
-                    , accordionState = Accordion.initialState
-                    , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
-                    , tenureDropdown = Dropdown.initialState
+                    , activeField = Nothing
+                    , breakdownVisible = False
                     }
                     |> Tuple.first
                     |> .warnings
-                    |> Expect.equal [ Warning "foo" RoleField ]
+                    |> Expect.equal
+                        [ Warning RoleField
+                            "foo"
+                        ]
         ]
 
 
@@ -659,7 +652,7 @@ testViewWarnings : Test
 testViewWarnings =
     let
         warnings =
-            [ Warning "Invalid role" RoleField ]
+            [ Warning RoleField "Invalid role" ]
     in
     test "Warnings are displayed as Bootstrap alerts"
         (\_ ->
