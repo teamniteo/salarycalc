@@ -42,8 +42,26 @@ module SalaryCalculator exposing
     )
 
 import Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , h6
+        , li
+        , mark
+        , p
+        , span
+        , strong
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , classList
+        )
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
@@ -583,7 +601,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -652,6 +670,7 @@ view model =
                 ]
 
 
+viewBreakdownToggle : Model -> Html Msg
 viewBreakdownToggle model =
     if
         model.role
@@ -816,6 +835,7 @@ viewTenureDropdown active tenure =
         ]
 
 
+viewRoleItem : Role -> Html Msg
 viewRoleItem role =
     button
         [ class "dropdown-item"
@@ -824,6 +844,7 @@ viewRoleItem role =
         [ text role.name ]
 
 
+viewCityItem : City -> Html Msg
 viewCityItem city =
     button
         [ class "dropdown-item"
@@ -832,6 +853,7 @@ viewCityItem city =
         [ text city.name ]
 
 
+viewTenureItem : Int -> Html Msg
 viewTenureItem tenure =
     button
         [ class "dropdown-item"
@@ -1037,7 +1059,7 @@ viewBreakdown role city tenure =
 
         viewLegendItem : String -> List (Html Msg) -> Html Msg
         viewLegendItem term definition =
-            div
+            li
                 [ class "list-group-item" ]
                 [ strong []
                     [ text term
