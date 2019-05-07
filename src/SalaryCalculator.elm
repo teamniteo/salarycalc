@@ -13,6 +13,7 @@ module SalaryCalculator exposing
     , careersDecoder
     , citiesDecoder
     , cityDecoder
+    , clearWarnings
     , commitmentBonus
     , configDecoder
     , humanizeCommitmentBonus
@@ -27,22 +28,22 @@ module SalaryCalculator exposing
     , update
     , view
     , viewBreakdown
-    , viewHeader
+    , viewBreakdownToggle
+    , viewCityDropdown
+    , viewCityItem
+    , viewForm
     , viewPluralizedYears
+    , viewRoleDropdown
+    , viewRoleItem
     , viewSalary
+    , viewTenureDropdown
+    , viewTenureItem
     , viewWarnings
     )
 
-import Bootstrap.Accordion as Accordion
-import Bootstrap.Alert as Alert
-import Bootstrap.Button as Button
-import Bootstrap.Card as Card
-import Bootstrap.Card.Block as Block
-import Bootstrap.Dropdown as Dropdown
-import Bootstrap.ListGroup as ListGroup
 import Browser
-import Html exposing (Html, div, mark, p, span, table, td, text, tr)
-import Html.Attributes exposing (class, rowspan)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
@@ -92,10 +93,8 @@ init flags =
                     , role = Nothing
                     , city = Nothing
                     , tenure = 0
-                    , accordionState = Accordion.initialState
-                    , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
-                    , tenureDropdown = Dropdown.initialState
+                    , breakdownVisible = False
+                    , activeField = Nothing
                     }
 
                 Ok config ->
@@ -139,11 +138,11 @@ init flags =
                                     lookupByName roleName roles
                                         |> Result.fromMaybe
                                             (Warning
+                                                RoleField
                                                 ("Invalid role provided via URL: "
                                                     ++ roleName
                                                     ++ ". Please choose one from the dropdown below."
                                                 )
-                                                RoleField
                                             )
                                         |> Result.map Just
 
@@ -157,11 +156,11 @@ init flags =
                                     lookupByName cityName config.cities
                                         |> Result.fromMaybe
                                             (Warning
+                                                CityField
                                                 ("Invalid city provided via URL: "
                                                     ++ cityName
                                                     ++ ". Please choose one from the dropdown below."
                                                 )
-                                                CityField
                                             )
                                         |> Result.map Just
 
@@ -190,13 +189,9 @@ init flags =
                     , careers = config.careers
                     , role = role |> Result.extract (\_ -> Nothing)
                     , city = city |> Result.extract (\_ -> Nothing)
-                    , tenure =
-                        query.years
-                            |> Maybe.withDefault 2
-                    , accordionState = Accordion.initialState
-                    , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
-                    , tenureDropdown = Dropdown.initialState
+                    , tenure = Maybe.withDefault 2 query.years
+                    , breakdownVisible = False
+                    , activeField = Nothing
                     }
     in
     ( model
@@ -442,23 +437,22 @@ type alias Query =
 
 
 type Msg
-    = RoleDropdownChanged Dropdown.State
-    | CityDropdownChanged Dropdown.State
-    | TenureDropdownChanged Dropdown.State
-    | RoleSelected Role
-    | CitySelected City
-    | TenureSelected Int
-    | AccordionMsg Accordion.State
+    = DropdownButtonClicked Field
+    | RoleItemSelected Role
+    | CityItemSelected City
+    | TenureItemSelected Int
+    | BreakdownToggleClicked
 
 
 type Field
     = RoleField
     | CityField
+    | TenureField
 
 
 type alias Warning =
-    { msg : String
-    , field : Field
+    { field : Field
+    , msg : String
     }
 
 
@@ -470,10 +464,8 @@ type alias Model =
     , role : Maybe Role
     , city : Maybe City
     , tenure : Int
-    , accordionState : Accordion.State
-    , roleDropdown : Dropdown.State
-    , cityDropdown : Dropdown.State
-    , tenureDropdown : Dropdown.State
+    , breakdownVisible : Bool
+    , activeField : Maybe Field
     }
 
 
@@ -538,59 +530,61 @@ salary role city tenure =
 -- UPDATE
 
 
+clearWarnings : Field -> List Warning -> List Warning
+clearWarnings field warnings =
+    List.filter (\warning -> warning.field /= field) warnings
+
+
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
-        RoleDropdownChanged state ->
-            ( { model | roleDropdown = state }
-            , Cmd.none
-            )
+        DropdownButtonClicked field ->
+            if model.activeField == Just field then
+                ( { model | activeField = Nothing }
+                , Cmd.none
+                )
 
-        CityDropdownChanged state ->
-            ( { model | cityDropdown = state }
-            , Cmd.none
-            )
+            else
+                ( { model | activeField = Just field }
+                , Cmd.none
+                )
 
-        TenureDropdownChanged state ->
-            ( { model | tenureDropdown = state }
-            , Cmd.none
-            )
-
-        RoleSelected role ->
+        RoleItemSelected role ->
             ( { model
-                | role = Just role
-                , warnings =
-                    model.warnings
-                        |> List.filter (\warning -> warning.field /= RoleField)
+                | warnings = clearWarnings RoleField model.warnings
+                , role = Just role
+                , activeField = Nothing
               }
             , Cmd.none
             )
 
-        CitySelected city ->
+        CityItemSelected city ->
             ( { model
-                | city = Just city
-                , warnings =
-                    model.warnings
-                        |> List.filter (\warning -> warning.field /= CityField)
+                | warnings = clearWarnings CityField model.warnings
+                , city = Just city
+                , activeField = Nothing
               }
             , Cmd.none
             )
 
-        TenureSelected years ->
-            ( { model | tenure = years }, Cmd.none )
+        TenureItemSelected tenure ->
+            ( { model
+                | warnings = clearWarnings TenureField model.warnings
+                , tenure = tenure
+                , activeField = Nothing
+              }
+            , Cmd.none
+            )
 
-        AccordionMsg state ->
-            ( { model | accordionState = state }, Cmd.none )
+        BreakdownToggleClicked ->
+            ( { model | breakdownVisible = not model.breakdownVisible }
+            , Cmd.none
+            )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Dropdown.subscriptions model.roleDropdown RoleDropdownChanged
-        , Dropdown.subscriptions model.cityDropdown CityDropdownChanged
-        , Dropdown.subscriptions model.tenureDropdown TenureDropdownChanged
-        , Accordion.subscriptions model.accordionState AccordionMsg
-        ]
+    Sub.none
 
 
 
@@ -606,54 +600,74 @@ view model =
                 |> text
 
         Nothing ->
-            div []
-                [ viewWarnings model.warnings
-                , Accordion.config AccordionMsg
-                    |> Accordion.withAnimation
-                    |> Accordion.cards
-                        [ Accordion.card
-                            { id = "card1"
-                            , options = [ Card.outlineLight ]
-                            , header =
-                                Accordion.header []
-                                    (Accordion.toggle [ class "p-0" ]
-                                        [ span []
-                                            [ if
-                                                model.role
-                                                    /= Nothing
-                                                    && model.city
-                                                    /= Nothing
-                                              then
-                                                text "Okay, let's break that down ..."
-
-                                              else
-                                                Html.text ""
-                                            ]
-                                        ]
-                                    )
-                                    |> Accordion.prependHeader
-                                        (viewHeader model)
-                            , blocks =
-                                case ( model.role, model.city ) of
-                                    ( Nothing, Nothing ) ->
-                                        []
-
-                                    ( Nothing, _ ) ->
-                                        []
-
-                                    ( _, Nothing ) ->
-                                        []
-
-                                    ( Just role, Just city ) ->
-                                        [ Accordion.block []
-                                            [ Block.text []
-                                                [ viewBreakdown role city model.tenure ]
-                                            ]
-                                        ]
-                            }
-                        ]
-                    |> Accordion.view model.accordionState
+            div
+                [ class "container-fluid"
                 ]
+                [ div
+                    [ class "warnings"
+                    , class "row"
+                    ]
+                    [ div
+                        [ class "col-lg-12" ]
+                        [ viewWarnings model.warnings ]
+                    ]
+                , div
+                    [ class "form"
+                    , class "row"
+                    ]
+                    [ div
+                        [ class "col-lg-12"
+                        , class "bg-light"
+                        , class "p-4"
+                        , class "border-bottom"
+                        ]
+                        [ viewForm model ]
+                    ]
+                , div
+                    [ class "breakdown"
+                    , class "row"
+                    , class "collapse"
+                    , classList
+                        [ ( "show"
+                          , not model.breakdownVisible
+                          )
+                        ]
+                    ]
+                    [ div
+                        [ class "col-lg-12"
+                        , class "p-3"
+                        , class "border border-light"
+                        ]
+                        (case ( model.role, model.city ) of
+                            ( Nothing, _ ) ->
+                                []
+
+                            ( _, Nothing ) ->
+                                []
+
+                            ( Just role, Just city ) ->
+                                [ viewBreakdown role city model.tenure ]
+                        )
+                    ]
+                ]
+
+
+viewBreakdownToggle model =
+    if
+        model.role
+            /= Nothing
+            && model.city
+            /= Nothing
+    then
+        button
+            [ onClick BreakdownToggleClicked
+            , class "btn"
+            , class "btn-link"
+            ]
+            [ text "Okay, let's break that down ..." ]
+
+    else
+        text ""
 
 
 viewWarnings : List Warning -> Html Msg
@@ -662,90 +676,168 @@ viewWarnings warnings =
         |> List.map .msg
         |> List.map text
         |> List.map List.singleton
-        |> List.map (Alert.simpleWarning [])
+        |> List.map
+            (div
+                [ class "alert"
+                , class "alert-warning"
+                , attribute "role" "alert"
+                ]
+            )
         |> div []
 
 
-viewHeader : Model -> List (Html Msg)
-viewHeader model =
+viewForm : Model -> Html Msg
+viewForm model =
+    div []
+        [ p [ class "lead" ]
+            [ "I'm a " |> text
+            , model.role
+                |> viewRoleDropdown
+                    (model.activeField == Just RoleField)
+                    model.careers
+            , " living in " |> text
+            , model.city
+                |> viewCityDropdown
+                    (model.activeField == Just CityField)
+                    model.cities
+            , " with a tenure at Niteo of " |> text
+            , model.tenure
+                |> viewTenureDropdown
+                    (model.activeField == Just TenureField)
+            , model.tenure |> viewPluralizedYears
+            ]
+        , p [ class "lead" ]
+            [ viewSalary model.role model.city model.tenure
+            ]
+        , viewBreakdownToggle model
+        ]
+
+
+viewRoleDropdown : Bool -> List Career -> Maybe Role -> Html Msg
+viewRoleDropdown active careers role =
     let
-        roleItem role =
-            Dropdown.buttonItem [ onClick (RoleSelected role) ] [ text role.name ]
+        viewItems : List (Html Msg)
+        viewItems =
+            careers
+                |> List.map viewCareerItemsSection
+                |> List.concat
 
-        cityItem city =
-            Dropdown.buttonItem [ onClick (CitySelected city) ] [ text city.name ]
-
-        tenureItem years =
-            Dropdown.buttonItem [ onClick (TenureSelected years) ]
-                [ humanizeTenure years |> text ]
+        viewCareerItemsSection : Career -> List (Html Msg)
+        viewCareerItemsSection career =
+            h6
+                [ class "dropdown-header" ]
+                [ text (career.name ++ " Career") ]
+                :: List.map viewRoleItem career.roles
     in
-    [ p [ class "lead" ]
-        [ text "I'm a "
-        , Dropdown.dropdown model.roleDropdown
-            { options = []
-            , toggleMsg = RoleDropdownChanged
-            , toggleButton =
-                Dropdown.toggle [ Button.outlinePrimary ]
-                    [ model.role
-                        |> Maybe.map .name
-                        |> Maybe.withDefault "select a role"
-                        |> text
-                    ]
-            , items =
-                model.careers
-                    |> List.map
-                        (\{ name, roles } ->
-                            Dropdown.header [ text (name ++ " Career") ]
-                                :: List.map roleItem roles
-                        )
-                    |> List.concat
-            }
-        , text " living in "
-        , Dropdown.dropdown model.cityDropdown
-            { options = []
-            , toggleMsg = CityDropdownChanged
-            , toggleButton =
-                Dropdown.toggle [ Button.outlinePrimary ]
-                    [ model.city
-                        |> Maybe.map .name
-                        |> Maybe.withDefault "select a city"
-                        |> text
-                    ]
-            , items =
-                model.cities
-                    |> List.map cityItem
-            }
-        , text " with a tenure at Niteo of "
-        , Dropdown.dropdown model.tenureDropdown
-            { options = []
-            , toggleMsg = TenureDropdownChanged
-            , toggleButton =
-                Dropdown.toggle [ Button.outlinePrimary ]
-                    [ model.tenure
-                        |> String.fromInt
-                        |> text
-                    ]
-            , items =
-                [ tenureItem 0
-                , tenureItem 1
-                , tenureItem 2
-                , tenureItem 3
-                , tenureItem 4
-                , tenureItem 5
-                , tenureItem 6
-                , tenureItem 7
-                , tenureItem 8
-                , tenureItem 9
-                , tenureItem 10
-                , tenureItem 15
-                ]
-            }
-        , viewPluralizedYears model.tenure
+    div
+        [ class "dropdown"
+        , class "d-inline-block"
+        , classList [ ( "show", active ) ]
         ]
-    , p [ class "lead" ]
-        [ viewSalary model.role model.city model.tenure
+        [ button
+            [ class "btn"
+            , class "btn-outline-primary"
+            , class "dropdown-toggle"
+            , onClick (DropdownButtonClicked RoleField)
+            ]
+            [ role
+                |> Maybe.map .name
+                |> Maybe.withDefault "select a role"
+                |> text
+            ]
+        , div
+            [ class "dropdown-menu"
+            , classList [ ( "show", active ) ]
+            ]
+            viewItems
         ]
-    ]
+
+
+viewCityDropdown : Bool -> List City -> Maybe City -> Html Msg
+viewCityDropdown active cities city =
+    let
+        viewItems : List (Html Msg)
+        viewItems =
+            cities
+                |> List.map viewCityItem
+    in
+    div
+        [ class "dropdown"
+        , class "d-inline-block"
+        , classList [ ( "show", active ) ]
+        ]
+        [ button
+            [ class "btn"
+            , class "btn-outline-primary"
+            , class "dropdown-toggle"
+            , onClick (DropdownButtonClicked CityField)
+            ]
+            [ city
+                |> Maybe.map .name
+                |> Maybe.withDefault "select a city"
+                |> text
+            ]
+        , div
+            [ class "dropdown-menu"
+            , classList [ ( "show", active ) ]
+            ]
+            viewItems
+        ]
+
+
+viewTenureDropdown : Bool -> Int -> Html Msg
+viewTenureDropdown active tenure =
+    let
+        viewItems =
+            List.map
+                viewTenureItem
+                [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15 ]
+    in
+    div
+        [ class "dropdown"
+        , class "d-inline-block"
+        , classList [ ( "show", active ) ]
+        ]
+        [ button
+            [ class "btn"
+            , class "btn-outline-primary"
+            , class "dropdown-toggle"
+            , onClick (DropdownButtonClicked TenureField)
+            ]
+            [ tenure
+                |> String.fromInt
+                |> text
+            ]
+        , div
+            [ class "dropdown-menu"
+            , classList [ ( "show", active ) ]
+            ]
+            viewItems
+        ]
+
+
+viewRoleItem role =
+    button
+        [ class "dropdown-item"
+        , onClick (RoleItemSelected role)
+        ]
+        [ text role.name ]
+
+
+viewCityItem city =
+    button
+        [ class "dropdown-item"
+        , onClick (CityItemSelected city)
+        ]
+        [ text city.name ]
+
+
+viewTenureItem tenure =
+    button
+        [ class "dropdown-item"
+        , onClick (TenureItemSelected tenure)
+        ]
+        [ tenure |> humanizeTenure |> text ]
 
 
 {-| Displays a plural or singular form of word "year"
@@ -842,128 +934,131 @@ humanizeCommitmentBonus bonus =
 
 viewBreakdown : Role -> City -> Int -> Html Msg
 viewBreakdown role city tenure =
-    div []
-        [ table [ class "table" ]
-            [ tr []
-                [ td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
+    let
+        viewFormula =
+            [ [ "(" |> viewOperator
+              , role.baseSalary
+                    |> String.fromFloat
+                    |> viewVariable "base salary"
+              , "x" |> viewOperator
+              , city.locationFactor
+                    |> String.fromFloat
+                    |> viewVariable "location factor"
+              , ")" |> viewOperator
+              ]
+                |> div
+                    [ class "d-flex"
+                    , class "justify-content-around"
+                    , class "flex-grow-1"
                     ]
-                    [ text "(" ]
-                , td
-                    [ class "border-0 p-0 text-center lead"
+            , "+" |> viewOperator
+            , [ "(" |> viewOperator
+              , role.baseSalary
+                    |> String.fromFloat
+                    |> viewVariable "base salary"
+              , "x" |> viewOperator
+              , tenure
+                    |> commitmentBonus
+                    |> humanizeCommitmentBonus
+                    |> viewVariable "commitment bonus"
+              , ")" |> viewOperator
+              ]
+                |> div
+                    [ class "d-flex"
+                    , class "justify-content-around"
+                    , class "flex-grow-1"
                     ]
-                    [ role.baseSalary
-                        |> String.fromFloat
-                        |> text
-                    ]
-                , td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
-                    ]
-                    [ text "x" ]
-                , td
-                    [ class "border-0 p-0 text-center lead"
-                    ]
-                    [ city.locationFactor
-                        |> String.fromFloat
-                        |> text
-                    ]
-                , td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
-                    ]
-                    [ text ")" ]
-                , td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
-                    ]
-                    [ text "+" ]
-                , td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
-                    ]
-                    [ text "(" ]
-                , td
-                    [ class "border-0 p-0 text-center lead"
-                    ]
-                    [ role.baseSalary
-                        |> String.fromFloat
-                        |> text
-                    ]
-                , td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
-                    ]
-                    [ text "x" ]
-                , td
-                    [ class "border-0 p-0 text-center lead"
-                    ]
-                    [ tenure
-                        |> commitmentBonus
-                        |> humanizeCommitmentBonus
-                        |> text
-                    ]
-                , td
-                    [ class "border-0 p-0 text-center align-middle display-4"
-                    , rowspan 2
-                    ]
-                    [ text ")" ]
-                ]
-            , tr []
-                [ td
-                    [ class "border-0 p-0 text-center text-muted" ]
-                    [ text "(base salary)" ]
-                , td
-                    [ class "border-0 p-0 text-center text-muted" ]
-                    [ text "(location factor)" ]
-                , td
-                    [ class "border-0 p-0 text-center text-muted" ]
-                    [ text "(base salary)" ]
-                , td
-                    [ class "border-0 p-0 text-center text-muted" ]
-                    [ text "(commitment bonus)" ]
-                ]
             ]
-        , ListGroup.ul
-            [ ListGroup.li []
-                [ span
-                    [ class "font-weight-bold"
+                |> div
+                    [ class "d-md-flex"
+                    , class "justify-content-around"
+                    , class "text-center"
                     ]
-                    [ text "Base Salary: " ]
-                , text "San Francisco 50th percentile for "
-                , mark [] [ text role.name ]
-                , text " on Glassdoor, discounted by our Affordability Ratio of 0.53."
+
+        viewLegend =
+            ul
+                [ class "list-group"
+                , class "mt-3"
                 ]
-            , ListGroup.li []
-                [ span
-                    [ class "font-weight-bold"
+                [ viewLegendItem
+                    "Base Salary"
+                    [ text "San Francisco 50th percentile for "
+                    , role.name |> viewHighlighted
+                    , text " on Glassdoor, discounted by our Affordability Ratio of 0.53."
                     ]
-                    [ text "Location Factor: " ]
-                , text "Numbeo Cost of Living in "
-                , mark [] [ text city.name ]
-                , text " compared to San Francisco, compressed and normalized against our Affordability Ratio of 0.53."
-                ]
-            , ListGroup.li []
-                [ span
-                    [ class "font-weight-bold"
+                , viewLegendItem
+                    "Location Factor"
+                    [ "Numbeo Cost of Living in " |> text
+                    , city.name |> viewHighlighted
+                    , " compared to San Francisco, compressed and normalized against our Affordability Ratio of 0.53." |> text
                     ]
-                    [ text "Commitment Bonus: " ]
-                , text "Natural logarithm of "
-                , mark []
-                    [ tenure
+                , viewLegendItem
+                    "Commitment Bonus"
+                    [ text "Natural logarithm of "
+                    , tenure
                         |> String.fromInt
-                        |> text
+                        |> viewHighlighted
+                    , text " years of your tenure, divided by 10."
                     ]
-                , text " years of your tenure, divided by 10."
-                ]
-            , ListGroup.li []
-                [ span
-                    [ class "font-weight-bold"
+                , viewLegendItem
+                    "Affordability Ratio"
+                    [ "Average Cost of Living index compared to San Francisco, for four major European tech hubs: Amsterdam, Berlin, Barcelona, Lisbon." |> text
                     ]
-                    [ text "Affordability Ratio: " ]
-                , text "Average Cost of Living index compared to San Francisco, for four major European tech hubs: Amsterdam, Berlin, Barcelona, Lisbon."
                 ]
+
+        {- For displaying the big things like "(" or "+" -}
+        viewOperator : String -> Html Msg
+        viewOperator operator =
+            div
+                [ class "display-4"
+                ]
+                [ text operator ]
+
+        viewVariable name value =
+            div
+                [ class "variable"
+                , class "d-flex"
+                , class "flex-column"
+                , class "justify-content-center"
+                ]
+                [ div
+                    [ class "value" ]
+                    [ text value ]
+                , div
+                    [ class "name"
+                    , class "text-muted"
+                    ]
+                    [ text <| String.concat [ "( ", name, " )" ] ]
+                ]
+
+        viewHighlighted : String -> Html Msg
+        viewHighlighted string =
+            mark [] [ text string ]
+
+        viewLegendItem : String -> List (Html Msg) -> Html Msg
+        viewLegendItem term definition =
+            div
+                [ class "list-group-item" ]
+                [ strong []
+                    [ text term
+                    , text ": "
+                    ]
+                , span [] definition
+                ]
+    in
+    div
+        []
+        [ div
+            [ class "row" ]
+            [ div
+                [ class "col-lg-12" ]
+                [ viewFormula ]
+            ]
+        , div
+            [ class "row" ]
+            [ div
+                [ class "col-lg-12" ]
+                [ viewLegend ]
             ]
         ]
 
