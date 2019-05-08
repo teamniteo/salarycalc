@@ -647,7 +647,7 @@ view model =
                     , class "collapse"
                     , classList
                         [ ( "show"
-                          , not model.breakdownVisible
+                          , model.breakdownVisible
                           )
                         ]
                     ]
