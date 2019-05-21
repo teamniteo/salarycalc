@@ -18,6 +18,9 @@ cities:
   - name: Delhi
     locationFactor: 0.79
 
+  - name: Gothenburg
+    locationFactor: 0.98
+
   - name: Kharkiv
     locationFactor: 0.79
 
