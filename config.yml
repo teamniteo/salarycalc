@@ -38,6 +38,9 @@ cities:
 
   - name: San Francisco
     locationFactor: 1.59
+    
+  - name: Yokohama
+    locationFactor: 1.08  
 
 careers:
 
