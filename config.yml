@@ -35,6 +35,9 @@ cities:
 
   - name: Novi Sad
     locationFactor: 0.81
+    
+  - name: Pune
+    locationFactor: 0.78
 
   - name: San Francisco
     locationFactor: 1.59
