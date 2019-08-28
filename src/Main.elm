@@ -32,7 +32,7 @@ import Career exposing (Career, Role)
 import City exposing (City)
 import Config
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
-import Html.Attributes exposing (class, rowspan)
+import Html.Attributes exposing (class, id, rowspan)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
@@ -493,7 +493,7 @@ viewSalary maybeRole maybeCity tenure =
         ( Just role, Just city ) ->
             span []
                 [ text "My monthly gross salary is "
-                , span [ class "font-weight-bold" ]
+                , span [ class "font-weight-bold", id "total-salary" ]
                     [ (Salary.calculate role city tenure
                         |> String.fromInt
                       )
