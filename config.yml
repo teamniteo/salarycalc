@@ -85,10 +85,10 @@ careers:
 
   - name: Operations
     roles:
-      - name: Customer Support Specialist
+      - name: Customer Support Associate
         baseSalary: 1711
 
-      - name: Customer Support Associate
+      - name: Customer Support Specialist
         baseSalary: 1792
 
       - name: Technical Support Specialist
