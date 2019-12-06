@@ -1,51 +1,75 @@
+# When we calculate Niteo's base salary in EUR we take the
+# 10-year average of EUR -> USD exchange rate.
 eur_to_usd_10_year_avg: 1.2027
+
+# We cannot afford to pay San Francisco-level salaries, so
+# set set our "affordability" ratio here -- all base salaries
+# are calculated based on SF salary * affordability_ratio
+# We took 0.53 because it is the averaged out salary between
+# Amsterdam, Berlin, Barcelona and Lisbon; compared to SF.
+affordability_ratio: 0.53
 
 cities:
 
 -   name: Amsterdam
-    locationFactor: 1.2
+    country: Netherlands
+    locationFactor: 1.14
 
 -   name: Barcelona
-    locationFactor: 0.97
+    country: Spain
+    locationFactor: 0.95
 
 -   name: Berlin
-    locationFactor: 0.99
+    country: Germany
+    locationFactor: 0.97
 
 -   name: Bucharest
-    locationFactor: 0.84
+    country: Romania
+    locationFactor: 0.83
 
 -   name: Davao
-    locationFactor: 0.81
+    country: Philippines
+    locationFactor: 0.78
 
 -   name: Delhi
-    locationFactor: 0.79
+    country: India
+    locationFactor: 0.78
 
 -   name: Kharkiv
-    locationFactor: 0.79
+    country: Ukraine
+    locationFactor: 0.81
 
 -   name: Lisbon
-    locationFactor: 0.94
+    country: Portugal
+    locationFactor: 0.93
 
 -   name: Ljubljana
-    locationFactor: 0.91
+    country: Slovenia
+    locationFactor: 0.9
 
 -   name: London
-    locationFactor: 1.3
+    country: United Kingdom
+    locationFactor: 1.27
 
 -   name: Maribor
-    locationFactor: 0.86
+    country: Slovenia
+    locationFactor: 0.87
 
 -   name: Novi Sad
+    country: Serbia
     locationFactor: 0.81
 
 -   name: Pune
-    locationFactor: 0.79
+    country: India
+    locationFactor: 0.78
 
--   name: San Francisco
+-   name: San Francisco, CA
+    country: United States
     locationFactor: 1.59
 
 -   name: Yokohama
-    locationFactor: 1.08
+    country: Japan
+    locationFactor: 1.07
 
 careers:
 
