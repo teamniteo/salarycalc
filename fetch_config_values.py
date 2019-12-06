@@ -97,8 +97,6 @@ def cities(
     pbar.set_description("Processing cities")
 
     for city in config["cities"]:
-        pbar.update()
-
         # Load numbeo
         driver.get(
             f"https://www.numbeo.com/cost-of-living/compare_cities.jsp?amount={BASE_SF_SALARY}&displayCurrency=USD&country1=United+States&city1=San+Francisco%2C+CA&country2={city['country']}&city2={city['name']}"
@@ -121,6 +119,8 @@ def cities(
         )
 
         city["locationFactor"] = round(normalized_ratio, 2)
+
+        pbar.update()
 
     pbar.close()
 
@@ -154,6 +154,78 @@ def normalize_against_affordability_ratio(ratio, affordability_ratio):
     return ratio / affordability_ratio
 
 
+def salaries(
+    driver: webdriver.firefox.webdriver.WebDriver,
+    config: ruamel.yaml.comments.CommentedMap,
+) -> None:
+    """Update the baseSalary values in config.yaml."""
+    roles = []
+    for career in config["careers"]:
+        for role in career["roles"]:
+            roles.append(role)
+
+    pbar = tqdm(total=len(roles) + 1)
+    pbar.set_description("Processing salaries")
+
+    # Login to Glassdoor
+    driver.get(f"https://www.glassdoor.com/profile/login_input.htm")
+    driver.find_element_by_css_selector("input#userEmail").send_keys(
+        "nejc.zupan@gmail.com"
+    )
+    driver.find_element_by_css_selector("input#userPassword").send_keys(
+        "ausaiFu4Akoo9ohvai7y"
+    )
+    driver.find_element_by_xpath("//button[text()='Sign In']").click()
+    pbar.update()
+
+    FIRST_RUN = True
+
+    for role in roles:
+
+        # Configure search parameters
+        driver.get("https://www.glassdoor.com/Salaries/index.htm")
+        driver.find_element_by_css_selector("input#KeywordSearch").clear()
+        driver.find_element_by_css_selector("input#KeywordSearch").send_keys(
+            role["name"]
+        )
+        driver.find_element_by_css_selector("input#LocationSearch").clear()
+        driver.find_element_by_css_selector("input#LocationSearch").send_keys(
+            "San Francisco, US"
+        )
+        driver.find_element_by_css_selector("button#HeroSearchButton").click()
+
+        # Switch to new tab opened by Glassdoor
+        if FIRST_RUN:
+            driver.switch_to.window(driver.window_handles[1])
+
+        WebDriverWait(driver, 5).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, "div#SearchResults"))
+        )
+
+        # Extract SF salary
+        sf_salary_text = driver.find_element_by_css_selector(
+            "span.occMedianModule__OccMedianBasePayStyle__payNumber"
+        ).text
+        sf_salary = int(sf_salary_text.replace(",", "").replace("$", ""))
+
+        base_salary = round(
+            sf_salary
+            * config["affordability_ratio"]
+            / 12
+            / config["eur_to_usd_10_year_avg"]
+        )
+
+        role["baseSalary"] = base_salary
+
+        if FIRST_RUN:
+            # Close tab
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
+            FIRST_RUN = False
+
+        pbar.update()
+
+
 def main(argv=sys.argv) -> None:
     """Update salaries."""
 
@@ -169,6 +241,7 @@ def main(argv=sys.argv) -> None:
 
             usd_to_eur_10_year_average(driver, config)
             cities(driver, config)
+            salaries(driver, config)
 
         with open("config.yml", "w") as file:
             ruamel.yaml.dump(config, file, indent=4, Dumper=RoundTripDumper)

@@ -76,71 +76,71 @@ careers:
 -   name: Design
     roles:
     -   name: Junior Designer
-        baseSalary: 2649
+        baseSalary: 2923
 
     -   name: Designer
-        baseSalary: 3119
+        baseSalary: 2926
 
     -   name: Senior Designer
-        baseSalary: 4066
+        baseSalary: 2923
 
     -   name: Lead Designer
-        baseSalary: 4206
+        baseSalary: 2923
 
     -   name: Principal Designer
-        baseSalary: 5371
+        baseSalary: 5215
 
 
 -   name: Marketing
     roles:
     -   name: Marketing Associate
-        baseSalary: 2446
+        baseSalary: 2181
 
     -   name: Digital Marketing Specialist
-        baseSalary: 2955
+        baseSalary: 2919
 
     -   name: Senior Digital Marketing Specialist
-        baseSalary: 3693
+        baseSalary: 2949
 
     -   name: Product Marketing Manager
-        baseSalary: 5243
+        baseSalary: 4807
 
     -   name: Senior Product Marketing Manager
-        baseSalary: 6140
+        baseSalary: 4807
 
 
 -   name: Operations
     roles:
     -   name: Customer Support Specialist
-        baseSalary: 1711
+        baseSalary: 1322
 
     -   name: Customer Support Associate
-        baseSalary: 1792
+        baseSalary: 1356
 
     -   name: Technical Support Specialist
-        baseSalary: 1979
+        baseSalary: 1798
 
     -   name: Operations Manager
-        baseSalary: 2720
+        baseSalary: 4012
 
     -   name: Senior Operations Manager
-        baseSalary: 3903
+        baseSalary: 4012
 
 
 -   name: Technical
     roles:
     -   name: Junior Programmer
-        baseSalary: 2506
+        baseSalary: 2615
 
     -   name: Junior Software Engineer
-        baseSalary: 3795
+        baseSalary: 4926
 
     -   name: Software Engineer
-        baseSalary: 4919
+        baseSalary: 4922
 
     -   name: Lead Software Engineer
-        baseSalary: 5791
+        baseSalary: 4926
 
     -   name: Principal Software Engineer
-        baseSalary: 6184
+        baseSalary: 6243
 
