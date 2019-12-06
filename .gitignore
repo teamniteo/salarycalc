@@ -1,10 +1,11 @@
 .cache/
 .coverage/
 .installed
+.mypy_cache/
+.npmrc
+.venv/
+/tests/VerifyExamples
 dist/
 elm-stuff/
 node_modules/
 repl-temp-*
-.npmrc
-/tests/VerifyExamples
-

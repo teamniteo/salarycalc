@@ -1,4 +1,7 @@
-version: 2
+version: 2.1
+
+orbs:
+  untracked_changes: niteo/check-untracked-changes@1
 
 defaults: &defaults
     working_directory: ~/repo
@@ -9,9 +12,11 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
+      - python
       - build
       - publish:
           requires:
+            - python
             - build
           filters:
             branches:
@@ -19,6 +24,35 @@ workflows:
 
 
 jobs:
+  python:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:3.7.5
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-python-dependencies-{{ checksum "Pipfile.lock" }}
+            - v1-python-dependencies-
+
+      - run:
+          name: lint fetch_config_values
+          command: |
+            pipenv install --dev
+            pipenv run black fetch_config_values.py
+            pipenv run isort -rc --atomic fetch_config_values.py
+            pipenv run flake8 fetch_config_values.py
+            pipenv run mypy fetch_config_values.py
+
+      - save_cache:
+          key: v1-python-dependencies-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ./.venv
+
+      - untracked_changes/check
+
   build:
     <<: *defaults
 
