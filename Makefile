@@ -1,3 +1,6 @@
+.EXPORT_ALL_VARIABLES:
+PIPENV_VENV_IN_PROJECT = 1
+
 .PHONY: all
 all: .installed lint test dist
 
@@ -64,7 +67,22 @@ publish: dist
 	@npm publish
 	@git checkout HEAD package.json package-lock.json
 
+# Fetch salaries, location factors and currencies from the Internet
+.python.installed: Pipfile Pipfile.lock
+	@echo "Pipfile(.lock) is newer than .installed, (re)installing"
+	@pipenv install --dev
+	@echo "This file is used by 'make' for keeping track of last install time. If Pipfile or Pipfile.lock are newer then this file (.installed) then all 'make *' commands that depend on '.installed' know they need to run pipenv install first." \
+		> .python.installed
+
+.PHONY: config
+config: .python.installed
+	@pipenv run black fetch_config_values.py
+	@pipenv run isort -rc --atomic fetch_config_values.py
+	@pipenv run flake8 fetch_config_values.py
+	@pipenv run mypy fetch_config_values.py
+	@pipenv run python fetch_config_values.py
+
 # Nuke from orbit
 clean:
-	@rm -rf elm-stuff/ dist/ node_modules/ tests/VerifyExamples/
+	@rm -rf elm-stuff/ dist/ node_modules/ tests/VerifyExamples/ .venv/
 	@rm -f .installed

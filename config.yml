@@ -1,120 +1,122 @@
+eur_to_usd_10_year_avg: 1.2027
+
 cities:
 
-  - name: Amsterdam
+-   name: Amsterdam
     locationFactor: 1.2
 
-  - name: Barcelona
+-   name: Barcelona
     locationFactor: 0.97
 
-  - name: Berlin
+-   name: Berlin
     locationFactor: 0.99
 
-  - name: Bucharest
+-   name: Bucharest
     locationFactor: 0.84
 
-  - name: Davao
+-   name: Davao
     locationFactor: 0.81
 
-  - name: Delhi
+-   name: Delhi
     locationFactor: 0.79
 
-  - name: Kharkiv
+-   name: Kharkiv
     locationFactor: 0.79
 
-  - name: Lisbon
+-   name: Lisbon
     locationFactor: 0.94
 
-  - name: Ljubljana
+-   name: Ljubljana
     locationFactor: 0.91
 
-  - name: London
+-   name: London
     locationFactor: 1.3
 
-  - name: Maribor
+-   name: Maribor
     locationFactor: 0.86
 
-  - name: Novi Sad
+-   name: Novi Sad
     locationFactor: 0.81
-    
-  - name: Pune
+
+-   name: Pune
     locationFactor: 0.79
 
-  - name: San Francisco
+-   name: San Francisco
     locationFactor: 1.59
-    
-  - name: Yokohama
-    locationFactor: 1.08  
+
+-   name: Yokohama
+    locationFactor: 1.08
 
 careers:
 
-  - name: Design
+-   name: Design
     roles:
-      - name: Junior Designer
+    -   name: Junior Designer
         baseSalary: 2649
 
-      - name: Designer
+    -   name: Designer
         baseSalary: 3119
 
-      - name: Senior Designer
+    -   name: Senior Designer
         baseSalary: 4066
 
-      - name: Lead Designer
+    -   name: Lead Designer
         baseSalary: 4206
 
-      - name: Principal Designer
+    -   name: Principal Designer
         baseSalary: 5371
 
 
-  - name: Marketing
+-   name: Marketing
     roles:
-      - name: Marketing Associate
+    -   name: Marketing Associate
         baseSalary: 2446
 
-      - name: Digital Marketing Specialist
+    -   name: Digital Marketing Specialist
         baseSalary: 2955
 
-      - name: Senior Digital Marketing Specialist
+    -   name: Senior Digital Marketing Specialist
         baseSalary: 3693
 
-      - name: Product Marketing Manager
+    -   name: Product Marketing Manager
         baseSalary: 5243
 
-      - name: Senior Product Marketing Manager
+    -   name: Senior Product Marketing Manager
         baseSalary: 6140
 
 
-  - name: Operations
+-   name: Operations
     roles:
-      - name: Customer Support Specialist
+    -   name: Customer Support Specialist
         baseSalary: 1711
 
-      - name: Customer Support Associate
+    -   name: Customer Support Associate
         baseSalary: 1792
 
-      - name: Technical Support Specialist
+    -   name: Technical Support Specialist
         baseSalary: 1979
 
-      - name: Operations Manager
+    -   name: Operations Manager
         baseSalary: 2720
 
-      - name: Senior Operations Manager
+    -   name: Senior Operations Manager
         baseSalary: 3903
 
 
-  - name: Technical
+-   name: Technical
     roles:
-      - name: Junior Programmer
+    -   name: Junior Programmer
         baseSalary: 2506
 
-      - name: Junior Software Engineer
+    -   name: Junior Software Engineer
         baseSalary: 3795
 
-      - name: Software Engineer
+    -   name: Software Engineer
         baseSalary: 4919
 
-      - name: Lead Software Engineer
+    -   name: Lead Software Engineer
         baseSalary: 5791
 
-      - name: Principal Software Engineer
+    -   name: Principal Software Engineer
         baseSalary: 6184
 
