@@ -2,20 +2,20 @@ module Config exposing
     ( Config
     , careerDecoder
     , careersDecoder
-    , citiesDecoder
-    , cityDecoder
+    , countriesDecoder
+    , countryDecoder
     , configDecoder
     , roleDecoder
     , rolesDecoder
     )
 
 import Career exposing (Career, Role)
-import City exposing (City)
+import Country exposing (Country)
 import Json.Decode as Decode
 
 
 type alias Config =
-    { cities : List City
+    { countries : List Country
     , careers : List Career
     }
 
@@ -23,15 +23,15 @@ type alias Config =
 {-| Used in `init` function to decode config passed in `Flags`
 
     import Json.Decode as Decode
-    import City exposing (City)
+    import Country exposing (Country)
     import Career exposing (Role, Career)
 
     Decode.decodeString configDecoder """
       {
-        "cities" : [
+        "countries" : [
           {
-            "name": "Keren",
-            "locationFactor": 1.87
+            "name": "Spain",
+            "compressed_cost_of_living": 1.87
           }
         ],
         "careers" : [
@@ -48,7 +48,7 @@ type alias Config =
       }
     """
     --> Ok
-    -->     { cities = [ City "Keren" 1.87 ]
+    -->     { countries = [ Country "Spain" 1.87 ]
     -->     , careers =
     -->         [ Career "Design"
     -->             [ Role "Junior Designer" 2345 ]
@@ -60,33 +60,33 @@ configDecoder : Decode.Decoder Config
 configDecoder =
     Decode.map2
         Config
-        (Decode.field "cities" citiesDecoder)
+        (Decode.field "countries" countriesDecoder)
         (Decode.field "careers" careersDecoder)
 
 
 {-| A helper for configDecoder
 
-    import City exposing (City)
+    import Country exposing (Country)
     import Json.Decode as Decode
 
-    Decode.decodeString citiesDecoder """
+    Decode.decodeString countriesDecoder """
       [
         {
-          "name": "Keren",
-          "locationFactor": 1.87
+          "name": "Spain",
+          "compressed_cost_of_living": 1.87
         }
       ]
     """
-    --> Ok [ City "Keren" 1.87 ]
+    --> Ok [ Country "Spain" 1.87 ]
 
 -}
-citiesDecoder : Decode.Decoder (List City)
-citiesDecoder =
-    Decode.list cityDecoder
+countriesDecoder : Decode.Decoder (List Country)
+countriesDecoder =
+    Decode.list countryDecoder
         |> Decode.andThen
             (\cities ->
                 if List.length cities == 0 then
-                    Decode.fail "There must be at least one city in your config."
+                    Decode.fail "There must be at least one country in your config."
 
                 else
                     Decode.succeed cities
@@ -95,23 +95,23 @@ citiesDecoder =
 
 {-| A helper for configDecoder
 
-    import City exposing (City)
+    import Country exposing (Country)
     import Json.Decode as Decode
 
-    Decode.decodeString cityDecoder """
+    Decode.decodeString countryDecoder """
       {
-        "name": "Keren",
-        "locationFactor": 1.87
+        "name": "Spain",
+        "compressed_cost_of_living": 1.87
       }
     """
-    --> Ok (City "Keren" 1.87)
+    --> Ok (Country "Spain" 1.87)
 
 -}
-cityDecoder : Decode.Decoder City
-cityDecoder =
-    Decode.map2 City
+countryDecoder : Decode.Decoder Country
+countryDecoder =
+    Decode.map2 Country
         (Decode.field "name" Decode.string)
-        (Decode.field "locationFactor" Decode.float)
+        (Decode.field "compressed_cost_of_living" Decode.float)
 
 
 {-| A helper for configDecoder
