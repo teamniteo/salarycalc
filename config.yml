@@ -97,71 +97,91 @@ careers:
 -   name: Design
     roles:
     -   name: Junior Designer
-        baseSalary: 2649
+        baseSalary: 4464
+        salary_com_key: web-designer-i
 
     -   name: Designer
-        baseSalary: 3119
+        baseSalary: 4956
+        salary_com_key: web-designer-ii
 
     -   name: Senior Designer
-        baseSalary: 4066
+        baseSalary: 6070
+        salary_com_key: web-designer-iii
 
     -   name: Lead Designer
-        baseSalary: 4206
+        baseSalary: 7412
+        salary_com_key: web-designer-iv
 
     -   name: Principal Designer
-        baseSalary: 5371
+        baseSalary: 7412
+        salary_com_key: web-designer-iv # TODO web-art-director
 
 
 -   name: Marketing
     roles:
     -   name: Marketing Associate
-        baseSalary: 2446
+        baseSalary: 3915
+        salary_com_key: digital-marketing-analyst-i
 
     -   name: Digital Marketing Specialist
-        baseSalary: 2955
+        baseSalary: 4797
+        salary_com_key: digital-marketing-analyst-ii
 
     -   name: Senior Digital Marketing Specialist
-        baseSalary: 3693
+        baseSalary: 6373
+        salary_com_key: digital-marketing-analyst-iii
 
     -   name: Product Marketing Manager
-        baseSalary: 5243
+        baseSalary: 7035
+        salary_com_key: digital-marketing-manager
 
     -   name: Senior Product Marketing Manager
-        baseSalary: 6140
+        baseSalary: 11188
+        salary_com_key: digital-marketing-director
 
 
 -   name: Operations
     roles:
     -   name: Customer Support Specialist
-        baseSalary: 1711
+        baseSalary: 6105
+        salary_com_key: software-engineer-ii
 
     -   name: Customer Support Associate
-        baseSalary: 1792
+        baseSalary: 5291
+        salary_com_key: technical-support-analyst-ii
 
     -   name: Technical Support Specialist
-        baseSalary: 1979
+        baseSalary: 5840
+        salary_com_key: it-project-manager-i
 
     -   name: Operations Manager
-        baseSalary: 2720
+        baseSalary: 7316
+        salary_com_key: it-project-manager-ii
 
     -   name: Senior Operations Manager
-        baseSalary: 3903
+        baseSalary: 8796
+        salary_com_key: it-project-manager-iii
 
 
 -   name: Technical
     roles:
     -   name: Junior Programmer
-        baseSalary: 2506
+        baseSalary: 4757
+        salary_com_key: software-engineer-i
 
     -   name: Junior Software Engineer
-        baseSalary: 3795
+        baseSalary: 6105
+        salary_com_key: software-engineer-ii
 
     -   name: Software Engineer
-        baseSalary: 4919
+        baseSalary: 7574
+        salary_com_key: software-engineer-iii
 
     -   name: Lead Software Engineer
-        baseSalary: 5791
+        baseSalary: 9116
+        salary_com_key: software-engineer-iv
 
     -   name: Principal Software Engineer
-        baseSalary: 6184
+        baseSalary: 10350
+        salary_com_key: software-engineer-v
 

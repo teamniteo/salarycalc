@@ -127,6 +127,37 @@ def countries(
     pbar.close()
 
 
+def salaries(
+    driver: webdriver.firefox.webdriver.WebDriver,
+    config: ruamel.yaml.comments.CommentedMap,
+) -> None:
+    """Update the baseSalary values in config.yaml."""
+
+    roles = []
+    for career in config["careers"]:
+        for role in career["roles"]:
+            roles.append(role)
+
+    pbar = tqdm(total=len(roles))
+    pbar.set_description("Processing roles")
+
+    for role in roles:
+        pbar.update()
+
+        # Load numbeo
+        driver.get(
+            f"https://www.salary.com/tools/salary-calculator/{role['salary_com_key']}"
+        )
+
+        # Extract Cost of Living Plus Rent Index
+        us_salary_text = driver.find_element_by_css_selector("#top_salary_value").text
+        us_salary = int(us_salary_text.replace(",", "").replace("$", ""))
+        base_salary = round(us_salary / 12 / config["eur_to_usd_10_year_avg"])
+        role["baseSalary"] = base_salary
+
+    pbar.close()
+
+
 def compress_towards_affordability(cost_of_living, affordability):
     """Decrease differences between expensive and cheap locations."""
     if cost_of_living == affordability:
@@ -152,6 +183,7 @@ def main(argv=sys.argv) -> None:
 
             usd_to_eur_10_year_average(driver, config)
             countries(driver, config)
+            salaries(driver, config)
 
         with open("config.yml", "w") as file:
             ruamel.yaml.dump(config, file, indent=4, Dumper=RoundTripDumper)
