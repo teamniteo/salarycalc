@@ -76,7 +76,7 @@ def usd_to_eur_10_year_average(
     avg_value = driver.find_element_by_css_selector(
         "td.historical-rates--table--average--value"
     ).text
-    avg = round(float(avg_value), 4)
+    avg = round(float(avg_value), 2)
     pbar.update()
 
     config["eur_to_usd_10_year_avg"] = avg
@@ -85,73 +85,56 @@ def usd_to_eur_10_year_average(
     pbar.close()
 
 
-def cities(
+def countries(
     driver: webdriver.firefox.webdriver.WebDriver,
     config: ruamel.yaml.comments.CommentedMap,
 ) -> None:
-    """Update the locationFactor values in config.yaml."""
+    """Update the Cost of Living values in config.yaml."""
 
-    BASE_SF_SALARY = 10000
+    pbar = tqdm(total=len(config["countries"]))
+    pbar.set_description("Processing countries")
 
-    pbar = tqdm(total=len(config["cities"]))
-    pbar.set_description("Processing cities")
-
-    for city in config["cities"]:
+    for country in config["countries"]:
         pbar.update()
 
         # Load numbeo
         driver.get(
-            f"https://www.numbeo.com/cost-of-living/compare_cities.jsp?amount={BASE_SF_SALARY}&displayCurrency=USD&country1=United+States&city1=San+Francisco%2C+CA&country2={city['country']}&city2={city['name']}"
+            "https://www.numbeo.com/cost-of-living/compare_countries_result.jsp?"
+            f"country1=United+States&country2={country['name']}"
         )
 
-        # Extract equivalent of $10k/month salary in SF
-        equivalent_salary_text = driver.find_element_by_css_selector(
-            "span.number_amount_nobreak"
-        ).text  # '4,801.48$ (4,323.12€)'
+        # Extract Cost of Living Plus Rent Index
+        difference_text = driver.find_element_by_css_selector(
+            ".table_indices_diff "
+            "> tbody:nth-child(1) "
+            "> tr:nth-child(3) "
+            "> td:nth-child(1)"
+        ).text
 
-        equivalent_salary = float(equivalent_salary_text.split("$")[0].replace(",", ""))
-
-        numbeo_ratio = equivalent_salary / BASE_SF_SALARY
-
-        compressed_ratio = compress_towards_affordability_ratio(
-            numbeo_ratio, config["affordability_ratio"]
-        )
-        normalized_ratio = normalize_against_affordability_ratio(
-            compressed_ratio, config["affordability_ratio"]
+        # 'Consumer Prices Including Rent in Netherlands are 2.05% lower than
+        # in United States'
+        difference = float(
+            difference_text.split("are")[1].split(" ")[1].replace("%", "")
         )
 
-        city["locationFactor"] = round(normalized_ratio, 2)
+        numbeo_ratio = 1 - (difference / 100)
+
+        country["cost_of_living"] = round(numbeo_ratio, 2)
+        country["compressed_cost_of_living"] = round(
+            compress_towards_affordability(numbeo_ratio, config["affordability"]), 2
+        )
 
     pbar.close()
 
 
-def compress_towards_affordability_ratio(ratio, affordability_ratio):
-    """Decrease differences between expensive and cheap locations.
-
-    We want to slightly underpay people in expensive locations and
-    overpay people in cheap locations:
-    - in cheap locations, a MacBook costs the same (if not more)
-    - people in cheap locations can easily work remotely for a
-      company in a more expensive location
-    - by overpaying cheap locations, we get access to top talent there
-    - by underpaying expensive locations our hiring is harder there so
-      the culture fit must be greater
-    """
-    if ratio == affordability_ratio:
-        return ratio
-    elif ratio < affordability_ratio:
-        return ((ratio - affordability_ratio) * 0.33) + affordability_ratio
+def compress_towards_affordability(cost_of_living, affordability):
+    """Decrease differences between expensive and cheap locations."""
+    if cost_of_living == affordability:
+        return cost_of_living
+    elif cost_of_living < affordability:
+        return ((cost_of_living - affordability) * 0.33) + affordability
     else:
-        return ((ratio - affordability_ratio) * 0.67) + affordability_ratio
-
-
-def normalize_against_affordability_ratio(ratio, affordability_ratio):
-    """We want the locationFactors to be normalized against 0.53.
-
-    It makes it easier to see which locations are more expensive
-    than our affordability ratio.
-    """
-    return ratio / affordability_ratio
+        return ((cost_of_living - affordability) * 0.67) + affordability
 
 
 def main(argv=sys.argv) -> None:
@@ -168,7 +151,7 @@ def main(argv=sys.argv) -> None:
             config = ruamel.yaml.load(file, Loader=RoundTripLoader)
 
             usd_to_eur_10_year_average(driver, config)
-            cities(driver, config)
+            countries(driver, config)
 
         with open("config.yml", "w") as file:
             ruamel.yaml.dump(config, file, indent=4, Dumper=RoundTripDumper)
