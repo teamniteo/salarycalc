@@ -85,40 +85,46 @@ def usd_to_eur_10_year_average(
     pbar.close()
 
 
-def cities(
+def countries(
     driver: webdriver.firefox.webdriver.WebDriver,
     config: ruamel.yaml.comments.CommentedMap,
 ) -> None:
     """Update the locationFactor values in config.yaml."""
 
-    BASE_SF_SALARY = 10000
+    pbar = tqdm(total=len(config["countries"]))
+    pbar.set_description("Processing countries")
 
-    pbar = tqdm(total=len(config["cities"]))
-    pbar.set_description("Processing cities")
-
-    for city in config["cities"]:
+    for country in config["countries"]:
         # Load numbeo
         driver.get(
-            f"https://www.numbeo.com/cost-of-living/compare_cities.jsp?amount={BASE_SF_SALARY}&displayCurrency=USD&country1=United+States&city1=San+Francisco%2C+CA&country2={city['country']}&city2={city['name']}"
+            "https://www.numbeo.com/cost-of-living/compare_countries_result.jsp?"
+            f"country1=United+States&country2={country['name']}"
         )
 
         # Extract equivalent of $10k/month salary in SF
-        equivalent_salary_text = driver.find_element_by_css_selector(
-            "span.number_amount_nobreak"
-        ).text  # '4,801.48$ (4,323.12€)'
+        difference_text = driver.find_element_by_css_selector(
+            ".table_indices_diff "
+            "> tbody:nth-child(1) "
+            "> tr:nth-child(3) "
+            "> td:nth-child(1)"
+        ).text
+        # 'Consumer Prices Including Rent in Netherlands are 2.05% lower than
+        # in United States'
 
-        equivalent_salary = float(equivalent_salary_text.split("$")[0].replace(",", ""))
-
-        numbeo_ratio = equivalent_salary / BASE_SF_SALARY
-
-        compressed_ratio = compress_towards_affordability_ratio(
-            numbeo_ratio, config["affordability_ratio"]
-        )
-        normalized_ratio = normalize_against_affordability_ratio(
-            compressed_ratio, config["affordability_ratio"]
+        difference = float(
+            difference_text.split("are")[1].split(" ")[1].replace("%", "")
         )
 
-        city["locationFactor"] = round(normalized_ratio, 2)
+        numbeo_ratio = 1 - (difference / 100)
+
+        # compressed_ratio = compress_towards_affordability_ratio(
+        #     numbeo_ratio, config["affordability_ratio"]
+        # )
+        # normalized_ratio = normalize_against_affordability_ratio(
+        #     compressed_ratio, config["affordability_ratio"]
+        # )
+
+        country["locationFactor"] = round(numbeo_ratio, 2)
 
         pbar.update()
 
@@ -240,7 +246,7 @@ def main(argv=sys.argv) -> None:
             config = ruamel.yaml.load(file, Loader=RoundTripLoader)
 
             usd_to_eur_10_year_average(driver, config)
-            cities(driver, config)
+            countries(driver, config)
             salaries(driver, config)
 
         with open("config.yml", "w") as file:

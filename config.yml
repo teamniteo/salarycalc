@@ -1,6 +1,6 @@
 # When we calculate Niteo's base salary in EUR we take the
 # 10-year average of EUR -> USD exchange rate.
-eur_to_usd_10_year_avg: 1.2027
+eur_to_usd_10_year_avg: 1.1988
 
 # We cannot afford to pay San Francisco-level salaries, so
 # set set our "affordability" ratio here -- all base salaries
@@ -9,67 +9,49 @@ eur_to_usd_10_year_avg: 1.2027
 # Amsterdam, Berlin, Barcelona and Lisbon; compared to SF.
 affordability_ratio: 0.53
 
-cities:
+countries:
 
--   name: Amsterdam
-    country: Netherlands
-    locationFactor: 1.14
+-   name: Netherlands
+    locationFactor: 0.98
 
--   name: Barcelona
-    country: Spain
-    locationFactor: 0.95
+-   name: Spain
+    locationFactor: 0.68
 
--   name: Berlin
-    country: Germany
-    locationFactor: 0.97
+-   name: Germany
+    locationFactor: 0.84
 
--   name: Bucharest
-    country: Romania
-    locationFactor: 0.83
+-   name: Romania
+    locationFactor: 0.41
 
--   name: Davao
-    country: Philippines
-    locationFactor: 0.78
+-   name: Philippines
+    locationFactor: 0.42
 
--   name: Delhi
-    country: India
-    locationFactor: 0.78
+-   name: India
+    locationFactor: 0.27
 
--   name: Kharkiv
-    country: Ukraine
-    locationFactor: 0.81
+-   name: Ukraine
+    locationFactor: 0.4
 
--   name: Lisbon
-    country: Portugal
-    locationFactor: 0.93
+-   name: Portugal
+    locationFactor: 0.64
 
--   name: Ljubljana
-    country: Slovenia
-    locationFactor: 0.9
+-   name: Slovenia
+    locationFactor: 0.64
 
--   name: London
-    country: United Kingdom
-    locationFactor: 1.27
+-   name: United Kingdom
+    locationFactor: 0.88
 
--   name: Maribor
-    country: Slovenia
-    locationFactor: 0.87
+-   name: Serbia
+    locationFactor: 0.41
 
--   name: Novi Sad
-    country: Serbia
-    locationFactor: 0.81
+-   name: India
+    locationFactor: 0.27
 
--   name: Pune
-    country: India
-    locationFactor: 0.78
+-   name: United States
+    locationFactor: 1.0
 
--   name: San Francisco, CA
-    country: United States
-    locationFactor: 1.59
-
--   name: Yokohama
-    country: Japan
-    locationFactor: 1.07
+-   name: Japan
+    locationFactor: 1.0
 
 careers:
 
