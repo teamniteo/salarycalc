@@ -7,7 +7,7 @@ module Tests exposing
     , testInitInvalidConfig
     , testInitInvalidQueryString
     , testInitMissingCareers
-    , testInitMissingCities
+    , testInitMissingCountries
     , testInitMissingRoles
     , testInitQueryString
     , testLookupByName
@@ -20,7 +20,7 @@ module Tests exposing
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
 import Career exposing (Career, Role)
-import City exposing (City)
+import Country exposing (Country)
 import Config exposing (Config)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -56,14 +56,14 @@ testInitHappyPath =
         json =
             """
               {
-                "cities": [
+                "countries": [
                   {
-                    "name": "Amsterdam",
-                    "locationFactor": 1.3
+                    "name": "Netherlands",
+                    "compressed_cost_of_living": 1.3
                   },
                   {
-                    "name": "Berlin",
-                    "locationFactor": 1.2
+                    "name": "Germany",
+                    "compressed_cost_of_living": 1.2
                   }
                 ],
                 "careers": [
@@ -102,9 +102,9 @@ testInitHappyPath =
                         |> Expect.equal
                             { error = Nothing
                             , warnings = []
-                            , cities =
-                                [ City "Amsterdam" 1.3
-                                , City "Berlin" 1.2
+                            , countries =
+                                [ Country "Netherlands" 1.3
+                                , Country "Germany" 1.2
                                 ]
                             , careers =
                                 [ Career "Technical"
@@ -113,11 +113,11 @@ testInitHappyPath =
                                     ]
                                 ]
                             , role = Just (Role "Software Developer" 3500)
-                            , city = Just (City "Amsterdam" 1.3)
+                            , country = Just (Country "Netherlands" 1.3)
                             , tenure = 2
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
@@ -129,14 +129,14 @@ testInitQueryString =
         json =
             """
               {
-                "cities": [
+                "countries": [
                   {
-                    "name": "Amsterdam",
-                    "locationFactor": 1.3
+                    "name": "Netherlands",
+                    "compressed_cost_of_living": 1.3
                   },
                   {
-                    "name": "Berlin",
-                    "locationFactor": 1.2
+                    "name": "Germany",
+                    "compressed_cost_of_living": 1.2
                   }
                 ],
                 "careers": [
@@ -157,7 +157,7 @@ testInitQueryString =
               }
             """
     in
-    test "Role and City are read from querystring "
+    test "Role and Country are read from querystring "
         (\_ ->
             case Decode.decodeString Decode.value json of
                 Err error ->
@@ -167,7 +167,7 @@ testInitQueryString =
                         |> Expect.fail
 
                 Ok config ->
-                    { location = "https://example.com/salary-calculator?role=Junior Software Developer&city=Berlin"
+                    { location = "https://example.com/salary-calculator?role=Junior Software Developer&country=Germany"
                     , config = config
                     }
                         |> init
@@ -175,9 +175,9 @@ testInitQueryString =
                         |> Expect.equal
                             { error = Nothing
                             , warnings = []
-                            , cities =
-                                [ City "Amsterdam" 1.3
-                                , City "Berlin" 1.2
+                            , countries =
+                                [ Country "Netherlands" 1.3
+                                , Country "Germany" 1.2
                                 ]
                             , careers =
                                 [ Career "Technical"
@@ -186,11 +186,11 @@ testInitQueryString =
                                     ]
                                 ]
                             , role = Just (Role "Junior Software Developer" 2500)
-                            , city = Just (City "Berlin" 1.2)
+                            , country = Just (Country "Germany" 1.2)
                             , tenure = 2
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
@@ -202,14 +202,14 @@ testInitInvalidQueryString =
         json =
             """
               {
-                "cities": [
+                "countries": [
                   {
-                    "name": "Amsterdam",
-                    "locationFactor": 1.3
+                    "name": "Netherlands",
+                    "compressed_cost_of_living": 1.3
                   },
                   {
-                    "name": "Berlin",
-                    "locationFactor": 1.2
+                    "name": "Germany",
+                    "compressed_cost_of_living": 1.2
                   }
                 ],
                 "careers": [
@@ -230,7 +230,7 @@ testInitInvalidQueryString =
               }
             """
     in
-    test "Role and City are given querystring but the values are bad"
+    test "Role and Country are given querystring but the values are bad"
         (\_ ->
             case Decode.decodeString Decode.value json of
                 Err error ->
@@ -240,7 +240,7 @@ testInitInvalidQueryString =
                         |> Expect.fail
 
                 Ok config ->
-                    { location = "https://example.com/salary-calculator?role=Foo&city=Bar"
+                    { location = "https://example.com/salary-calculator?role=Foo&country=Bar"
                     , config = config
                     }
                         |> init
@@ -249,11 +249,11 @@ testInitInvalidQueryString =
                             { error = Nothing
                             , warnings =
                                 [ Warning "Invalid role provided via URL: Foo. Please choose one from the dropdown below." RoleField
-                                , Warning "Invalid city provided via URL: Bar. Please choose one from the dropdown below." CityField
+                                , Warning "Invalid country provided via URL: Bar. Please choose one from the dropdown below." CountryField
                                 ]
-                            , cities =
-                                [ City "Amsterdam" 1.3
-                                , City "Berlin" 1.2
+                            , countries =
+                                [ Country "Netherlands" 1.3
+                                , Country "Germany" 1.2
                                 ]
                             , careers =
                                 [ Career "Technical"
@@ -262,28 +262,28 @@ testInitInvalidQueryString =
                                     ]
                                 ]
                             , role = Nothing
-                            , city = Nothing
+                            , country = Nothing
                             , tenure = 2
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
 
 
-testInitMissingCities : Test
-testInitMissingCities =
+testInitMissingCountries : Test
+testInitMissingCountries =
     let
         json =
             """
               {
-                "cities": [],
+                "countries": [],
                 "careers": []
               }
             """
     in
-    test "Cities need to be given"
+    test "Countries need to be given"
         (\_ ->
             case Decode.decodeString Decode.value json of
                 Err error ->
@@ -299,16 +299,16 @@ testInitMissingCities =
                         |> init
                         |> Tuple.first
                         |> Expect.equal
-                            { error = Just "Problem with the value at json.cities:\n\n    []\n\nThere must be at least one city in your config."
+                            { error = Just "Problem with the value at json.countries:\n\n    []\n\nThere must be at least one country in your config."
                             , warnings = []
-                            , cities = []
+                            , countries = []
                             , careers = []
                             , role = Nothing
-                            , city = Nothing
+                            , country = Nothing
                             , tenure = 0
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
@@ -320,10 +320,10 @@ testInitMissingCareers =
         json =
             """
               {
-                "cities": [
+                "countries": [
                   {
-                    "name": "Amsterdam",
-                    "locationFactor": 1.3
+                    "name": "Netherlands",
+                    "compressed_cost_of_living": 1.3
                   }
                 ],
                 "careers": []
@@ -348,14 +348,14 @@ testInitMissingCareers =
                         |> Expect.equal
                             { error = Just "Problem with the value at json.careers:\n\n    []\n\nThere must be at least one career in your config."
                             , warnings = []
-                            , cities = []
+                            , countries = []
                             , careers = []
                             , role = Nothing
-                            , city = Nothing
+                            , country = Nothing
                             , tenure = 0
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
@@ -367,10 +367,10 @@ testInitMissingRoles =
         json =
             """
               {
-                "cities": [
+                "countries": [
                   {
-                    "name": "Amsterdam",
-                    "locationFactor": 1.3
+                    "name": "Netherlands",
+                    "compressed_cost_of_living": 1.3
                   }
                 ],
                 "careers": [
@@ -400,14 +400,14 @@ testInitMissingRoles =
                         |> Expect.equal
                             { error = Just "Problem with the value at json.careers[0].roles:\n\n    []\n\nThere must be at least one role in your config."
                             , warnings = []
-                            , cities = []
+                            , countries = []
                             , careers = []
                             , role = Nothing
-                            , city = Nothing
+                            , country = Nothing
                             , tenure = 0
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
@@ -439,16 +439,16 @@ testInitInvalidConfig =
                         |> init
                         |> Tuple.first
                         |> Expect.equal
-                            { error = Just "Problem with the given value:\n\n{\n        \"foo\": \"bar\"\n    }\n\nExpecting an OBJECT with a field named `cities`"
+                            { error = Just "Problem with the given value:\n\n{\n        \"foo\": \"bar\"\n    }\n\nExpecting an OBJECT with a field named `countries`"
                             , warnings = []
-                            , cities = []
+                            , countries = []
                             , careers = []
                             , role = Nothing
-                            , city = Nothing
+                            , country = Nothing
                             , tenure = 0
                             , accordionState = Accordion.initialState
                             , roleDropdown = Dropdown.initialState
-                            , cityDropdown = Dropdown.initialState
+                            , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
                             }
         )
@@ -460,15 +460,15 @@ testSalary =
         role =
             { name = "FooRole", baseSalary = 4919 }
 
-        city =
-            { name = "FooCity", locationFactor = 0.91 }
+        country =
+            { name = "FooCountry", compressed_cost_of_living = 0.91 }
 
         tenure =
             2
     in
-    test "Salary for Software Engineer from Ljubljana with a 2 year tenure"
+    test "Salary for Software Engineer from Slovenia with a 2 year tenure"
         (\_ ->
-            Salary.calculate role city tenure
+            Salary.calculate role country tenure
                 |> Expect.equal 5017
         )
 
@@ -479,28 +479,28 @@ testViewSalary =
         role =
             Just (Role "foo" 500)
 
-        city =
-            Just (City "bar" 1.1)
+        country =
+            Just (Country "bar" 1.1)
     in
-    describe "Correct handling when role or city is not available"
+    describe "Correct handling when role or country is not available"
         [ test "nothing is set" <|
             \_ ->
                 viewSalary Nothing Nothing 0
                     |> Query.fromHtml
-                    |> Query.has [ text "Please select a role and a city." ]
-        , test "only city is set" <|
+                    |> Query.has [ text "Please select a role and a country." ]
+        , test "only country is set" <|
             \_ ->
-                viewSalary Nothing city 0
+                viewSalary Nothing country 0
                     |> Query.fromHtml
                     |> Query.has [ text "Please select a role." ]
         , test "only role is set" <|
             \_ ->
                 viewSalary role Nothing 0
                     |> Query.fromHtml
-                    |> Query.has [ text "Please select a city." ]
-        , test "role and city are set" <|
+                    |> Query.has [ text "Please select a country." ]
+        , test "role and country are set" <|
             \_ ->
-                viewSalary role city 2
+                viewSalary role country 2
                     |> Query.fromHtml
                     |> Query.has [ text "605 €" ]
         ]
@@ -593,38 +593,38 @@ testHumanizeTenure =
 
 hideWarnings : Test
 hideWarnings =
-    describe "Warnings are hidden when role or city is selected"
+    describe "Warnings are hidden when role or country is selected"
         [ test "role is selected" <|
             \_ ->
                 update (RoleSelected (Role "foo" 5000))
                     { error = Nothing
-                    , warnings = [ Warning "foo" RoleField, Warning "bar" CityField ]
-                    , cities = []
+                    , warnings = [ Warning "foo" RoleField, Warning "bar" CountryField ]
+                    , countries = []
                     , careers = []
                     , role = Nothing
-                    , city = Nothing
+                    , country = Nothing
                     , tenure = 0
                     , accordionState = Accordion.initialState
                     , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
+                    , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
                     }
                     |> Tuple.first
                     |> .warnings
-                    |> Expect.equal [ Warning "bar" CityField ]
-        , test "city is selected" <|
+                    |> Expect.equal [ Warning "bar" CountryField ]
+        , test "country is selected" <|
             \_ ->
-                update (CitySelected (City "foo" 1.1))
+                update (CountrySelected (Country "foo" 1.1))
                     { error = Nothing
-                    , warnings = [ Warning "foo" RoleField, Warning "bar" CityField ]
-                    , cities = []
+                    , warnings = [ Warning "foo" RoleField, Warning "bar" CountryField ]
+                    , countries = []
                     , careers = []
                     , role = Nothing
-                    , city = Nothing
+                    , country = Nothing
                     , tenure = 0
                     , accordionState = Accordion.initialState
                     , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
+                    , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
                     }
                     |> Tuple.first
@@ -672,27 +672,24 @@ testViewWarnings =
 -- Generated tests
 
 
-cities =
-    [ { name = "San Francisco"
-      , locationFactor = 1.59
+countries =
+    [ { name = "United States"
+      , compressed_cost_of_living = 1.59
       }
-    , { name = "Amsterdam"
-      , locationFactor = 1.2
+    , { name = "Netherlands"
+      , compressed_cost_of_living = 1.2
       }
-    , { name = "Lisbon"
-      , locationFactor = 0.94
+    , { name = "Portugal"
+      , compressed_cost_of_living = 0.94
       }
-    , { name = "Ljubljana"
-      , locationFactor = 0.91
+    , { name = "Slovenia"
+      , compressed_cost_of_living = 0.91
       }
-    , { name = "Novi Sad"
-      , locationFactor = 0.81
+    , { name = "Serbia"
+      , compressed_cost_of_living = 0.81
       }
-    , { name = "Davao"
-      , locationFactor = 0.81
-      }
-    , { name = "Delhi"
-      , locationFactor = 0.79
+    , { name = "India"
+      , compressed_cost_of_living = 0.81
       }
     ]
 
@@ -729,14 +726,14 @@ years =
 tenureImpact : Test
 tenureImpact =
     let
-        tenureTest : Role -> City -> Int -> Test
-        tenureTest role city tenure =
+        tenureTest : Role -> Country -> Int -> Test
+        tenureTest role country tenure =
             let
                 title =
                     String.join " "
                         [ role.name
                         , "living in"
-                        , city.name
+                        , country.name
                         , "with tenure of"
                         , String.fromInt tenure
                         , "earns more than with tenure of"
@@ -746,16 +743,16 @@ tenureImpact =
             test title
                 (\_ ->
                     Expect.greaterThan
-                        (Salary.calculate role city tenure)
-                        (Salary.calculate role city tenure + 1)
+                        (Salary.calculate role country tenure)
+                        (Salary.calculate role country tenure + 1)
                 )
     in
     describe "Longer tenure always results in higher salary" <|
-        List.lift3 tenureTest roles cities years
+        List.lift3 tenureTest roles countries years
 
 
-cityImpact : Test
-cityImpact =
+countryImpact : Test
+countryImpact =
     let
         personaSuit : ( Role, Int ) -> Test
         personaSuit ( role, tenure ) =
@@ -768,19 +765,19 @@ cityImpact =
                     ]
                         |> String.join " "
             in
-            cities
-                |> List.sortBy .locationFactor
+            countries
+                |> List.sortBy .compressed_cost_of_living
                 |> List.reverse
                 |> pairs
-                |> List.map (citiesTest role tenure)
+                |> List.map (countriesTest role tenure)
                 |> describe title
 
         personas : List ( Role, Int )
         personas =
             List.lift2 Tuple.pair roles years
 
-        citiesTest : Role -> Int -> ( City, City ) -> Test
-        citiesTest role tenure ( a, b ) =
+        countriesTest : Role -> Int -> ( Country, Country ) -> Test
+        countriesTest role tenure ( a, b ) =
             let
                 title =
                     [ "...living in"
@@ -796,19 +793,19 @@ cityImpact =
                         (Salary.calculate role a tenure)
                         (Salary.calculate role b tenure)
     in
-    describe "Salaries are higher in more expensive cities" <|
+    describe "Salaries are higher in more expensive countries" <|
         List.map personaSuit personas
 
 
 {-| Helper that given a list of elements returns a list of tuples with two neighboring elements paired together
 
-    pairs [ SanFrancisco, London, Amsterdam, Berlin ]
+    pairs [ SanFrancisco, London, Netherlands, Germany ]
     --> [ ( SanFrancisco, London )
-    --> , ( London, Amsterdam )
-    --> , ( Amsterdam, Berlin )
+    --> , ( London, Netherlands )
+    --> , ( Netherlands, Germany )
     --> ]
 
-Used for comparing salaries in different cities.
+Used for comparing salaries in different countries.
 
 -}
 pairs : List a -> List ( a, a )

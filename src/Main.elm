@@ -29,7 +29,7 @@ import Bootstrap.Dropdown as Dropdown
 import Bootstrap.ListGroup as ListGroup
 import Browser
 import Career exposing (Career, Role)
-import City exposing (City)
+import Country exposing (Country)
 import Config
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, id, rowspan)
@@ -55,14 +55,14 @@ init flags =
                 Err error ->
                     { error = Just (Decode.errorToString error)
                     , warnings = []
-                    , cities = []
+                    , countries = []
                     , careers = []
                     , role = Nothing
-                    , city = Nothing
+                    , country = Nothing
                     , tenure = 0
                     , accordionState = Accordion.initialState
                     , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
+                    , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
                     }
 
@@ -74,7 +74,7 @@ init flags =
                         queryParser =
                             QueryParser.map3 Query
                                 (QueryParser.string "role")
-                                (QueryParser.string "city")
+                                (QueryParser.string "country")
                                 (QueryParser.int "years")
 
                         parser =
@@ -88,12 +88,12 @@ init flags =
                                         |> UrlParser.parse parser
                                         |> Maybe.withDefault
                                             { role = Nothing
-                                            , city = Nothing
+                                            , country = Nothing
                                             , years = Nothing
                                             }
 
                                 Nothing ->
-                                    { role = Nothing, city = Nothing, years = Nothing }
+                                    { role = Nothing, country = Nothing, years = Nothing }
 
                         roles =
                             config.careers
@@ -118,23 +118,23 @@ init flags =
                                 Nothing ->
                                     Ok (List.head roles)
 
-                        city : Result Warning (Maybe City)
-                        city =
-                            case query.city of
-                                Just cityName ->
-                                    lookupByName cityName config.cities
+                        country : Result Warning (Maybe Country)
+                        country =
+                            case query.country of
+                                Just countryName ->
+                                    lookupByName countryName config.countries
                                         |> Result.fromMaybe
                                             (Warning
-                                                ("Invalid city provided via URL: "
-                                                    ++ cityName
+                                                ("Invalid country provided via URL: "
+                                                    ++ countryName
                                                     ++ ". Please choose one from the dropdown below."
                                                 )
-                                                CityField
+                                                CountryField
                                             )
                                         |> Result.map Just
 
                                 Nothing ->
-                                    Ok (List.head config.cities)
+                                    Ok (List.head config.countries)
 
                         warnings =
                             [ case role of
@@ -143,7 +143,7 @@ init flags =
 
                                 Err warning ->
                                     Just warning
-                            , case city of
+                            , case country of
                                 Ok _ ->
                                     Nothing
 
@@ -154,16 +154,16 @@ init flags =
                     in
                     { error = Nothing
                     , warnings = warnings
-                    , cities = config.cities
+                    , countries = config.countries
                     , careers = config.careers
                     , role = role |> Result.extract (\_ -> Nothing)
-                    , city = city |> Result.extract (\_ -> Nothing)
+                    , country = country |> Result.extract (\_ -> Nothing)
                     , tenure =
                         query.years
                             |> Maybe.withDefault 2
                     , accordionState = Accordion.initialState
                     , roleDropdown = Dropdown.initialState
-                    , cityDropdown = Dropdown.initialState
+                    , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
                     }
     in
@@ -180,24 +180,24 @@ type alias Flags =
 
 type alias Query =
     { role : Maybe String
-    , city : Maybe String
+    , country : Maybe String
     , years : Maybe Int
     }
 
 
 type Msg
     = RoleDropdownChanged Dropdown.State
-    | CityDropdownChanged Dropdown.State
+    | CountryDropdownChanged Dropdown.State
     | TenureDropdownChanged Dropdown.State
     | RoleSelected Role
-    | CitySelected City
+    | CountrySelected Country
     | TenureSelected Int
     | AccordionMsg Accordion.State
 
 
 type Field
     = RoleField
-    | CityField
+    | CountryField
 
 
 type alias Warning =
@@ -210,13 +210,13 @@ type alias Model =
     { error : Maybe String
     , warnings : List Warning
     , careers : List Career
-    , cities : List City
+    , countries : List Country
     , role : Maybe Role
-    , city : Maybe City
+    , country : Maybe Country
     , tenure : Int
     , accordionState : Accordion.State
     , roleDropdown : Dropdown.State
-    , cityDropdown : Dropdown.State
+    , countryDropdown : Dropdown.State
     , tenureDropdown : Dropdown.State
     }
 
@@ -233,8 +233,8 @@ update msg model =
             , Cmd.none
             )
 
-        CityDropdownChanged state ->
-            ( { model | cityDropdown = state }
+        CountryDropdownChanged state ->
+            ( { model | countryDropdown = state }
             , Cmd.none
             )
 
@@ -253,12 +253,12 @@ update msg model =
             , Cmd.none
             )
 
-        CitySelected city ->
+        CountrySelected country ->
             ( { model
-                | city = Just city
+                | country = Just country
                 , warnings =
                     model.warnings
-                        |> List.filter (\warning -> warning.field /= CityField)
+                        |> List.filter (\warning -> warning.field /= CountryField)
               }
             , Cmd.none
             )
@@ -274,7 +274,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Dropdown.subscriptions model.roleDropdown RoleDropdownChanged
-        , Dropdown.subscriptions model.cityDropdown CityDropdownChanged
+        , Dropdown.subscriptions model.countryDropdown CountryDropdownChanged
         , Dropdown.subscriptions model.tenureDropdown TenureDropdownChanged
         , Accordion.subscriptions model.accordionState AccordionMsg
         ]
@@ -308,7 +308,7 @@ view model =
                                             [ if
                                                 model.role
                                                     /= Nothing
-                                                    && model.city
+                                                    && model.country
                                                     /= Nothing
                                               then
                                                 text "Okay, let's break that down ..."
@@ -321,7 +321,7 @@ view model =
                                     |> Accordion.prependHeader
                                         (viewHeader model)
                             , blocks =
-                                case ( model.role, model.city ) of
+                                case ( model.role, model.country ) of
                                     ( Nothing, Nothing ) ->
                                         []
 
@@ -331,10 +331,10 @@ view model =
                                     ( _, Nothing ) ->
                                         []
 
-                                    ( Just role, Just city ) ->
+                                    ( Just role, Just country ) ->
                                         [ Accordion.block []
                                             [ Block.text []
-                                                [ viewBreakdown role city model.tenure ]
+                                                [ viewBreakdown role country model.tenure ]
                                             ]
                                         ]
                             }
@@ -359,8 +359,8 @@ viewHeader model =
         roleItem role =
             Dropdown.buttonItem [ onClick (RoleSelected role) ] [ text role.name ]
 
-        cityItem city =
-            Dropdown.buttonItem [ onClick (CitySelected city) ] [ text city.name ]
+        countryItem country =
+            Dropdown.buttonItem [ onClick (CountrySelected country) ] [ text country.name ]
 
         tenureItem years =
             Dropdown.buttonItem [ onClick (TenureSelected years) ]
@@ -388,19 +388,19 @@ viewHeader model =
                     |> List.concat
             }
         , text " living in "
-        , Dropdown.dropdown model.cityDropdown
+        , Dropdown.dropdown model.countryDropdown
             { options = []
-            , toggleMsg = CityDropdownChanged
+            , toggleMsg = CountryDropdownChanged
             , toggleButton =
                 Dropdown.toggle [ Button.outlinePrimary ]
-                    [ model.city
+                    [ model.country
                         |> Maybe.map .name
-                        |> Maybe.withDefault "select a city"
+                        |> Maybe.withDefault "select a country"
                         |> text
                     ]
             , items =
-                model.cities
-                    |> List.map cityItem
+                model.countries
+                    |> List.map countryItem
             }
         , text " with a tenure at Niteo of "
         , Dropdown.dropdown model.tenureDropdown
@@ -430,7 +430,7 @@ viewHeader model =
         , viewPluralizedYears model.tenure
         ]
     , p [ class "lead" ]
-        [ viewSalary model.role model.city model.tenure
+        [ viewSalary model.role model.country model.tenure
         ]
     ]
 
@@ -461,40 +461,40 @@ viewPluralizedYears years =
         text " years."
 
 
-{-| Displays monthly salary when provided with role and city. Otherwise
+{-| Displays monthly salary when provided with role and country. Otherwise
 displays a prompt for missing data.
 
     import Html
-    import City exposing (City)
+    import Country exposing (Country)
     import Career exposing (Role)
 
     viewSalary Nothing Nothing 3
-    --> Html.text "Please select a role and a city."
+    --> Html.text "Please select a role and a country."
 
-    viewSalary Nothing (Just (City "Keren" 1.87)) 3
+    viewSalary Nothing (Just (Country "Spain" 1.87)) 3
     --> Html.text "Please select a role."
 
     viewSalary (Just (Role "Junior Designer" 2345)) Nothing 3
-    --> Html.text "Please select a city."
+    --> Html.text "Please select a country."
 
 -}
-viewSalary : Maybe Role -> Maybe City -> Int -> Html Msg
-viewSalary maybeRole maybeCity tenure =
-    case ( maybeRole, maybeCity ) of
+viewSalary : Maybe Role -> Maybe Country -> Int -> Html Msg
+viewSalary maybeRole maybeCountry tenure =
+    case ( maybeRole, maybeCountry ) of
         ( Nothing, Nothing ) ->
-            text "Please select a role and a city."
+            text "Please select a role and a country."
 
         ( Nothing, _ ) ->
             text "Please select a role."
 
         ( _, Nothing ) ->
-            text "Please select a city."
+            text "Please select a country."
 
-        ( Just role, Just city ) ->
+        ( Just role, Just country ) ->
             span []
                 [ text "My monthly gross salary is "
                 , span [ class "font-weight-bold", id "total-salary" ]
-                    [ (Salary.calculate role city tenure
+                    [ (Salary.calculate role country tenure
                         |> String.fromInt
                       )
                         ++ " €"
@@ -504,8 +504,8 @@ viewSalary maybeRole maybeCity tenure =
                 ]
 
 
-viewBreakdown : Role -> City -> Int -> Html Msg
-viewBreakdown role city tenure =
+viewBreakdown : Role -> Country -> Int -> Html Msg
+viewBreakdown role country tenure =
     div []
         [ table [ class "table" ]
             [ tr []
@@ -529,7 +529,7 @@ viewBreakdown role city tenure =
                 , td
                     [ class "border-0 p-0 text-center lead"
                     ]
-                    [ city.locationFactor
+                    [ country.compressed_cost_of_living
                         |> String.fromFloat
                         |> text
                     ]
@@ -580,7 +580,7 @@ viewBreakdown role city tenure =
                     [ text "(base salary)" ]
                 , td
                     [ class "border-0 p-0 text-center text-muted" ]
-                    [ text "(location factor)" ]
+                    [ text "(compressed cost of living)" ]
                 , td
                     [ class "border-0 p-0 text-center text-muted" ]
                     [ text "(base salary)" ]
@@ -605,7 +605,7 @@ viewBreakdown role city tenure =
                     ]
                     [ text "Location Factor: " ]
                 , text "Numbeo Cost of Living in "
-                , mark [] [ text city.name ]
+                , mark [] [ text country.name ]
                 , text " compared to San Francisco, compressed and normalized against our Affordability Ratio of 0.53."
                 ]
             , ListGroup.li []
@@ -653,15 +653,15 @@ main =
 {-| Given a list of records with a name field returns first item with a
 matching name. If no item has a matching name then returns Nothing.
 
-    lookupByName "Amsterdam"
-        [ { name = "Amsterdam", locationFactor = 1.4 }
-        , { name = "Ljubljana", locationFactor = 1.0 }
+    lookupByName "Netherlands"
+        [ { name = "Netherlands", compressed_cost_of_living = 1.4 }
+        , { name = "Slovenia", compressed_cost_of_living = 1.0 }
         ]
-    --> Just { name = "Amsterdam", locationFactor = 1.4 }
+    --> Just { name = "Netherlands", compressed_cost_of_living = 1.4 }
 
     lookupByName "Warsaw"
-        [ { name = "Amsterdam", locationFactor = 1.4 }
-        , { name = "Ljubljana", locationFactor = 1.0 }
+        [ { name = "Netherlands", compressed_cost_of_living = 1.4 }
+        , { name = "Slovenia", compressed_cost_of_living = 1.0 }
         ]
     --> Nothing
 

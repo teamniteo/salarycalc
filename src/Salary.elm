@@ -4,26 +4,26 @@ module Salary exposing
     )
 
 import Career exposing (Role)
-import City exposing (City)
+import Country exposing (Country)
 
 
-{-| Calculate a salary based on a role, city and tenure
+{-| Calculate a salary based on a role, country and tenure
 
-    import City exposing (City)
+    import Country exposing (Country)
     import Career exposing (Role)
 
-    calculate (Role "Designer" 2500) (City "Warsaw" 1) 0
+    calculate (Role "Designer" 2500) (Country "Poland" 1) 0
     --> 2500
 
-    calculate (Role "Designer" 2500) (City "Amsterdam" 1.5) 0
+    calculate (Role "Designer" 2500) (Country "Netherlands" 1.5) 0
     --> 3750
 
 -}
-calculate : Role -> City -> Int -> Int
-calculate role city tenure =
+calculate : Role -> Country -> Int -> Int
+calculate role country tenure =
     round
         (role.baseSalary
-            * city.locationFactor
+            * country.compressed_cost_of_living
             + role.baseSalary
             * commitmentBonus tenure
         )
