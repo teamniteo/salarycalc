@@ -1,97 +1,11 @@
-# When we calculate Niteo's base salary in EUR we take the
-# 10-year average of EUR -> USD exchange rate from ofx.com.
+# Each career has roles defined in
+# https://github.com/niteoweb/handbook/blob/master/5_People/salary-system.md#roles
+#
+# For each role, we get the median US salary from Salary.com, which
+# is annual amount in USD, we divide it by 12 and further divide it
+# by the 10-year average of EUR -> USD exchange rate from ofx.com.
+# We get a monthly base salary in EUR.
 eur_to_usd_10_year_avg: 1.20
-
-# For each country we get the ratio between US and that country's Numbeo
-# Cost of Living Plus Rent Index value. Example: if Country A
-# is 30% cheaper based on Cost of Living Plus Rent Index, then
-# this country's `cost_of_living` is 0.7.
-#
-# Then, we want to slightly underpay people in expensive
-# locations and not-so-slightly overpay people in cheap locations:
-#  - in cheap locations, a MacBook costs the same (if not more);
-#  - people in cheap locations can easily work remotely for a
-#    company in a more expensive location;
-#  - by overpaying cheap locations, we get access to top talent there;
-#  - by underpaying expensive locations our hiring is harder there so
-#    the culture fit must be greater.
-#
-# Additionally, we cannot afford to pay US-level salaries, so we
-# set set our "affordability" ratio here, that we use to decrease
-# `cost_of_living` values, which effectively decreases our salaries.
-# The value is set somewhat arbitrarily, to match our salaries before
-# the introduction of the Salary Calculator in Niteo. We adjust the
-# "affordability" ratio in January, based on the previous year's
-# performance.
-#
-# Finally for each country, we "compress" the `cost_of_living` towards
-# our `affordability`. This means that if `cost_of_living` is higher
-# than `affordability`, we decrease `cost_of_living` by 2/3 of the
-# difference. If `cost_of_living` is lower than `affordability`, we
-# increase `cost_of_living` by 2/3 of the difference.
-#
-# See `countries` and `compress_towards_affordability` functions in
-# https://github.com/niteoweb/salarycalc/blob/master/fetch_config_values.py
-# for exact details on these calculations.
-affordability: 0.60
-countries:
-
--   name: Netherlands
-    cost_of_living: 0.98
-    compressed_cost_of_living: 0.85
-
--   name: Spain
-    cost_of_living: 0.68
-    compressed_cost_of_living: 0.66
-
--   name: Germany
-    cost_of_living: 0.84
-    compressed_cost_of_living: 0.76
-
--   name: Romania
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.54
-
--   name: Philippines
-    cost_of_living: 0.42
-    compressed_cost_of_living: 0.54
-
--   name: India
-    cost_of_living: 0.27
-    compressed_cost_of_living: 0.49
-
--   name: Ukraine
-    cost_of_living: 0.4
-    compressed_cost_of_living: 0.53
-
--   name: Portugal
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.63
-
--   name: Slovenia
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.63
-
--   name: United Kingdom
-    cost_of_living: 0.88
-    compressed_cost_of_living: 0.79
-
--   name: Serbia
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.54
-
--   name: India
-    cost_of_living: 0.27
-    compressed_cost_of_living: 0.49
-
--   name: United States
-    cost_of_living: 1.00
-    compressed_cost_of_living: 0.87
-
--   name: Japan
-    cost_of_living: 1.00
-    compressed_cost_of_living: 0.87
-
 careers:
 
 -   name: Design
@@ -184,4 +98,95 @@ careers:
     -   name: Principal Software Engineer
         baseSalary: 10350
         salary_com_key: software-engineer-v
+
+
+# For each country we get the ratio between US and that country's Numbeo
+# Cost of Living Plus Rent Index value. Example: if Country A
+# is 30% cheaper based on Cost of Living Plus Rent Index, then
+# this country's `cost_of_living` is 0.7.
+#
+# Then, we want to slightly underpay people in expensive
+# locations and not-so-slightly overpay people in cheap locations:
+#  - in cheap locations, a MacBook costs the same (if not more);
+#  - people in cheap locations can easily work remotely for a
+#    company in a more expensive location;
+#  - by overpaying cheap locations, we get access to top talent there;
+#  - by underpaying expensive locations our hiring is harder there so
+#    the culture fit must be greater.
+#
+# Additionally, we cannot afford to pay US-level salaries, so we
+# set set our "affordability" ratio here, that we use to decrease
+# `cost_of_living` values, which effectively decreases our salaries.
+# The value is set somewhat arbitrarily, to match our salaries before
+# the introduction of the Salary Calculator in Niteo. We adjust the
+# "affordability" ratio in January, based on the previous year's
+# performance.
+#
+# Finally for each country, we "compress" the `cost_of_living` towards
+# our `affordability`. This means that if `cost_of_living` is higher
+# than `affordability`, we decrease `cost_of_living` by 2/3 of the
+# difference. If `cost_of_living` is lower than `affordability`, we
+# increase `cost_of_living` by 2/3 of the difference.
+#
+# See `countries` and `compress_towards_affordability` functions in
+# https://github.com/niteoweb/salarycalc/blob/master/fetch_config_values.py
+# for exact details on these calculations.
+affordability: 0.60
+countries:
+
+-   name: Netherlands
+    cost_of_living: 0.98
+    compressed_cost_of_living: 0.85
+
+-   name: Spain
+    cost_of_living: 0.68
+    compressed_cost_of_living: 0.66
+
+-   name: Germany
+    cost_of_living: 0.84
+    compressed_cost_of_living: 0.76
+
+-   name: Romania
+    cost_of_living: 0.41
+    compressed_cost_of_living: 0.54
+
+-   name: Philippines
+    cost_of_living: 0.42
+    compressed_cost_of_living: 0.54
+
+-   name: India
+    cost_of_living: 0.27
+    compressed_cost_of_living: 0.49
+
+-   name: Ukraine
+    cost_of_living: 0.4
+    compressed_cost_of_living: 0.53
+
+-   name: Portugal
+    cost_of_living: 0.64
+    compressed_cost_of_living: 0.63
+
+-   name: Slovenia
+    cost_of_living: 0.64
+    compressed_cost_of_living: 0.63
+
+-   name: United Kingdom
+    cost_of_living: 0.88
+    compressed_cost_of_living: 0.79
+
+-   name: Serbia
+    cost_of_living: 0.41
+    compressed_cost_of_living: 0.54
+
+-   name: India
+    cost_of_living: 0.27
+    compressed_cost_of_living: 0.49
+
+-   name: United States
+    cost_of_living: 1.00
+    compressed_cost_of_living: 0.87
+
+-   name: Japan
+    cost_of_living: 1.00
+    compressed_cost_of_living: 0.87
 
