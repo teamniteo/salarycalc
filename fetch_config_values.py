@@ -162,10 +162,8 @@ def compress_towards_affordability(cost_of_living, affordability):
     """Decrease differences between expensive and cheap locations."""
     if cost_of_living == affordability:
         return cost_of_living
-    elif cost_of_living < affordability:
-        return ((cost_of_living - affordability) * 0.33) + affordability
     else:
-        return ((cost_of_living - affordability) * 0.67) + affordability
+        return ((cost_of_living - affordability) * 0.33) + affordability
 
 
 def main(argv=sys.argv) -> None:
