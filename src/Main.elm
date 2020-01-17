@@ -29,8 +29,8 @@ import Bootstrap.Dropdown as Dropdown
 import Bootstrap.ListGroup as ListGroup
 import Browser
 import Career exposing (Career, Role)
-import Country exposing (Country)
 import Config
+import Country exposing (Country)
 import Html exposing (Html, div, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, id, rowspan)
 import Html.Events exposing (onClick)
@@ -424,7 +424,10 @@ viewHeader model =
                 , tenureItem 8
                 , tenureItem 9
                 , tenureItem 10
+                , tenureItem 11
+                , tenureItem 12
                 , tenureItem 15
+                , tenureItem 20
                 ]
             }
         , viewPluralizedYears model.tenure
