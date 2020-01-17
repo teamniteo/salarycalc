@@ -27,67 +27,67 @@ careers:
         salary_com_key: web-designer-iv
 
     -   name: Principal Designer
-        baseSalary: 7412
-        salary_com_key: web-designer-iv # TODO web-art-director
+        baseSalary: 8139
+        salary_com_key: web-art-director
 
 
 -   name: Marketing
     roles:
-    -   name: Marketing Associate
+    -   name: Junior Digital Marketer
         baseSalary: 3915
         salary_com_key: digital-marketing-analyst-i
 
-    -   name: Digital Marketing Specialist
+    -   name: Digital Marketer
         baseSalary: 4797
         salary_com_key: digital-marketing-analyst-ii
 
-    -   name: Senior Digital Marketing Specialist
+    -   name: Senior Digital Marketer
         baseSalary: 6373
         salary_com_key: digital-marketing-analyst-iii
 
-    -   name: Product Marketing Manager
+    -   name: Lead Digital Marketer
         baseSalary: 7035
         salary_com_key: digital-marketing-manager
 
-    -   name: Senior Product Marketing Manager
+    -   name: Principal Digital Marketer
         baseSalary: 11188
         salary_com_key: digital-marketing-director
 
 
 -   name: Operations
     roles:
-    -   name: Customer Support Specialist
-        baseSalary: 6105
-        salary_com_key: software-engineer-ii
+    -   name: Tech Support I
+        baseSalary: 4217
+        salary_com_key: technical-support-analyst-i
 
-    -   name: Customer Support Associate
+    -   name: Tech Support II
         baseSalary: 5291
         salary_com_key: technical-support-analyst-ii
 
-    -   name: Technical Support Specialist
+    -   name: Support Manager
         baseSalary: 5840
         salary_com_key: it-project-manager-i
 
-    -   name: Operations Manager
+    -   name: Project Manager
         baseSalary: 7316
         salary_com_key: it-project-manager-ii
 
-    -   name: Senior Operations Manager
+    -   name: Operations Manager
         baseSalary: 8796
         salary_com_key: it-project-manager-iii
 
 
 -   name: Technical
     roles:
-    -   name: Junior Programmer
+    -   name: Junior Software Engineer
         baseSalary: 4757
         salary_com_key: software-engineer-i
 
-    -   name: Junior Software Engineer
+    -   name: Software Engineer
         baseSalary: 6105
         salary_com_key: software-engineer-ii
 
-    -   name: Software Engineer
+    -   name: Senior Software Engineer
         baseSalary: 7574
         salary_com_key: software-engineer-iii
 
@@ -158,10 +158,6 @@ countries:
     cost_of_living: 0.42
     compressed_cost_of_living: 0.47
 
--   name: India
-    cost_of_living: 0.27
-    compressed_cost_of_living: 0.42
-
 -   name: Ukraine
     cost_of_living: 0.39
     compressed_cost_of_living: 0.46
@@ -183,7 +179,7 @@ countries:
     compressed_cost_of_living: 0.46
 
 -   name: India
-    cost_of_living: 0.27
+    cost_of_living: 0.28
     compressed_cost_of_living: 0.42
 
 -   name: United States
@@ -192,5 +188,4 @@ countries:
 
 -   name: Japan
     cost_of_living: 0.99
-    compressed_cost_of_living: 0.66
-
+    compressed_cost_of_living: 0.65
