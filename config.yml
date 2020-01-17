@@ -138,54 +138,54 @@ careers:
 affordability: 0.49
 countries:
 
--   name: Netherlands
-    cost_of_living: 0.98
-    compressed_cost_of_living: 0.65
-
--   name: Spain
-    cost_of_living: 0.68
-    compressed_cost_of_living: 0.55
-
 -   name: Germany
     cost_of_living: 0.83
     compressed_cost_of_living: 0.6
-
--   name: Romania
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.46
-
--   name: Philippines
-    cost_of_living: 0.42
-    compressed_cost_of_living: 0.47
-
--   name: Ukraine
-    cost_of_living: 0.39
-    compressed_cost_of_living: 0.46
-
--   name: Portugal
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
-
--   name: Slovenia
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
-
--   name: United Kingdom
-    cost_of_living: 0.88
-    compressed_cost_of_living: 0.62
-
--   name: Serbia
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.46
 
 -   name: India
     cost_of_living: 0.28
     compressed_cost_of_living: 0.42
 
--   name: United States
-    cost_of_living: 1.0
-    compressed_cost_of_living: 0.66
-
 -   name: Japan
     cost_of_living: 0.99
     compressed_cost_of_living: 0.65
+
+-   name: Netherlands
+    cost_of_living: 0.98
+    compressed_cost_of_living: 0.65
+
+-   name: Philippines
+    cost_of_living: 0.42
+    compressed_cost_of_living: 0.47
+
+-   name: Portugal
+    cost_of_living: 0.64
+    compressed_cost_of_living: 0.54
+
+-   name: Romania
+    cost_of_living: 0.41
+    compressed_cost_of_living: 0.46
+
+-   name: Serbia
+    cost_of_living: 0.41
+    compressed_cost_of_living: 0.46
+
+-   name: Slovenia
+    cost_of_living: 0.64
+    compressed_cost_of_living: 0.54
+
+-   name: Spain
+    cost_of_living: 0.68
+    compressed_cost_of_living: 0.55
+
+-   name: Ukraine
+    cost_of_living: 0.39
+    compressed_cost_of_living: 0.46
+
+-   name: United Kingdom
+    cost_of_living: 0.88
+    compressed_cost_of_living: 0.62
+
+-   name: United States
+    cost_of_living: 1.0
+    compressed_cost_of_living: 0.66
