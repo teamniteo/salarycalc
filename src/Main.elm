@@ -598,18 +598,18 @@ viewBreakdown role country tenure =
                     [ class "font-weight-bold"
                     ]
                     [ text "Base Salary: " ]
-                , text "San Francisco 50th percentile for "
+                , text "US median for "
                 , mark [] [ text role.name ]
-                , text " on Glassdoor, discounted by our Affordability Ratio of 0.53."
+                , text " on Salary.com, divided by 12 (months) and converted to EUR using a 10-year USD -> EUR average."
                 ]
             , ListGroup.li []
                 [ span
                     [ class "font-weight-bold"
                     ]
-                    [ text "Location Factor: " ]
+                    [ text "Compressed Cost of Living: " ]
                 , text "Numbeo Cost of Living in "
                 , mark [] [ text country.name ]
-                , text " compared to San Francisco, compressed and normalized against our Affordability Ratio of 0.53."
+                , text " compared to United States, compressed against our Affordability Ratio of 0.49."
                 ]
             , ListGroup.li []
                 [ span
@@ -629,7 +629,7 @@ viewBreakdown role country tenure =
                     [ class "font-weight-bold"
                     ]
                     [ text "Affordability Ratio: " ]
-                , text "Average Cost of Living index compared to San Francisco, for four major European tech hubs: Amsterdam, Berlin, Barcelona, Lisbon."
+                , text "The value is set somewhat arbitrarily, to match our salaries before the introduction of the Salary Calculator in Niteo. We adjust the Affordability Ratio every January, based on the previous year's performance."
                 ]
             ]
         ]
