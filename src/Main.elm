@@ -629,7 +629,7 @@ viewBreakdown role country tenure =
                     [ class "font-weight-bold"
                     ]
                     [ text "Affordability Ratio: " ]
-                , text "The value is set somewhat arbitrarily, to match our salaries before the introduction of the Salary Calculator in Niteo. We adjust the Affordability Ratio every January, based on the previous year's performance."
+                , text "The value is set somewhat arbitrarily, to match our salaries before the introduction of Salary System v2.0. The value in v1.0 was set to reflect the average cost of living in 4 major European tech hubs. We adjust the Affordability Ratio every January, based on the previous year's performance."
                 ]
             ]
         ]
