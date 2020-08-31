@@ -143,8 +143,8 @@ countries:
     compressed_cost_of_living: 0.6
 
 -   name: Guatemala
-    cost_of_living: 0.00
-    compressed_cost_of_living: 0.00
+    cost_of_living: 0.54
+    compressed_cost_of_living: 0.51
 
 -   name: India
     cost_of_living: 0.28
@@ -183,8 +183,8 @@ countries:
     compressed_cost_of_living: 0.55
 
 -   name: Uganda
-    cost_of_living: 0.00
-    compressed_cost_of_living: 0.00
+    cost_of_living: 0.36
+    compressed_cost_of_living: 0.45
 
 -   name: Ukraine
     cost_of_living: 0.39
