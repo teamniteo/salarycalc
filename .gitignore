@@ -9,3 +9,4 @@ dist/
 elm-stuff/
 node_modules/
 repl-temp-*
+.direnv/

@@ -1,3 +1,16 @@
+# Note that the following stanza uses CircleCI 2.1 to make use of a Reusable Executor
+# This allows defining a docker image to reuse across jobs.
+# visit https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors to
+# learn more.
+#
+# NixOS stuff taken from
+# https://github.com/PrivateStorageio/PaymentServer/blob/master/.circleci/config.yml
+#
+# For nix-shell's we're not using --pure because we need some env vars and
+# the CircleCI environment is relatively pure already
+
+# yamllint disable rule:line-length
+
 version: 2.1
 
 orbs:
@@ -10,46 +23,118 @@ defaults: &defaults
 
 workflows:
   version: 2
-  build-and-deploy:
+  workflow:
     jobs:
-      - python
+      - Linux Deps Cached
+      - MacOS Deps Cached
+      - Python Tests
       - build
       - publish:
           requires:
-            - python
+            - Python Tests
             - build
           filters:
             branches:
               only: master
 
 
-jobs:
-  python:
-    working_directory: ~/repo
+executors:
+  salarycalc:
+    working_directory: ~/salarycalc
     docker:
-      - image: circleci/python:3.7.5
+      - image: niteo/nixpkgs-nixos-20.03:925ae0dee63cf2c59533a6258340812e5643428a
+
+    environment:
+      NIX_BUILD_SHELL: bash
+      CACHIX_NAME: salarycalc
+
+
+commands:
+  configure_nix:
+    steps:
+    - run:
+        name: Configure Nix and Cachix
+        command: |
+          mkdir -p /etc/nix
+          echo "sandbox = false" >> /etc/nix/nix.conf
+          cachix authtoken "$CACHIX_AUTH_TOKEN"
+          cachix use "$CACHIX_NAME"
+          nix-shell --max-jobs 2 --run "echo 'nix-shell successfully entered'"
+
+jobs:
+
+  Linux Deps Cached:
+    executor: salarycalc
+    steps:
+
+      - checkout:
+          path: ~/salarycalc
+
+      - configure_nix
+
+      - run:
+          name: Upload Linux dependencies
+          command: |
+            nix-build -A buildableShell | cachix push "$CACHIX_NAME"
+
+  MacOS Deps Cached:
+    macos:
+      xcode: 11.4.1
+    working_directory: ~/salarycalc
+    environment:
+      CACHIX_NAME: salarycalc
+
+    steps:
+
+      - run:
+          name: Install Nix
+          command: |
+            # Nix installation adapted from
+            # https://github.com/cachix/install-nix-action/blob/master/lib/install-nix.sh
+            set -euo pipefail
+            # This paragraph's steps are copied from
+            # https://github.com/NixOS/nix/blob/26fcab53e05ce66f5533f0f07ed13d727a891c8d/scripts/create-darwin-volume.sh
+            echo nix | sudo tee -a /etc/synthetic.conf
+            /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B
+            disk=$(diskutil info -plist / | xpath "/plist/dict/key[text()='ParentWholeDisk']/following-sibling::string[1]/text()" 2>/dev/null)
+            sudo diskutil apfs addVolume "$disk" APFS 'Nix Store' -mountpoint /nix
+            # Can't be bothered to get a daemon installation to work, so we'll
+            # just do a single-user installation instead.
+            sudo diskutil enableOwnership /nix
+            sudo chown -R "$(whoami)" /nix
+            sh <(curl -sS --retry 5 --retry-connrefused -L https://nixos.org/nix/install) </dev/null --no-channel-add
+            # Disable spotlight indexing of /nix to speed up performance
+            sudo mdutil -i off /nix
+            sudo mkdir -p /etc/nix
+            echo "max-jobs = auto" | sudo tee -a /etc/nix/nix.conf
+            # macOS needs certificates hints
+            cert_file=/nix/var/nix/profiles/per-user/$(whoami)/profile/etc/ssl/certs/ca-bundle.crt
+            echo "export NIX_SSL_CERT_FILE=$cert_file" >> $BASH_ENV
+            # Set paths
+            echo "export PATH=/nix/var/nix/profiles/per-user/$(whoami)/profile/bin:\$PATH" >> $BASH_ENV
+
+      - checkout:
+          path: ~/salarycalc
+
+      - run:
+          name: Upload Darwin dependencies
+          command: |
+            $(nix-build -A pkgs.cachix)/bin/cachix authtoken "$CACHIX_AUTH_TOKEN"
+            $(nix-build -A pkgs.cachix)/bin/cachix use "$CACHIX_NAME"
+            nix-build -A buildableShell | $(nix-build -A pkgs.cachix)/bin/cachix push "$CACHIX_NAME"
+
+  Python Tests:
+    executor: salarycalc
 
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - v1-python-dependencies-{{ checksum "Pipfile.lock" }}
-            - v1-python-dependencies-
+      - configure_nix
 
       - run:
-          name: lint fetch_config_values
+          name: Run Linters
           command: |
-            pipenv install --dev
-            pipenv run black fetch_config_values.py
-            pipenv run isort -rc --atomic fetch_config_values.py
-            pipenv run flake8 fetch_config_values.py
-            pipenv run mypy fetch_config_values.py
-
-      - save_cache:
-          key: v1-python-dependencies-{{ checksum "Pipfile.lock" }}
-          paths:
-            - ./.venv
+            nix-shell --run "make lint all=true"
 
       - untracked_changes/check
 

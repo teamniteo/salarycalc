@@ -1,44 +1,54 @@
-.EXPORT_ALL_VARIABLES:
-PIPENV_VENV_IN_PROJECT = 1
+# Convenience makefile to build the dev env and run common commands
+# Based on https://github.com/niteoweb/Makefile
 
 .PHONY: all
-all: .installed lint test dist
+all: tests dist
 
-.PHONY: install
-install:
-	@rm -rf .installed
-	@make .installed
-
-.installed: package.json package-lock.json elm.json
-	@echo "Dependencies files are newer than .installed; (re)installing."
-	@npm clean-install
-	@echo "This file is used by 'make' for keeping track of last install time. If package.json, package-lock.json or elm.json are newer then this file (.installed) then all 'make *' commands that depend on '.installed' know they need to run npm install first." \
-		> .installed
+# Lock version pins for Python, JavaScript & Elm dependencies
+.PHONY: lock
+lock:
+	@rm -rf .venv/
+	@poetry lock
+	@rm -rf .venv/
+	@rm -rf node_modules
+	@elm2nix convert > elm-srcs.nix
+	@elm2nix snapshot > registry.dat
+	@nix-shell --run true
 
 # Testing and linting targets
 .PHONY: lint
-lint: .installed
-	@npx elm-analyse
+lint:
+# 1. get all unstaged modified files
+# 2. get all staged modified files
+# 3. get all untracked files
+# 4. run pre-commit checks on them
+ifeq ($(all),true)
+	@pre-commit run --hook-stage push --all-files
+else
+	@{ git diff --name-only ./; git diff --name-only --staged ./;git ls-files --other --exclude-standard; } \
+			| sort | uniq | sed 's|backend/||' \
+			| xargs pre-commit run --hook-stage push --files
+endif
 
 .PHONY: test
 test: tests
 
 .PHONY: tests
-tests: .installed coverage
+tests: coverage
 
 .PHONY: coverage
-coverage: .installed verify-examples
+coverage: verify-examples
 	@npx elm-coverage --report codecov
 
 .PHONY: verify-examples
-verify-examples: .installed
+verify-examples:
 	@npx elm-verify-examples
 
-.coverage/codecov.json: .installed test
+.coverage/codecov.json: test
 
 # Run development server
 .PHONY: run
-run: .installed
+run:
 	@npx parcel --global SalaryCalculator src/index.html
 
 .PHONY: codecov
@@ -47,7 +57,7 @@ codecov: .coverage/codecov.json
 
 # Build distribution files and place them where they are expected
 .PHONY: dist
-dist: .installed
+dist:
 	# For modules (commonjs or ES6)
 	@npx parcel build src/index.js
 	# For html script tags
@@ -67,22 +77,8 @@ publish: dist
 	@npm publish
 	@git checkout HEAD package.json package-lock.json
 
-# Fetch salaries, location factors and currencies from the Internet
-.python.installed: Pipfile Pipfile.lock
-	@echo "Pipfile(.lock) is newer than .installed, (re)installing"
-	@pipenv install --dev
-	@echo "This file is used by 'make' for keeping track of last install time. If Pipfile or Pipfile.lock are newer then this file (.installed) then all 'make *' commands that depend on '.installed' know they need to run pipenv install first." \
-		> .python.installed
 
+# Fetch salaries, location factors and currencies from the Internet
 .PHONY: config
 config: .python.installed
-	@pipenv run black fetch_config_values.py
-	@pipenv run isort -rc --atomic fetch_config_values.py
-	@pipenv run flake8 fetch_config_values.py
-	@pipenv run mypy fetch_config_values.py
-	@pipenv run python fetch_config_values.py
-
-# Nuke from orbit
-clean:
-	@rm -rf elm-stuff/ dist/ node_modules/ tests/VerifyExamples/ .venv/
-	@rm -f .installed
+	@python scripts/fetch_config_values.py

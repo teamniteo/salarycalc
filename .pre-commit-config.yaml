@@ -1,0 +1,87 @@
+minimum_pre_commit_version: 1.17.0
+default_stages: [commit,push]
+repos:
+
+  - repo: local
+    hooks:
+
+      - id: codespell
+        name: Check Spelling
+        description: Checks for common misspellings in text files.
+        entry: codespell --ignore-words=.aspell.en.pws
+        language: system
+        exclude: ^.*\.svg
+        types: [file, text]
+
+      - id: trailing-whitespace
+        name: Trim Trailing Space
+        entry: trailing-whitespace-fixer
+        language: system
+        types: [file, text]
+
+      - id: end-of-file-fixer
+        name: Fix End of Files
+        description: Ensures that a file is either empty, or ends with one newline.
+        entry: end-of-file-fixer
+        language: system
+        types: [file, text]
+
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        description: Check for files that contain merge conflict strings.
+        entry: check-merge-conflict
+        language: system
+        types: [file, text]
+
+      - id: yamllint
+        name: yamllint
+        description: Lint YAML files.
+        entry: yamllint
+        language: system
+        types: [yaml]
+
+      - id: isort
+        name: isort
+        description: A Python utility that sorts imports alphabetically
+        entry: isort
+        language: system
+        types: [python]
+
+      - id: flake8
+        name: Flake8
+        description: Python Style Guide Enforcement
+        entry: flake8 --config .flake8
+        language: system
+        types: [python]
+
+      - id: black
+        name: Black
+        description: Uncompromising Python code formatter
+        entry: black
+        language: system
+        types: [python]
+
+      # - id: elm-format
+      #   name: Elm Format
+      #   description: Format Elm source code
+      #   entry: elm-format --yes
+      #   language: system
+      #   files: .*\.elm
+      #   types: [file]
+
+      # - id: eslint
+      #   name: ESLint
+      #   description: Pluggable JavaScript linter
+      #   entry: eslint --fix src/
+      #   pass_filenames: false
+      #   language: system
+      #   types: [javascript]
+
+      # - id: elm-analyse
+      #   name: Elm Analyse
+      #   description: Identify deficiencies and apply best practices in Elm
+      #   entry: elm-analyse
+      #   pass_filenames: false
+      #   language: system
+      #   files: .*\.elm
+      #   types: [file]

@@ -25,7 +25,7 @@ def usd_to_eur_10_year_average(
 
     # Load OFX.com
     driver.get(
-        "https://www.ofx.com/en-us/forex-news/historical-exchange-rates/yearly-average-rates/"
+        "https://www.ofx.com/en-us/forex-news/historical-exchange-rates/yearly-average-rates/"  # noqa: 501
     )
     pbar.update()
 
