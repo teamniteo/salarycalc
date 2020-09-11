@@ -17,7 +17,7 @@ There are several scenarios. Pick the one that suits you the best.
 
 ### Serve from a sub-directory
 
-Assuming you have a website at `https://example.com/` with content served from the `public/` directory and want the calculator to be available at `https://example.com/salary-calculator/`, the easiest way is to copy (or link) the `dist` directory, like this: 
+Assuming you have a website at `https://example.com/` with content served from the `public/` directory and want the calculator to be available at `https://example.com/salary-calculator/`, the easiest way is to copy (or link) the `dist` directory, like this:
 
 ```shell
 cp -r node_modules/salary-calculator/dist/ public/salary-calculator
@@ -34,7 +34,7 @@ If you want to customize the stylesheet or want to embed it in your own HTML pag
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Salary Calculator custom integration</title>
-    <link 
+    <link
       href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/darkly/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-w+8Gqjk9Cuo6XH9HKHG5t5I1VR4YBNdPt/29vwgfZR485eoEJZ8rJRbm3TR32P6k"
@@ -45,7 +45,7 @@ If you want to customize the stylesheet or want to embed it in your own HTML pag
   </head>
   <body>
     <div id="salary-calculator-container">
-    </div> 
+    </div>
     <script charset="utf-8">
       SalaryCalculator.init(
         document.getElementById("salary-calculator-container")
@@ -83,7 +83,7 @@ Contributions are welcome.
 ### Prerequisites
 
 - Git
-- GNU Make, 
+- GNU Make,
 - Node.js (preferabely v. 11)
 
 ### Local development
@@ -92,7 +92,7 @@ Contributions are welcome.
 
 1.  To start development server with hot reloading run `make run`
 
-    This command should also install all the requirements. 
+    This command should also install all the requirements.
 
 1.  When you are happy with your code, run `make` to compile a production-optimized code in `dist/` directory.
 
@@ -101,4 +101,3 @@ Contributions are welcome.
 ### Contributing
 
 Thanks for your interest in our project. We are open to learn about any issues and for your pull requests.
-
