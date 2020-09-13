@@ -10,3 +10,4 @@ elm-stuff/
 node_modules
 repl-temp-*
 .direnv/
+geckodriver.log
