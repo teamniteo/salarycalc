@@ -7,6 +7,6 @@
 /tests/VerifyExamples
 dist/
 elm-stuff/
-node_modules/
+node_modules
 repl-temp-*
 .direnv/

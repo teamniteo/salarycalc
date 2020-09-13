@@ -12,6 +12,112 @@ let
     drv = (import ./. { buildSrc = "/var/empty"; }).devShell;
   };
 
+  # The development shell definition
+  devShell = pkgs.mkShell {
+    inputsFrom = [
+      dist
+    ];
+    buildInputs = with pkgs; [
+      # common tooling
+      devEnv
+      gitAndTools.pre-commit
+      niv
+      vim
+
+      # Elm app
+      elmPackages.elm
+      elmPackages.elm-format
+      elmPackages.elm-analyse
+      elmPackages.elm-verify-examples
+      elmPackages.elm-test
+      elm2nix
+      yarn
+
+      # Python helper scripts
+      geckodriver
+      poetry
+
+    ]
+
+    # Currently, both firefox and firefox-bin are broken on Darwin (MacOS)
+    # so if you are on a MacBook, you have to manually install firefox.
+    # If https://github.com/NixOS/nixpkgs/issues/53979 gets fixed,
+    # we can remove this if.
+    ++ lib.optionals (!pkgs.stdenv.isDarwin) [
+      pkgs.firefox
+    ];
+
+    shellHook = ''
+      if [[ -d .git ]]; then
+        pre-commit install -f --hook-type pre-commit
+        pre-commit install -f --hook-type pre-push
+      fi
+
+      dest=${toString buildSrc}/node_modules
+      ${copyGeneratedFiles}
+    '';
+  };
+
+  # Elm stuff
+  yarnPkg = pkgs.yarn2nix.mkYarnPackage {
+    name = "salarycalc-node-packages";
+    src = pkgs.lib.cleanSourceWith {
+      src = ./.;
+      name = "salarycalc-package.json";
+      filter = name: type: baseNameOf (toString name) == "package.json";
+    };
+    yarnLock = ./yarn.lock;
+    publishBinsFor = [
+        "parcel-bundler"
+        # "eslint"
+    ];
+  };
+
+  copyGeneratedFiles = ''
+    echo "symlinking node_modules ..." >> /dev/stderr
+    rm -rf $dest
+    ln -s ${yarnPkg}/libexec/salarycalc/node_modules $dest
+  '';
+
+  dist = pkgs.stdenv.mkDerivation {
+    name = "salarycalc-frontend-dist";
+
+    src = pkgs.lib.cleanSourceWith {
+      src = pkgs.gitignoreSource buildSrc;
+      # parcel reuses the source name
+      name = "salarycalc";
+    };
+
+    buildInputs = with pkgs.elmPackages; [
+      elm
+      yarnPkg
+      pkgs.yarn
+    ];
+
+    patchPhase = ''
+      dest=node_modules
+      ${copyGeneratedFiles}
+    '';
+
+    configurePhase = pkgs.elmPackages.fetchElmDeps {
+      elmPackages = import ./elm-srcs.nix;
+      registryDat = ./registry.dat;
+      inherit (pkgs.elmPackages) elmVersion;
+    };
+
+    buildPhase = ''
+      rm -rf dist/
+      yarn --offline build
+    '';
+
+    installPhase = ''
+      mkdir -p $out
+      cp -R dist/* $out/
+    '';
+  };
+
+
+  # Python stuff
   removePytestRunner = pkg: pkg.overrideAttrs (old: {
     postPatch = old.postPatch or "" + ''
       substituteInPlace setup.py \
@@ -45,35 +151,9 @@ let
     };
   });
 
-  # The development shell definition
-  devShell = pkgs.mkShell {
-    buildInputs = with pkgs; [
-      devEnv
-      poetry
-      geckodriver
-      gitAndTools.pre-commit
-      vim
-      niv
-    ]
-
-    # Currently, both firefox and firefox-bin are broken on Darwin (MacOS)
-    # so if you are on a MacBook, you have to manually install firefox.
-    # If https://github.com/NixOS/nixpkgs/issues/53979 gets fixed,
-    # we can remove this if.
-    ++ lib.optionals (!pkgs.stdenv.isDarwin) [
-      pkgs.firefox
-    ];
-
-    shellHook = ''
-      if [[ -d .git ]]; then
-        pre-commit install -f --hook-type pre-commit
-        pre-commit install -f --hook-type pre-push
-      fi
-    '';
-  };
 
 in {
-  inherit devShell;
+  inherit dist devShell;
   inherit buildableShell;
 
   # Used to install dependencies for CI and Heroku
