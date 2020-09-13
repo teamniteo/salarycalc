@@ -16,11 +16,6 @@ version: 2.1
 orbs:
   untracked_changes: niteo/check-untracked-changes@1
 
-defaults: &defaults
-    working_directory: ~/repo
-    docker:
-      - image: circleci/node:9.4.0
-
 workflows:
   version: 2
   workflow:
@@ -177,8 +172,10 @@ jobs:
 
       - run:
           name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/salarycalc/.npmrc
 
       - run:
           name: Publish the package to NPM
-          command: make publish
+          command: |
+            nix-shell --run "npm version --no-git-tag-version prerelease --preid $(date +%Y-%m-%dT%H-%M-%S)"
+            nix-shell --run "npm publish"
