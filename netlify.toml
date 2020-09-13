@@ -4,4 +4,4 @@ ID = "cccd17ab-57b5-48f2-8f5d-203432b99502"
 [build]
 command = "make dist"
 publish = "dist"
-environment = { NODE_VERSION = "11.13.0", NPM_VERSION = "6.9.0" }
+environment = { NODE_VERSION = "10.12.0", NPM_VERSION = "6.9.0" }
