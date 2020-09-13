@@ -42,7 +42,7 @@ executors:
   salarycalc:
     working_directory: ~/salarycalc
     docker:
-      - image: niteo/nixpkgs-nixos-20.03:925ae0dee63cf2c59533a6258340812e5643428a
+      - image: niteo/nixpkgs-nixos-20.03:4bd1938e03e1caa49a6da1ec8cff802348458f05
 
     environment:
       NIX_BUILD_SHELL: bash
@@ -59,7 +59,7 @@ commands:
           echo "sandbox = false" >> /etc/nix/nix.conf
           cachix authtoken "$CACHIX_AUTH_TOKEN"
           cachix use "$CACHIX_NAME"
-          nix-shell --max-jobs 2 --run "echo 'nix-shell successfully entered'"
+          nix-shell --run "echo 'nix-shell successfully entered'"
 
 jobs:
 
@@ -106,7 +106,7 @@ jobs:
             # Disable spotlight indexing of /nix to speed up performance
             sudo mdutil -i off /nix
             sudo mkdir -p /etc/nix
-            echo "max-jobs = auto" | sudo tee -a /etc/nix/nix.conf
+            echo "max-jobs = 2" | sudo tee -a /etc/nix/nix.conf
             # macOS needs certificates hints
             cert_file=/nix/var/nix/profiles/per-user/$(whoami)/profile/etc/ssl/certs/ca-bundle.crt
             echo "export NIX_SSL_CERT_FILE=$cert_file" >> $BASH_ENV
