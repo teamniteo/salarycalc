@@ -20,8 +20,8 @@ module Tests exposing
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Dropdown as Dropdown
 import Career exposing (Career, Role)
-import Country exposing (Country)
 import Config exposing (Config)
+import Country exposing (Country)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html

@@ -15,6 +15,12 @@ lock:
 	@elm2nix snapshot > registry.dat
 	@nix-shell --run true
 
+# Build distribution files and place them where they are expected
+.PHONY: dist
+dist:
+	@rm -rf dist
+	@nix-build . -A dist -o dist
+
 # Testing and linting targets
 .PHONY: lint
 lint:
@@ -54,17 +60,6 @@ run:
 .PHONY: codecov
 codecov: .coverage/codecov.json
 	@codecov --disable=gcov --file=.coverage/codecov.json
-
-# Build distribution files and place them where they are expected
-.PHONY: dist
-dist:
-	# For modules (commonjs or ES6)
-	@parcel build src/index.js
-	# For html script tags
-	@parcel build \
-		--global SalaryCalculator \
-		src/salary-calculator.js \
-		src/index.html
 
 # Publish a pre-release version to NPM
 .PHONY: publish
