@@ -69,13 +69,13 @@ repos:
       #   files: .*\.elm
       #   types: [file]
 
-      # - id: eslint
-      #   name: ESLint
-      #   description: Pluggable JavaScript linter
-      #   entry: eslint --fix src/
-      #   pass_filenames: false
-      #   language: system
-      #   types: [javascript]
+      - id: eslint
+        name: ESLint
+        description: Pluggable JavaScript linter
+        entry: eslint --fix src/
+        pass_filenames: false
+        language: system
+        types: [javascript]
 
       # - id: elm-analyse
       #   name: Elm Analyse

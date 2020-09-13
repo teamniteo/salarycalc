@@ -1,0 +1,73 @@
+env:
+  es6: true
+  browser: true
+  node: true
+
+extends: 'eslint:recommended'
+
+parserOptions:
+  ecmaVersion: 8
+  ecmaFeatures:
+    experimentalObjectRestSpread: true
+  sourceType: module
+rules:
+  # General
+  indent:
+    - error
+    - 2
+  linebreak-style:
+    - error
+    - unix
+  max-len:
+    - warn
+    - code: 80
+      ignoreTemplateLiterals: true
+      ignoreStrings: true
+  semi:
+    - error
+    - always
+  comma-spacing:
+    - error
+  comma-style:
+    - error
+    - last
+  brace-style:
+    - error
+    - stroustrup
+    - allowSingleLine: true
+  block-spacing:
+    - error
+    - always
+
+  no-console:
+    - error
+    - allow:
+      - warn
+
+  # String literals:
+  quotes:
+    - error
+    - backtick
+
+  # Object literals:
+  quote-props:
+    - error
+    - consistent
+  object-curly-newline:
+    - error
+    - multiline: true
+  object-curly-spacing:
+    - error
+    - always
+
+  # Array literals:
+  array-bracket-spacing:
+    - error
+    - always
+
+  # Arrow function definitions:
+  arrow-parens:
+    - error
+    - always
+  arrow-spacing:
+    - error
