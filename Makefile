@@ -38,30 +38,30 @@ tests: coverage
 
 .PHONY: coverage
 coverage: verify-examples
-	@npx elm-coverage --report codecov
+	@elm-coverage --report codecov
 
 .PHONY: verify-examples
 verify-examples:
-	@npx elm-verify-examples
+	@elm-verify-examples
 
 .coverage/codecov.json: test
 
 # Run development server
 .PHONY: run
 run:
-	@npx parcel --global SalaryCalculator src/index.html
+	@parcel --global SalaryCalculator src/index.html
 
 .PHONY: codecov
 codecov: .coverage/codecov.json
-	npx codecov --disable=gcov --file=.coverage/codecov.json
+	@codecov --disable=gcov --file=.coverage/codecov.json
 
 # Build distribution files and place them where they are expected
 .PHONY: dist
 dist:
 	# For modules (commonjs or ES6)
-	@npx parcel build src/index.js
+	@parcel build src/index.js
 	# For html script tags
-	@npx parcel build \
+	@parcel build \
 		--global SalaryCalculator \
 		src/salary-calculator.js \
 		src/index.html
