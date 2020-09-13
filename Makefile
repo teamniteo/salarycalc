@@ -22,10 +22,7 @@ dist:
 	# For modules (commonjs or ES6)
 	@parcel build src/index.js
 	# For html script tags
-	@parcel build \
-		--global SalaryCalculator \
-		src/salary-calculator.js \
-		src/index.html
+	@parcel build --global SalaryCalculator	src/salary-calculator.js src/index.html
 
 # Testing and linting targets
 .PHONY: lint
@@ -71,10 +68,7 @@ codecov: .coverage/codecov.json
 .PHONY: publish
 publish: release = $(shell date +%Y-%m-%dT%H-%M-%S)
 publish: dist
-	@npm version \
-		--no-git-tag-version \
-		prerelease \
-		--preid $(release)
+	@npm version --no-git-tag-version prerelease --preid $(release)
 	@npm publish
 	@git checkout HEAD package.json package-lock.json
 

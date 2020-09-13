@@ -30,6 +30,7 @@ let
       elmPackages.elm-coverage
       elm2nix
       yarn
+      nodePackages.npm
 
       # Python helper scripts
       geckodriver
