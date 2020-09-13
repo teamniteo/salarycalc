@@ -3,15 +3,13 @@
 from ruamel.yaml import RoundTripDumper
 from ruamel.yaml import RoundTripLoader
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 from tqdm import tqdm
 
 import argparse
 import ruamel.yaml
 import sys
+import time
 
 
 def usd_to_eur_10_year_average(
@@ -65,18 +63,12 @@ def usd_to_eur_10_year_average(
     pbar.update()
 
     # Wait for data to load
-    WebDriverWait(driver, 3).until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, "table.historical-rates--table")
-        )
-    )
+    time.sleep(3)
     pbar.update()
 
     # Extract the Average Rate
-    avg_value = driver.find_element_by_css_selector(
-        "td.historical-rates--table--average--value"
-    ).text
-    avg = round(float(avg_value), 2)
+    avg_value = driver.find_element_by_css_selector("tbody.fresh").text
+    avg = round(float(avg_value.replace("Average ", "")), 2)
     pbar.update()
 
     config["eur_to_usd_10_year_avg"] = avg
