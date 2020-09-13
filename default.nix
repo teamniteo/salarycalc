@@ -29,8 +29,9 @@ let
       elmPackages.elm-test
       elmPackages.elm-coverage
       elm2nix
-      yarn
       nodePackages.npm
+      yarn
+      yarnPkg
 
       # Python helper scripts
       geckodriver
