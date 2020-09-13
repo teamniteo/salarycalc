@@ -34,5 +34,17 @@
         "type": "tarball",
         "url": "https://github.com/nix-community/poetry2nix/archive/40a67636c3b3befddc6d3ac060bb44c1745491a9.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "yarn2nix": {
+        "branch": "yarnnix",
+        "description": "Generate nix expressions from a yarn.lock file",
+        "homepage": "",
+        "owner": "infinisil",
+        "repo": "yarn2nix",
+        "rev": "d55ea6ae90a086dd83e35ea227ec30b985613fb4",
+        "sha256": "00gjz5674x3gv9dkmsi6465j1yr7a65796zxbkcfpg23pkawvbl9",
+        "type": "tarball",
+        "url": "https://github.com/infinisil/yarn2nix/archive/d55ea6ae90a086dd83e35ea227ec30b985613fb4.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
