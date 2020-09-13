@@ -82,17 +82,19 @@ Contributions are welcome.
 
 ### Prerequisites
 
-- Git
-- GNU Make,
-- Node.js (preferabely v. 11)
+You need to have [Nix](https://nixos.org/download.html) installed. Once you do, running `nix-shell` will drop you into a shell that has all the tooling required for development ready for you.
+
+Additionally, to not have to remember to run `nix-shell` you can install `http://direnv.com/` and you will be dropped into the Nix shell automatically when `cd`-ing into the project.
 
 ### Local development
 
 1.  `git clone git@github.com:niteoweb/salarycalc.git && cd salarycalc`
 
-1.  To start development server with hot reloading run `make run`
+1.  `nix-shell` or `direnv allow`.
 
-    This command should also install all the requirements.
+1.  To start development server with hot reloading run `make run`.
+
+1.  To update currency rates, base salaries and location factors, run `make config`.
 
 1.  When you are happy with your code, run `make` to compile a production-optimized code in `dist/` directory.
 
