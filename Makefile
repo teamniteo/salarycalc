@@ -19,7 +19,13 @@ lock:
 .PHONY: dist
 dist:
 	@rm -rf dist
-	@nix-build . -A dist -o dist
+	# For modules (commonjs or ES6)
+	@parcel build src/index.js
+	# For html script tags
+	@parcel build \
+		--global SalaryCalculator \
+		src/salary-calculator.js \
+		src/index.html
 
 # Testing and linting targets
 .PHONY: lint
@@ -75,5 +81,5 @@ publish: dist
 
 # Fetch salaries, location factors and currencies from the Internet
 .PHONY: config
-config: .python.installed
+config:
 	@python scripts/fetch_config_values.py

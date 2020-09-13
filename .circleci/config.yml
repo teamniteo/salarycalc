@@ -29,11 +29,10 @@ workflows:
       - MacOS Deps Cached
       - Python Tests
       - Elm Tests
-      - build
       - publish:
           requires:
             - Python Tests
-            - build
+            - Elm Tests
           filters:
             branches:
               only: master
@@ -168,72 +167,17 @@ jobs:
       - untracked_changes/check
 
 
-  build:
-    <<: *defaults
+  publish:
+    executor: salarycalc
 
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - v4-dependencies-{{ checksum "package.json" }}
-            - v4-dependencies-
-
-      - run:
-          name: Updating npm
-          command: npmv=$(echo $(npm -v) | head -c 1); if [ "$npmv" -lt "6" ]; then sudo npm i -g npm; else echo "Node.js Docker Team finally decided to include npm v6+ in latest image; you can remove this script now"; fi
-
-      - run:
-          name: Installing dependencies
-          command: make .installed
-
-      - run:
-          name: Running linters
-          command: make lint
-
-      - run:
-          name: Running tests
-          command: make tests
-
-      - run:
-          name: Generating coverage report
-          command: make codecov
-
-      - run:
-          name: Compiling salary-calculator.js
-          command: make dist
-
-      - save_cache:
-          key: v4-dependencies-{{ checksum "package.json" }}
-          paths:
-            - /home/circleci/.npm
-            - /home/circleci/.elm
-            - elm-stuff
-            - tests/elm-stuff
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths: .
-
-  publish:
-    <<: *defaults
-
-    steps:
-      - attach_workspace:
-            at: ~/repo
+      - configure_nix
 
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
-
-      - run:
-          name: Updating npm
-          command: npmv=$(echo $(npm -v) | head -c 1); if [ "$npmv" -lt "6" ]; then sudo npm i -g npm; else echo "Node.js Docker Team finally decided to include npm v6+ in latest image; you can remove this script now"; fi
-
-      - run:
-          name: Clean the dependencies cache
-          command: make clean
-          # See https://github.com/niteoweb/salarycalc/issues/14
 
       - run:
           name: Publish the package to NPM

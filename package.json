@@ -4,7 +4,7 @@
   "description": "Elm engine running the Niteo Salary Calculator",
   "main": "dist/index.js",
   "scripts": {
-    "build": "parcel build --global SalaryCalculator src/salary-calculator.js src/index.html",
+    "build": "make dist",
     "test": "make test"
   },
   "repository": {
