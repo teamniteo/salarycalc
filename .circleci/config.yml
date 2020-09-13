@@ -28,6 +28,7 @@ workflows:
       - Linux Deps Cached
       - MacOS Deps Cached
       - Python Tests
+      - Elm Tests
       - build
       - publish:
           requires:
@@ -137,6 +138,35 @@ jobs:
             nix-shell --run "make lint all=true"
 
       - untracked_changes/check
+
+
+  Elm Tests:
+    executor: salarycalc
+
+    steps:
+      - checkout
+
+      - configure_nix
+
+      - run:
+          name: Run Linters
+          command: |
+            nix-shell --run "make lint all=true"
+
+      - run:
+          name: Running tests
+          command: nix-shell --run "make tests"
+
+      - run:
+          name: Generating coverage report
+          command: nix-shell --run "make codecov"
+
+      - run:
+          name: Compiling salary-calculator.js
+          command: nix-shell --run "make dist"
+
+      - untracked_changes/check
+
 
   build:
     <<: *defaults
