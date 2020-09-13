@@ -61,10 +61,10 @@ let
 
   # Elm stuff
   yarnPkg = pkgs.yarn2nix.mkYarnPackage {
-    name = "salarycalc-node-packages";
+    name = "salary-calculator-node-packages";
     src = pkgs.lib.cleanSourceWith {
       src = ./.;
-      name = "salarycalc-package.json";
+      name = "salary-calculator-package.json";
       filter = name: type: baseNameOf (toString name) == "package.json";
     };
     yarnLock = ./yarn.lock;
@@ -79,16 +79,16 @@ let
   copyGeneratedFiles = ''
     echo "symlinking node_modules ..." >> /dev/stderr
     rm -rf $dest
-    ln -s ${yarnPkg}/libexec/salarycalc/node_modules $dest
+    ln -s ${yarnPkg}/libexec/salary-calculator/node_modules $dest
   '';
 
   dist = pkgs.stdenv.mkDerivation {
-    name = "salarycalc-frontend-dist";
+    name = "salary-calculator-frontend-dist";
 
     src = pkgs.lib.cleanSourceWith {
       src = pkgs.gitignoreSource buildSrc;
       # parcel reuses the source name
-      name = "salarycalc";
+      name = "salary-calculator";
     };
 
     buildInputs = with pkgs.elmPackages; [
