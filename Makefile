@@ -64,14 +64,6 @@ run:
 codecov: .coverage/codecov.json
 	@codecov --disable=gcov --file=.coverage/codecov.json
 
-# Publish a pre-release version to NPM
-.PHONY: publish
-publish: release = $(shell date +%Y-%m-%dT%H-%M-%S)
-publish: dist
-	@npm version --no-git-tag-version prerelease --preid $(release)
-	@npm publish
-	@git checkout HEAD package.json package-lock.json
-
 
 # Fetch salaries, location factors and currencies from the Internet
 .PHONY: config
