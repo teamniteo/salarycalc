@@ -14,9 +14,6 @@ let
 
   # The development shell definition
   devShell = pkgs.mkShell {
-    inputsFrom = [
-      dist
-    ];
     buildInputs = with pkgs; [
       # common tooling
       devEnv
@@ -82,44 +79,6 @@ let
     ln -s ${yarnPkg}/libexec/salary-calculator/node_modules $dest
   '';
 
-  dist = pkgs.stdenv.mkDerivation {
-    name = "salary-calculator-frontend-dist";
-
-    src = pkgs.lib.cleanSourceWith {
-      src = pkgs.gitignoreSource buildSrc;
-      # parcel reuses the source name
-      name = "salary-calculator";
-    };
-
-    buildInputs = with pkgs.elmPackages; [
-      elm
-      yarnPkg
-      pkgs.yarn
-    ];
-
-    patchPhase = ''
-      dest=node_modules
-      ${copyGeneratedFiles}
-    '';
-
-    configurePhase = pkgs.elmPackages.fetchElmDeps {
-      elmPackages = import ./elm-srcs.nix;
-      registryDat = ./registry.dat;
-      inherit (pkgs.elmPackages) elmVersion;
-    };
-
-    buildPhase = ''
-      rm -rf dist/
-      yarn --offline build
-    '';
-
-    installPhase = ''
-      mkdir -p $out
-      cp -R dist/* $out/
-    '';
-  };
-
-
   # Python stuff
   removePytestRunner = pkg: pkg.overrideAttrs (old: {
     postPatch = old.postPatch or "" + ''
@@ -156,7 +115,7 @@ let
 
 
 in {
-  inherit dist devShell;
+  inherit devShell;
   inherit buildableShell;
 
   # Used to install dependencies for CI and Heroku
