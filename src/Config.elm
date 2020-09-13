@@ -2,9 +2,9 @@ module Config exposing
     ( Config
     , careerDecoder
     , careersDecoder
+    , configDecoder
     , countriesDecoder
     , countryDecoder
-    , configDecoder
     , roleDecoder
     , rolesDecoder
     )

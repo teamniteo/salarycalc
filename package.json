@@ -4,8 +4,8 @@
   "description": "Elm engine running the Niteo Salary Calculator",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "if test -z $MAKELEVEL; then make; fi",
-    "test": "if test -z $MAKELEVEL; then make test; fi"
+    "build": "parcel build src/index.html",
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -30,10 +30,12 @@
     "elm-analyse": "^0.16.1",
     "elm-coverage": "^0.2.0",
     "elm-hot": "^1.0.1",
+    "elm-upgrade": "^0.19.8",
     "elm-verify-examples": "^4.0.0",
     "eslint": "^7.9.0",
-    "node-elm-compiler": "^5.0.3",
+    "node-elm-compiler": "^5.0.5",
     "parcel-bundler": "^1.12.0"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
