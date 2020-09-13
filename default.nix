@@ -69,7 +69,7 @@ let
     yarnLock = ./yarn.lock;
     publishBinsFor = [
         "parcel-bundler"
-        # "eslint"
+        "eslint"
     ];
   };
 
