@@ -30,6 +30,7 @@ let
       elmPackages.elm-analyse
       elmPackages.elm-verify-examples
       elmPackages.elm-test
+      elmPackages.elm-coverage
       elm2nix
       yarn
 
@@ -68,6 +69,7 @@ let
     };
     yarnLock = ./yarn.lock;
     publishBinsFor = [
+        "codecov"
         "elm-upgrade"
         "eslint"
         "parcel-bundler"

@@ -61,13 +61,13 @@ repos:
         language: system
         types: [python]
 
-      # - id: elm-format
-      #   name: Elm Format
-      #   description: Format Elm source code
-      #   entry: elm-format --yes
-      #   language: system
-      #   files: .*\.elm
-      #   types: [file]
+      - id: elm-format
+        name: Elm Format
+        description: Format Elm source code
+        entry: elm-format --yes
+        language: system
+        files: .*\.elm
+        types: [file]
 
       - id: eslint
         name: ESLint
@@ -77,11 +77,11 @@ repos:
         language: system
         types: [javascript]
 
-      # - id: elm-analyse
-      #   name: Elm Analyse
-      #   description: Identify deficiencies and apply best practices in Elm
-      #   entry: elm-analyse
-      #   pass_filenames: false
-      #   language: system
-      #   files: .*\.elm
-      #   types: [file]
+      - id: elm-analyse
+        name: Elm Analyse
+        description: Identify deficiencies and apply best practices in Elm
+        entry: elm-analyse
+        pass_filenames: false
+        language: system
+        files: .*\.elm
+        types: [file]
