@@ -176,7 +176,4 @@ jobs:
 
       - run:
           name: Publish the package to NPM
-          command: |
-            nix-shell --run "make dist"
-            nix-shell --run "npm version --no-git-tag-version prerelease --preid $(date +%Y-%m-%dT%H-%M-%S)"
-            nix-shell --run "npm publish"
+          command: nix-shell --run "npm version --no-git-tag-version prerelease --preid $(date +%Y-%m-%dT%H-%M-%S) && make dist && npm publish"
