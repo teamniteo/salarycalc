@@ -138,58 +138,6 @@ careers:
 affordability: 0.49
 countries:
 
--   name: Germany
-    cost_of_living: 0.83
-    compressed_cost_of_living: 0.6
-
--   name: India
-    cost_of_living: 0.28
-    compressed_cost_of_living: 0.42
-
--   name: Japan
-    cost_of_living: 0.99
-    compressed_cost_of_living: 0.65
-
--   name: Netherlands
-    cost_of_living: 0.98
-    compressed_cost_of_living: 0.65
-
--   name: Philippines
-    cost_of_living: 0.42
-    compressed_cost_of_living: 0.47
-
--   name: Portugal
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
-
--   name: Romania
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.46
-
--   name: Serbia
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.46
-
--   name: Slovenia
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
-
--   name: Spain
-    cost_of_living: 0.68
-    compressed_cost_of_living: 0.55
-
--   name: Ukraine
-    cost_of_living: 0.34
-    compressed_cost_of_living: 0.44
-
--   name: United Kingdom
-    cost_of_living: 0.86
-    compressed_cost_of_living: 0.61
-
--   name: United States
-    cost_of_living: 1.0
-    compressed_cost_of_living: 0.66
-
 -   name: Albania
     cost_of_living: 0.43
     compressed_cost_of_living: 0.47
@@ -314,6 +262,10 @@ countries:
     cost_of_living: 0.36
     compressed_cost_of_living: 0.45
 
+-   name: Germany
+    cost_of_living: 0.83
+    compressed_cost_of_living: 0.6
+
 -   name: Ghana
     cost_of_living: 0.52
     compressed_cost_of_living: 0.5
@@ -342,6 +294,10 @@ countries:
     cost_of_living: 0.82
     compressed_cost_of_living: 0.6
 
+-   name: India
+    cost_of_living: 0.28
+    compressed_cost_of_living: 0.42
+
 -   name: Indonesia
     cost_of_living: 0.4
     compressed_cost_of_living: 0.46
@@ -357,6 +313,10 @@ countries:
 -   name: Italy
     cost_of_living: 0.84
     compressed_cost_of_living: 0.61
+
+-   name: Japan
+    cost_of_living: 0.99
+    compressed_cost_of_living: 0.65
 
 -   name: Jordan
     cost_of_living: 0.57
@@ -426,6 +386,10 @@ countries:
     cost_of_living: 0.3
     compressed_cost_of_living: 0.43
 
+-   name: Netherlands
+    cost_of_living: 0.98
+    compressed_cost_of_living: 0.65
+
 -   name: New Zealand
     cost_of_living: 0.94
     compressed_cost_of_living: 0.64
@@ -470,9 +434,17 @@ countries:
     cost_of_living: 0.44
     compressed_cost_of_living: 0.47
 
+-   name: Philippines
+    cost_of_living: 0.42
+    compressed_cost_of_living: 0.47
+
 -   name: Poland
     cost_of_living: 0.52
     compressed_cost_of_living: 0.5
+
+-   name: Portugal
+    cost_of_living: 0.64
+    compressed_cost_of_living: 0.54
 
 -   name: Puerto Rico
     cost_of_living: 0.8
@@ -481,6 +453,10 @@ countries:
 -   name: Qatar
     cost_of_living: 0.99
     compressed_cost_of_living: 0.66
+
+-   name: Romania
+    cost_of_living: 0.41
+    compressed_cost_of_living: 0.46
 
 -   name: Russia
     cost_of_living: 0.37
@@ -494,6 +470,10 @@ countries:
     cost_of_living: 0.61
     compressed_cost_of_living: 0.53
 
+-   name: Serbia
+    cost_of_living: 0.41
+    compressed_cost_of_living: 0.46
+
 -   name: Singapore
     cost_of_living: 0.72
     compressed_cost_of_living: 0.57
@@ -502,6 +482,10 @@ countries:
     cost_of_living: 0.58
     compressed_cost_of_living: 0.52
 
+-   name: Slovenia
+    cost_of_living: 0.64
+    compressed_cost_of_living: 0.54
+
 -   name: South Africa
     cost_of_living: 0.48
     compressed_cost_of_living: 0.49
@@ -509,6 +493,10 @@ countries:
 -   name: South Korea
     cost_of_living: 0.87
     compressed_cost_of_living: 0.62
+
+-   name: Spain
+    cost_of_living: 0.68
+    compressed_cost_of_living: 0.55
 
 -   name: Sri Lanka
     cost_of_living: 0.37
@@ -549,6 +537,18 @@ countries:
 -   name: Turkey
     cost_of_living: 0.33
     compressed_cost_of_living: 0.44
+
+-   name: Ukraine
+    cost_of_living: 0.34
+    compressed_cost_of_living: 0.44
+
+-   name: United Kingdom
+    cost_of_living: 0.86
+    compressed_cost_of_living: 0.61
+
+-   name: United States
+    cost_of_living: 1.0
+    compressed_cost_of_living: 0.66
 
 -   name: Uruguay
     cost_of_living: 0.55
