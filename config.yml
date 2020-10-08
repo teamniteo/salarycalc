@@ -539,9 +539,9 @@ countries:
     compressed_cost_of_living: 0.44
 
 -   name: Ukraine
-    cost_of_living: 0.34
-    compressed_cost_of_living: 0.44
-
+    cost_of_living: 0.39
+    compressed_cost_of_living: 0.46
+    
 -   name: United Kingdom
     cost_of_living: 0.86
     compressed_cost_of_living: 0.61
