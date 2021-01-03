@@ -5,102 +5,102 @@
 # is annual amount in USD, we divide it by 12 and further divide it
 # by the 10-year average of EUR -> USD exchange rate from ofx.com.
 # We get a monthly base salary in EUR.
-eur_to_usd_10_year_avg: 1.20
+eur_to_usd_10_year_avg: 1.2
 careers:
 
 -   name: Design
     roles:
     -   name: Junior Designer
-        baseSalary: 4464
+        baseSalary: 4565
         salary_com_key: web-designer-i
 
     -   name: Designer
-        baseSalary: 4956
+        baseSalary: 5073
         salary_com_key: web-designer-ii
 
     -   name: Senior Designer
-        baseSalary: 6070
+        baseSalary: 6209
         salary_com_key: web-designer-iii
 
     -   name: Lead Designer
-        baseSalary: 7412
+        baseSalary: 7584
         salary_com_key: web-designer-iv
 
     -   name: Principal Designer
-        baseSalary: 8139
+        baseSalary: 8312
         salary_com_key: web-art-director
 
 
 -   name: Marketing
     roles:
     -   name: Junior Digital Marketer
-        baseSalary: 3915
+        baseSalary: 3908
         salary_com_key: digital-marketing-analyst-i
 
     -   name: Digital Marketer
-        baseSalary: 4797
+        baseSalary: 4811
         salary_com_key: digital-marketing-analyst-ii
 
     -   name: Senior Digital Marketer
-        baseSalary: 6373
+        baseSalary: 6158
         salary_com_key: digital-marketing-analyst-iii
 
     -   name: Lead Digital Marketer
-        baseSalary: 7035
+        baseSalary: 7454
         salary_com_key: digital-marketing-manager
 
     -   name: Principal Digital Marketer
-        baseSalary: 11188
+        baseSalary: 11217
         salary_com_key: digital-marketing-director
 
 
 -   name: Operations
     roles:
     -   name: Tech Support I
-        baseSalary: 4217
+        baseSalary: 4306
         salary_com_key: technical-support-analyst-i
 
     -   name: Tech Support II
-        baseSalary: 5291
+        baseSalary: 5412
         salary_com_key: technical-support-analyst-ii
 
     -   name: Support Manager
-        baseSalary: 5840
+        baseSalary: 5531
         salary_com_key: it-project-manager-i
 
     -   name: Project Manager
-        baseSalary: 7316
+        baseSalary: 6897
         salary_com_key: it-project-manager-ii
 
     -   name: Operations Manager
-        baseSalary: 8796
+        baseSalary: 8144
         salary_com_key: it-project-manager-iii
 
 
 -   name: Technical
     roles:
     -   name: Junior Software Engineer
-        baseSalary: 4757
+        baseSalary: 4864
         salary_com_key: software-engineer-i
 
     -   name: Software Engineer
-        baseSalary: 6105
+        baseSalary: 6241
         salary_com_key: software-engineer-ii
 
     -   name: Senior Software Engineer
-        baseSalary: 7574
+        baseSalary: 7744
         salary_com_key: software-engineer-iii
 
     -   name: Lead Software Engineer
-        baseSalary: 9116
+        baseSalary: 9320
         salary_com_key: software-engineer-iv
 
     -   name: Principal Software Engineer
-        baseSalary: 10350
+        baseSalary: 10584
         salary_com_key: software-engineer-v
 
     -   name: Information Technology Director
-        baseSalary: 12087
+        baseSalary: 12395
         salary_com_key: information-technology-director
 
 
@@ -135,144 +135,144 @@ careers:
 # See `countries` and `compress_towards_affordability` functions in
 # https://github.com/niteoweb/salarycalc/blob/master/fetch_config_values.py
 # for exact details on these calculations.
-affordability: 0.49
+affordability: 0.50
 countries:
 
 -   name: Albania
-    cost_of_living: 0.43
-    compressed_cost_of_living: 0.47
+    cost_of_living: 0.45
+    compressed_cost_of_living: 0.48
 
 -   name: Algeria
-    cost_of_living: 0.31
+    cost_of_living: 0.3
     compressed_cost_of_living: 0.43
 
 -   name: Argentina
-    cost_of_living: 0.34
-    compressed_cost_of_living: 0.44
+    cost_of_living: 0.36
+    compressed_cost_of_living: 0.45
 
 -   name: Armenia
-    cost_of_living: 0.39
+    cost_of_living: 0.38
     compressed_cost_of_living: 0.46
 
 -   name: Australia
-    cost_of_living: 0.97
-    compressed_cost_of_living: 0.65
-
--   name: Austria
-    cost_of_living: 0.91
+    cost_of_living: 0.9
     compressed_cost_of_living: 0.63
 
+-   name: Austria
+    cost_of_living: 0.95
+    compressed_cost_of_living: 0.65
+
 -   name: Bangladesh
-    cost_of_living: 0.34
-    compressed_cost_of_living: 0.44
+    cost_of_living: 0.35
+    compressed_cost_of_living: 0.45
 
 -   name: Belarus
     cost_of_living: 0.36
     compressed_cost_of_living: 0.45
 
 -   name: Belgium
-    cost_of_living: 0.92
-    compressed_cost_of_living: 0.63
+    cost_of_living: 0.96
+    compressed_cost_of_living: 0.65
 
 -   name: Bolivia
     cost_of_living: 0.42
     compressed_cost_of_living: 0.47
 
 -   name: Bosnia And Herzegovina
-    cost_of_living: 0.4
-    compressed_cost_of_living: 0.46
+    cost_of_living: 0.42
+    compressed_cost_of_living: 0.47
 
 -   name: Brazil
-    cost_of_living: 0.35
-    compressed_cost_of_living: 0.44
+    cost_of_living: 0.36
+    compressed_cost_of_living: 0.45
 
 -   name: Bulgaria
-    cost_of_living: 0.45
-    compressed_cost_of_living: 0.48
+    cost_of_living: 0.46
+    compressed_cost_of_living: 0.49
 
 -   name: Cambodia
     cost_of_living: 0.56
-    compressed_cost_of_living: 0.51
+    compressed_cost_of_living: 0.52
 
 -   name: Canada
-    cost_of_living: 0.88
-    compressed_cost_of_living: 0.62
+    cost_of_living: 0.91
+    compressed_cost_of_living: 0.64
 
 -   name: Chile
-    cost_of_living: 0.54
-    compressed_cost_of_living: 0.51
+    cost_of_living: 0.6
+    compressed_cost_of_living: 0.53
 
 -   name: Colombia
-    cost_of_living: 0.34
-    compressed_cost_of_living: 0.44
+    cost_of_living: 0.37
+    compressed_cost_of_living: 0.46
 
 -   name: Costa Rica
-    cost_of_living: 0.6
+    cost_of_living: 0.59
     compressed_cost_of_living: 0.53
 
 -   name: Croatia
-    cost_of_living: 0.66
-    compressed_cost_of_living: 0.55
+    cost_of_living: 0.69
+    compressed_cost_of_living: 0.56
 
 -   name: Cyprus
-    cost_of_living: 0.75
-    compressed_cost_of_living: 0.58
+    cost_of_living: 0.79
+    compressed_cost_of_living: 0.6
 
 -   name: Czech Republic
-    cost_of_living: 0.6
-    compressed_cost_of_living: 0.53
+    cost_of_living: 0.63
+    compressed_cost_of_living: 0.54
 
 -   name: Denmark
-    cost_of_living: 0.89
-    compressed_cost_of_living: 0.62
+    cost_of_living: 0.84
+    compressed_cost_of_living: 0.61
 
 -   name: Dominican Republic
     cost_of_living: 0.46
-    compressed_cost_of_living: 0.48
+    compressed_cost_of_living: 0.49
 
 -   name: Ecuador
     cost_of_living: 0.47
-    compressed_cost_of_living: 0.48
+    compressed_cost_of_living: 0.49
 
 -   name: Egypt
     cost_of_living: 0.32
-    compressed_cost_of_living: 0.43
+    compressed_cost_of_living: 0.44
 
 -   name: El Salvador
     cost_of_living: 0.51
     compressed_cost_of_living: 0.5
 
 -   name: Estonia
-    cost_of_living: 0.63
-    compressed_cost_of_living: 0.54
+    cost_of_living: 0.66
+    compressed_cost_of_living: 0.55
 
 -   name: Ethiopia
     cost_of_living: 0.63
     compressed_cost_of_living: 0.54
 
 -   name: Finland
-    cost_of_living: 0.92
-    compressed_cost_of_living: 0.63
+    cost_of_living: 0.96
+    compressed_cost_of_living: 0.65
 
 -   name: France
-    cost_of_living: 0.95
-    compressed_cost_of_living: 0.64
+    cost_of_living: 0.99
+    compressed_cost_of_living: 0.66
 
 -   name: Georgia
-    cost_of_living: 0.36
+    cost_of_living: 0.33
     compressed_cost_of_living: 0.45
 
 -   name: Germany
-    cost_of_living: 0.83
-    compressed_cost_of_living: 0.6
+    cost_of_living: 0.91
+    compressed_cost_of_living: 0.64
 
 -   name: Ghana
-    cost_of_living: 0.52
-    compressed_cost_of_living: 0.5
+    cost_of_living: 0.53
+    compressed_cost_of_living: 0.51
 
 -   name: Greece
-    cost_of_living: 0.65
-    compressed_cost_of_living: 0.54
+    cost_of_living: 0.68
+    compressed_cost_of_living: 0.56
 
 -   name: Guatemala
     cost_of_living: 0.54
@@ -283,147 +283,147 @@ countries:
     compressed_cost_of_living: 0.49
 
 -   name: Hong Kong
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
+    cost_of_living: 0.66
+    compressed_cost_of_living: 0.55
 
 -   name: Hungary
-    cost_of_living: 0.49
-    compressed_cost_of_living: 0.49
+    cost_of_living: 0.51
+    compressed_cost_of_living: 0.5
 
 -   name: Iceland
-    cost_of_living: 0.82
-    compressed_cost_of_living: 0.6
+    cost_of_living: 0.73
+    compressed_cost_of_living: 0.58
 
 -   name: India
     cost_of_living: 0.28
-    compressed_cost_of_living: 0.42
+    compressed_cost_of_living: 0.43
 
 -   name: Indonesia
-    cost_of_living: 0.4
-    compressed_cost_of_living: 0.46
+    cost_of_living: 0.43
+    compressed_cost_of_living: 0.48
 
 -   name: Ireland
-    cost_of_living: 0.87
-    compressed_cost_of_living: 0.62
-
--   name: Israel
-    cost_of_living: 0.99
-    compressed_cost_of_living: 0.66
-
--   name: Italy
     cost_of_living: 0.84
     compressed_cost_of_living: 0.61
 
+-   name: Israel
+    cost_of_living: 0.91
+    compressed_cost_of_living: 0.63
+
+-   name: Italy
+    cost_of_living: 0.88
+    compressed_cost_of_living: 0.62
+
 -   name: Japan
-    cost_of_living: 0.99
+    cost_of_living: 0.95
     compressed_cost_of_living: 0.65
 
 -   name: Jordan
-    cost_of_living: 0.57
+    cost_of_living: 0.56
     compressed_cost_of_living: 0.52
 
 -   name: Kenya
     cost_of_living: 0.41
-    compressed_cost_of_living: 0.46
-
--   name: Kuwait
-    cost_of_living: 0.71
-    compressed_cost_of_living: 0.56
-
--   name: Latvia
-    cost_of_living: 0.58
-    compressed_cost_of_living: 0.52
-
--   name: Lebanon
-    cost_of_living: 0.82
-    compressed_cost_of_living: 0.6
-
--   name: Libya
-    cost_of_living: 0.73
-    compressed_cost_of_living: 0.57
-
--   name: Liechtenstein
-    cost_of_living: 0.62
-    compressed_cost_of_living: 0.53
-
--   name: Lithuania
-    cost_of_living: 0.55
-    compressed_cost_of_living: 0.51
-
--   name: Luxembourg
-    cost_of_living: 0.71
-    compressed_cost_of_living: 0.56
-
--   name: Malaysia
-    cost_of_living: 0.44
     compressed_cost_of_living: 0.47
 
--   name: Malta
-    cost_of_living: 0.93
+-   name: Kuwait
+    cost_of_living: 0.72
+    compressed_cost_of_living: 0.57
+
+-   name: Latvia
+    cost_of_living: 0.6
+    compressed_cost_of_living: 0.53
+
+-   name: Lebanon
+    cost_of_living: 0.89
     compressed_cost_of_living: 0.63
 
+-   name: Libya
+    cost_of_living: 0.03
+    compressed_cost_of_living: 0.34
+
+-   name: Liechtenstein
+    cost_of_living: 0.56
+    compressed_cost_of_living: 0.52
+
+-   name: Lithuania
+    cost_of_living: 0.57
+    compressed_cost_of_living: 0.52
+
+-   name: Luxembourg
+    cost_of_living: 0.65
+    compressed_cost_of_living: 0.55
+
+-   name: Malaysia
+    cost_of_living: 0.45
+    compressed_cost_of_living: 0.49
+
+-   name: Malta
+    cost_of_living: 0.96
+    compressed_cost_of_living: 0.65
+
 -   name: Mexico
-    cost_of_living: 0.39
-    compressed_cost_of_living: 0.46
+    cost_of_living: 0.42
+    compressed_cost_of_living: 0.47
 
 -   name: Moldova
-    cost_of_living: 0.38
-    compressed_cost_of_living: 0.45
-
--   name: Montenegro
-    cost_of_living: 0.47
-    compressed_cost_of_living: 0.48
-
--   name: Morocco
-    cost_of_living: 0.4
+    cost_of_living: 0.37
     compressed_cost_of_living: 0.46
 
+-   name: Montenegro
+    cost_of_living: 0.49
+    compressed_cost_of_living: 0.5
+
+-   name: Morocco
+    cost_of_living: 0.42
+    compressed_cost_of_living: 0.47
+
 -   name: Namibia
-    cost_of_living: 0.46
-    compressed_cost_of_living: 0.48
+    cost_of_living: 0.5
+    compressed_cost_of_living: 0.5
 
 -   name: Nepal
     cost_of_living: 0.3
     compressed_cost_of_living: 0.43
 
 -   name: Netherlands
-    cost_of_living: 0.98
-    compressed_cost_of_living: 0.65
-
--   name: New Zealand
-    cost_of_living: 0.94
+    cost_of_living: 0.93
     compressed_cost_of_living: 0.64
 
+-   name: New Zealand
+    cost_of_living: 0.96
+    compressed_cost_of_living: 0.65
+
 -   name: Nicaragua
-    cost_of_living: 0.47
-    compressed_cost_of_living: 0.48
+    cost_of_living: 0.46
+    compressed_cost_of_living: 0.49
 
 -   name: Nigeria
-    cost_of_living: 0.53
-    compressed_cost_of_living: 0.5
+    cost_of_living: 0.52
+    compressed_cost_of_living: 0.51
 
 -   name: North Macedonia
-    cost_of_living: 0.37
-    compressed_cost_of_living: 0.45
+    cost_of_living: 0.38
+    compressed_cost_of_living: 0.46
 
 -   name: Norway
-    cost_of_living: 0.8
-    compressed_cost_of_living: 0.59
+    cost_of_living: 0.71
+    compressed_cost_of_living: 0.57
 
 -   name: Oman
     cost_of_living: 0.6
     compressed_cost_of_living: 0.53
 
 -   name: Pakistan
-    cost_of_living: 0.23
-    compressed_cost_of_living: 0.4
+    cost_of_living: 0.24
+    compressed_cost_of_living: 0.41
 
 -   name: Palestine
-    cost_of_living: 0.58
-    compressed_cost_of_living: 0.52
+    cost_of_living: 0.61
+    compressed_cost_of_living: 0.54
 
 -   name: Panama
-    cost_of_living: 0.7
+    cost_of_living: 0.68
     compressed_cost_of_living: 0.56
 
 -   name: Paraguay
@@ -431,133 +431,133 @@ countries:
     compressed_cost_of_living: 0.45
 
 -   name: Peru
-    cost_of_living: 0.44
-    compressed_cost_of_living: 0.47
+    cost_of_living: 0.43
+    compressed_cost_of_living: 0.48
 
 -   name: Philippines
-    cost_of_living: 0.42
-    compressed_cost_of_living: 0.47
+    cost_of_living: 0.46
+    compressed_cost_of_living: 0.49
 
 -   name: Poland
-    cost_of_living: 0.52
-    compressed_cost_of_living: 0.5
+    cost_of_living: 0.55
+    compressed_cost_of_living: 0.52
 
 -   name: Portugal
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
+    cost_of_living: 0.68
+    compressed_cost_of_living: 0.56
 
 -   name: Puerto Rico
     cost_of_living: 0.8
-    compressed_cost_of_living: 0.59
+    compressed_cost_of_living: 0.6
 
 -   name: Qatar
-    cost_of_living: 0.99
+    cost_of_living: 0.98
     compressed_cost_of_living: 0.66
 
 -   name: Romania
-    cost_of_living: 0.41
-    compressed_cost_of_living: 0.46
-
--   name: Russia
-    cost_of_living: 0.37
-    compressed_cost_of_living: 0.45
-
--   name: Rwanda
     cost_of_living: 0.45
     compressed_cost_of_living: 0.48
 
--   name: Senegal
-    cost_of_living: 0.61
-    compressed_cost_of_living: 0.53
-
--   name: Serbia
-    cost_of_living: 0.41
+-   name: Russia
+    cost_of_living: 0.38
     compressed_cost_of_living: 0.46
 
+-   name: Rwanda
+    cost_of_living: 0.44
+    compressed_cost_of_living: 0.48
+
+-   name: Senegal
+    cost_of_living: 0.65
+    compressed_cost_of_living: 0.55
+
+-   name: Serbia
+    cost_of_living: 0.45
+    compressed_cost_of_living: 0.48
+
 -   name: Singapore
-    cost_of_living: 0.72
-    compressed_cost_of_living: 0.57
+    cost_of_living: 0.67
+    compressed_cost_of_living: 0.56
 
 -   name: Slovakia
-    cost_of_living: 0.58
-    compressed_cost_of_living: 0.52
+    cost_of_living: 0.6
+    compressed_cost_of_living: 0.53
 
 -   name: Slovenia
-    cost_of_living: 0.64
-    compressed_cost_of_living: 0.54
+    cost_of_living: 0.71
+    compressed_cost_of_living: 0.57
 
 -   name: South Africa
-    cost_of_living: 0.48
-    compressed_cost_of_living: 0.49
+    cost_of_living: 0.52
+    compressed_cost_of_living: 0.51
 
 -   name: South Korea
-    cost_of_living: 0.87
-    compressed_cost_of_living: 0.62
+    cost_of_living: 0.94
+    compressed_cost_of_living: 0.65
 
 -   name: Spain
-    cost_of_living: 0.68
-    compressed_cost_of_living: 0.55
+    cost_of_living: 0.75
+    compressed_cost_of_living: 0.58
 
 -   name: Sri Lanka
     cost_of_living: 0.37
-    compressed_cost_of_living: 0.45
+    compressed_cost_of_living: 0.46
 
 -   name: Sudan
     cost_of_living: 0.53
-    compressed_cost_of_living: 0.5
+    compressed_cost_of_living: 0.51
 
 -   name: Sweden
-    cost_of_living: 0.93
-    compressed_cost_of_living: 0.63
+    cost_of_living: 0.98
+    compressed_cost_of_living: 0.66
 
 -   name: Switzerland
-    cost_of_living: 0.36
-    compressed_cost_of_living: 0.45
+    cost_of_living: 0.31
+    compressed_cost_of_living: 0.44
 
 -   name: Syria
-    cost_of_living: 0.3
-    compressed_cost_of_living: 0.43
+    cost_of_living: 0.31
+    compressed_cost_of_living: 0.44
 
 -   name: Taiwan
-    cost_of_living: 0.7
-    compressed_cost_of_living: 0.56
+    cost_of_living: 0.74
+    compressed_cost_of_living: 0.58
 
 -   name: Tanzania
     cost_of_living: 0.43
-    compressed_cost_of_living: 0.47
+    compressed_cost_of_living: 0.48
 
 -   name: Thailand
-    cost_of_living: 0.58
-    compressed_cost_of_living: 0.52
+    cost_of_living: 0.59
+    compressed_cost_of_living: 0.53
 
 -   name: Tunisia
-    cost_of_living: 0.31
-    compressed_cost_of_living: 0.43
-
--   name: Turkey
-    cost_of_living: 0.33
+    cost_of_living: 0.32
     compressed_cost_of_living: 0.44
 
+-   name: Turkey
+    cost_of_living: 0.34
+    compressed_cost_of_living: 0.45
+
 -   name: Ukraine
-    cost_of_living: 0.39
-    compressed_cost_of_living: 0.46
+    cost_of_living: 0.34
+    compressed_cost_of_living: 0.45
 
 -   name: United Kingdom
-    cost_of_living: 0.86
-    compressed_cost_of_living: 0.61
+    cost_of_living: 0.91
+    compressed_cost_of_living: 0.64
 
 -   name: United States
     cost_of_living: 1.0
-    compressed_cost_of_living: 0.66
+    compressed_cost_of_living: 0.67
 
 -   name: Uruguay
-    cost_of_living: 0.55
-    compressed_cost_of_living: 0.51
+    cost_of_living: 0.58
+    compressed_cost_of_living: 0.52
 
 -   name: Venezuela
-    cost_of_living: 0.54
-    compressed_cost_of_living: 0.5
+    cost_of_living: 0.52
+    compressed_cost_of_living: 0.51
 
 -   name: Vietnam
-    cost_of_living: 0.46
-    compressed_cost_of_living: 0.48
+    cost_of_living: 0.47
+    compressed_cost_of_living: 0.49
