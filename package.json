@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/niteoweb/salarycalc.git"
+    "url": "https://github.com/teamniteo/salarycalc.git"
   },
   "keywords": [
     "Elm",
@@ -20,9 +20,9 @@
   "author": "Niteo",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/niteoweb/salarycalc/issues"
+    "url": "https://github.com/teamniteo/salarycalc/issues"
   },
-  "homepage": "https://github.com/niteoweb/salarycalc#readme",
+  "homepage": "https://github.com/teamniteo/salarycalc#readme",
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "babel-plugin-transform-es2015-modules-strip": "^0.1.1",

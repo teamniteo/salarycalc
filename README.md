@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/niteoweb/salarycalc.svg?style=svg)](https://circleci.com/gh/niteoweb/salarycalc)
+[![CircleCI](https://circleci.com/gh/teamniteo/salarycalc.svg?style=svg)](https://circleci.com/gh/teamniteo/salarycalc)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/cccd17ab-57b5-48f2-8f5d-203432b99502/deploy-status)](https://app.netlify.com/sites/salarycalculator/deploys)
 
 # Niteo Salary Calculator
@@ -88,7 +88,7 @@ Additionally, to not have to remember to run `nix-shell` you can install `http:/
 
 ### Local development
 
-1.  `git clone git@github.com:niteoweb/salarycalc.git && cd salarycalc`
+1.  `git clone git@github.com:teamniteo/salarycalc.git && cd salarycalc`
 
 1.  `nix-shell` or `direnv allow`.
 

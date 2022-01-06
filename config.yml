@@ -1,5 +1,5 @@
 # Each career has roles defined in
-# https://github.com/niteoweb/handbook/blob/master/5_People/salary-system.md#roles
+# https://github.com/teamniteo/handbook/blob/master/5_People/salary-system.md#roles
 #
 # For each role, we get the median US salary from Salary.com, which
 # is annual amount in USD, we divide it by 12 and further divide it
@@ -133,7 +133,7 @@ careers:
 # increase `cost_of_living` by 2/3 of the difference.
 #
 # See `countries` and `compress_towards_affordability` functions in
-# https://github.com/niteoweb/salarycalc/blob/master/fetch_config_values.py
+# https://github.com/teamniteo/salarycalc/blob/master/fetch_config_values.py
 # for exact details on these calculations.
 affordability: 0.49
 countries:

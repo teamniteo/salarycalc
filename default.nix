@@ -93,7 +93,7 @@ let
   });
 
   poetryOverrides = self: super: {
-    # Fails when trying to update Nix packages. Research Done here: https://github.com/niteoweb/kai/issues/238
+    # Fails when trying to update Nix packages. Research Done here: https://github.com/teamniteo/kai/issues/238
     flake8-debugger = removePytestRunner super.flake8-debugger;
     flake8-mutable = removePytestRunner super.flake8-mutable;
     flake8-print = removePytestRunner super.flake8-print;
