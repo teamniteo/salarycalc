@@ -97,7 +97,7 @@ jobs:
             # just do a single-user installation instead.
             sudo diskutil enableOwnership /nix
             sudo chown -R "$(whoami)" /nix
-            sh <(curl -sS --retry 5 --retry-connrefused -L https://nixos.org/nix/install) </dev/null --no-channel-add
+            sh <(curl -sS --retry 5 --retry-connrefused -L https://releases.nixos.org/nix/nix-2.5.1/install) </dev/null --no-channel-add
             # Disable spotlight indexing of /nix to speed up performance
             sudo mdutil -i off /nix
             sudo mkdir -p /etc/nix
