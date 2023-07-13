@@ -59,7 +59,7 @@ let
   };
 
   # Elm stuff
-  yarnPkg = pkgs.yarn2nix.mkYarnPackage {
+  yarnPkg = pkgs.mkYarnPackage {
     name = "salary-calculator-node-packages";
     src = pkgs.lib.cleanSourceWith {
       src = ./.;
@@ -98,10 +98,21 @@ let
     flake8-mutable = removePytestRunner super.flake8-mutable;
     flake8-print = removePytestRunner super.flake8-print;
 
+    isort = super.isort.overridePythonAttrs (
+    old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [ super.poetry ];
+    });
+
+    flake8-assertive = super.flake8-assertive.overridePythonAttrs (
+    old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools ];
+    });
+
   };
 
   commonPoetryArgs = {
     projectDir = ./.;
+    python = pkgs.python311;
     overrides = [
       pkgs.poetry2nix.defaultPoetryOverrides
       poetryOverrides

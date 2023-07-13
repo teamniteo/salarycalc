@@ -11,3 +11,4 @@ node_modules
 repl-temp-*
 .direnv/
 geckodriver.log
+yarn-error.log
