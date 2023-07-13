@@ -26,7 +26,7 @@ dist:
 	# For modules (commonjs or ES6)
 	@parcel build src/index.js
 	# For html script tags
-	@parcel build --global SalaryCalculator	src/salary-calculator.js src/index.html
+	@parcel build src/salary-calculator.js src/index.html
 
 # Testing and linting targets
 .PHONY: lint
