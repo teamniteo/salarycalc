@@ -68,10 +68,9 @@ let
     };
     yarnLock = ./yarn.lock;
     publishBinsFor = [
-        "codecov"
-        "elm-upgrade"
-        "eslint"
-        "parcel-bundler"
+        # "elm-upgrade"
+        # "eslint"
+        "parcel"
     ];
   };
 
