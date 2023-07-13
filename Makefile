@@ -8,12 +8,16 @@ all: tests dist
 .PHONY: lock
 lock:
 	@rm -rf .venv/
-	@poetry lock
+	@poetry lock --no-update
 	@rm -rf .venv/
 	@rm -rf node_modules
 	@elm2nix convert > elm-srcs.nix
 	@elm2nix snapshot > registry.dat
 	@nix-shell --run true
+	@direnv reload
+	@echo "-e ." >> requirements.txt
+	@nix-build shell.nix -A inputDerivation | cachix push niteo
+	@rm result
 
 # Build distribution files and place them where they are expected
 .PHONY: dist
@@ -43,26 +47,14 @@ endif
 test: tests
 
 .PHONY: tests
-tests: coverage
-
-.PHONY: coverage
-coverage: verify-examples
-	@elm-coverage --report codecov
-
-.PHONY: verify-examples
-verify-examples:
+tests:
 	@elm-verify-examples
-
-.coverage/codecov.json: test
+	@elm-test
 
 # Run development server
 .PHONY: run
 run:
 	@parcel --global SalaryCalculator src/index.html
-
-.PHONY: codecov
-codecov: .coverage/codecov.json
-	@codecov --disable=gcov --file=.coverage/codecov.json
 
 
 # Fetch salaries, location factors and currencies from the Internet

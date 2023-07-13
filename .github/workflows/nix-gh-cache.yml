@@ -1,0 +1,43 @@
+# Build derivations for Linux and Apple Silicon and upload them to
+# Cachix
+
+name: Nix Cache
+
+on:
+  push:
+    paths:
+      - "**.nix"
+      - "**.lock"
+      - "**package.json"
+      - "**pyproject.toml"
+      - ".github/**.ya?ml"
+  workflow_dispatch:
+
+# Kill running jobs if a new commit is pushed to PR, or someone restarts
+# a job that is already running.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+
+  prime:
+    name: Prime Cachix
+
+    strategy:
+      # Keep building other OSes even if one fails
+      fail-fast: false
+      matrix:
+        # ubuntu-latest-16-cores: Hosted GHA Linux runner, larger than default
+        #    so that this job primes the cache as much as possible before
+        #    other jobs that depend on the cache start running
+        # macos-latest: Hosted GHA Intel-based MAC runner
+        # macos-m1: TODO, GitHub says they will be available in Q4
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/nix-shell
+        with:
+          cachix_auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
