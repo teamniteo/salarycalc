@@ -54,7 +54,7 @@ tests:
 # Run development server
 .PHONY: run
 run:
-	@parcel --global SalaryCalculator src/index.html
+	@parcel src/index.html
 
 
 # Fetch salaries, location factors and currencies from the Internet
