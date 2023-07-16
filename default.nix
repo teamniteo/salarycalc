@@ -1,22 +1,10 @@
-{ pkgs ? import ./nix { }
-# Allows CI to override this to an empty directory to determine dependencies
-# Which then can get cached without the source code itself
-, buildSrc ? ./.
-}:
+{ pkgs ? import ./nix { } }:
 let
-
-  buildableShell = import ./nix/buildableShell.nix {
-    inherit pkgs;
-    # We reimport this file with buildSrc set to /var/empty such that the dev env to
-    # upload to cachix doesn't depend on where the project is located in the filesystem
-    drv = (import ./. { buildSrc = "/var/empty"; }).devShell;
-  };
 
   # The development shell definition
   devShell = pkgs.mkShell {
     buildInputs = with pkgs; [
       # common tooling
-      devEnv
       gitAndTools.pre-commit
       niv
       vim
@@ -36,6 +24,7 @@ let
       # Python helper scripts
       geckodriver
       poetry
+      poetryEnv
 
     ]
 
@@ -53,7 +42,7 @@ let
         pre-commit install -f --hook-type pre-push
       fi
 
-      dest=${toString buildSrc}/node_modules
+      dest=./node_modules
       ${copyGeneratedFiles}
     '';
   };
@@ -80,54 +69,24 @@ let
   '';
 
   # Python stuff
-  removePytestRunner = pkg: pkg.overrideAttrs (old: {
-    postPatch = old.postPatch or "" + ''
-      substituteInPlace setup.py \
-        --replace "'pytest-runner'," "" \
-        --replace "'pytest-runner'" "" \
-        --replace '"pytest-runner",' "" \
-        --replace '"pytest-runner"' ""
-    '';
-  });
-
-  poetryOverrides = self: super: {
-    # Fails when trying to update Nix packages. Research Done here: https://github.com/teamniteo/kai/issues/238
-    flake8-debugger = removePytestRunner super.flake8-debugger;
-    flake8-mutable = removePytestRunner super.flake8-mutable;
-    flake8-print = removePytestRunner super.flake8-print;
-
-    isort = super.isort.overridePythonAttrs (
-    old: {
-      buildInputs = (old.buildInputs or [ ]) ++ [ super.poetry ];
-    });
-
-    flake8-assertive = super.flake8-assertive.overridePythonAttrs (
-    old: {
-      buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools ];
-    });
-
-  };
-
-  commonPoetryArgs = {
-    projectDir = ./.;
+  poetryEnv = pkgs.poetry2nix.mkPoetryEnv {
     python = pkgs.python311;
-    overrides = [
-      pkgs.poetry2nix.defaultPoetryOverrides
-      poetryOverrides
-    ];
-  };
-
- # All dev and non-dev dependencies with knowledge of the salarycalc module in the source
-  devEnv = pkgs.poetry2nix.mkPoetryEnv (commonPoetryArgs // {
+    projectDir = ./.;
     editablePackageSources = {
-      salarycalc = buildSrc + "./";
+      salarycalc = ./.;
     };
-  });
+    overrides = pkgs.poetry2nix.defaultPoetryOverrides.extend(self: super: {
 
+      flake8-assertive = super.flake8-assertive.overridePythonAttrs (
+      old: {
+        buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools ];
+      });
+
+    });
+  };
 
 in {
   inherit devShell;
-  inherit buildableShell;
 
   # Used to install dependencies for CI and Heroku
   inherit pkgs;
