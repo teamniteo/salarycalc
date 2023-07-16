@@ -68,8 +68,7 @@ let
     };
     yarnLock = ./yarn.lock;
     publishBinsFor = [
-        # "elm-upgrade"
-        # "eslint"
+        "eslint"
         "parcel"
     ];
   };

@@ -47,7 +47,7 @@ rules:
   # String literals:
   quotes:
     - error
-    - backtick
+    - double
 
   # Object literals:
   quote-props:
