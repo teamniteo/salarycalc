@@ -15,8 +15,7 @@ lock:
 	@elm2nix snapshot > registry.dat
 	@nix-shell --run true
 	@direnv reload
-	@echo "-e ." >> requirements.txt
-	@nix-build shell.nix -A inputDerivation | cachix push niteo
+	@nix-build shell.nix -A inputDerivation | cachix push niteo-public
 	@rm result
 
 # Build distribution files and place them where they are expected

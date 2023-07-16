@@ -41,18 +41,3 @@ jobs:
       - run: nix-shell --run "make dist"
 
       - uses: ./.github/actions/uncommitted-changes
-
-# yamllint disable
-# TODO: publishing workflow
-    # steps:
-    #   - checkout
-
-    #   - configure_nix
-
-    #   - run:
-    #       name: Authenticate with registry
-    #      command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/salarycalc/.npmrc
-
-    #   - run:
-    #       name: Publish the package to NPM
-    #      command: nix-shell --run "npm version --no-git-tag-version prerelease --preid $(date +%Y-%m-%dT%H-%M-%S) && make dist && npm publish"
