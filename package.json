@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/teamniteo/salarycalc#readme",
   "devDependencies": {
+    "eslint": "*",
     "node-elm-compiler": "*",
     "parcel": "*",
     "@parcel/transformer-yaml": "*",
