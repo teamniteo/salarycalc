@@ -30,9 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/nix-shell
+      - uses: teamniteo/gha-actions/nix@v2
         with:
-          cachix_auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
+          cache: niteo-public
+          auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
 
       - run: nix-shell --run "make lint all=true"
 
@@ -40,7 +41,7 @@ jobs:
 
       - run: nix-shell --run "make dist"
 
-      - uses: ./.github/actions/uncommitted-changes
+      - uses: teamniteo/gha-actions/uncommitted-changes@v2
 
 
 # yamllint disable
