@@ -3,6 +3,7 @@
 from ruamel.yaml import RoundTripDumper
 from ruamel.yaml import RoundTripLoader
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from tqdm import tqdm
 
@@ -28,15 +29,15 @@ def usd_to_eur_10_year_average(
     pbar.update()
 
     # Select EUR as base currency
-    driver.find_element_by_css_selector(
-        "div.historical-rates--camparison--base"
+    driver.find_element(
+        By.CSS_SELECTOR, "div.historical-rates--camparison--base"
     ).click()
     driver.find_element_by_xpath('//li[text()="EUR Euro"]').click()
     pbar.update()
 
     # Select USD as target currency
-    driver.find_element_by_css_selector(
-        "div.historical-rates--camparison--target"
+    driver.find_element(
+        By.CSS_SELECTOR, "div.historical-rates--camparison--target"
     ).click()
     driver.find_element_by_xpath('//li[text()="USD US Dollar"]').click()
     pbar.update()
@@ -59,7 +60,7 @@ def usd_to_eur_10_year_average(
     pbar.update()
 
     # Click `Retrieve Data` button
-    driver.find_element_by_css_selector("button.historical-rates--submit").click()
+    driver.find_element(By.CSS_SELECTOR, "button.historical-rates--submit").click()
     pbar.update()
 
     # Wait for data to load
@@ -67,7 +68,7 @@ def usd_to_eur_10_year_average(
     pbar.update()
 
     # Extract the Average Rate
-    avg_value = driver.find_element_by_css_selector("tbody.fresh").text
+    avg_value = driver.find_element(By.CSS_SELECTOR, "tbody.fresh").text
     avg = round(float(avg_value.replace("Average ", "")), 2)
     pbar.update()
 
@@ -142,7 +143,7 @@ def salaries(
         )
 
         # Extract Cost of Living Plus Rent Index
-        us_salary_text = driver.find_element_by_css_selector("#top_salary_value").text
+        us_salary_text = driver.find_element(By.CSS_SELECTOR, "#top_salary_value").text
         us_salary = int(us_salary_text.replace(",", "").replace("$", ""))
         base_salary = round(us_salary / 12 / config["eur_to_usd_10_year_avg"])
         role["baseSalary"] = base_salary
