@@ -59,4 +59,4 @@ run:
 # Fetch salaries, location factors and currencies from the Internet
 .PHONY: config
 config:
-	@python scripts/fetch_config_values.py
+	@python3.11 scripts/fetch_config_values.py
