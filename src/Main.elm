@@ -64,8 +64,8 @@ init flags =
                     , roleDropdown = Dropdown.initialState
                     , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
-                    , careers_updated = "1999-01-01"
-                    , countries_updated = "1999-01-01"
+                    , careers_updated = "1970-01-01"
+                    , countries_updated = "1970-01-01"
                     }
 
                 Ok config ->
@@ -718,10 +718,10 @@ humanizeTenure years =
     --> "30%"
 
     humanizeCommitmentBonus 0.12345
-    --> "12%"
+    --> "12.34%"
 
     humanizeCommitmentBonus 0.126
-    --> "13%"
+    --> "12.6%"
 
     humanizeCommitmentBonus 3.0
     --> "300%"
