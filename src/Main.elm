@@ -64,6 +64,8 @@ init flags =
                     , roleDropdown = Dropdown.initialState
                     , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
+                    , careers_updated = "1999-01-01"
+                    , countries_updated = "1999-01-01"
                     }
 
                 Ok config ->
@@ -165,6 +167,8 @@ init flags =
                     , roleDropdown = Dropdown.initialState
                     , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
+                    , careers_updated = config.careers_updated
+                    , countries_updated = config.countries_updated
                     }
     in
     ( model
@@ -218,6 +222,8 @@ type alias Model =
     , roleDropdown : Dropdown.State
     , countryDropdown : Dropdown.State
     , tenureDropdown : Dropdown.State
+    , careers_updated : String
+    , countries_updated : String
     }
 
 
@@ -334,7 +340,7 @@ view model =
                                     ( Just role, Just country ) ->
                                         [ Accordion.block []
                                             [ Block.text []
-                                                [ viewBreakdown role country model.tenure ]
+                                                [ viewBreakdown role country model.tenure model.careers_updated model.countries_updated ]
                                             ]
                                         ]
                             }
@@ -507,8 +513,8 @@ viewSalary maybeRole maybeCountry tenure =
                 ]
 
 
-viewBreakdown : Role -> Country -> Int -> Html Msg
-viewBreakdown role country tenure =
+viewBreakdown : Role -> Country -> Int -> String -> String -> Html Msg
+viewBreakdown role country tenure careers_updated countries_updated =
     div []
         [ table [ class "table" ]
             [ tr []
@@ -600,7 +606,10 @@ viewBreakdown role country tenure =
                     [ text "Base Salary: " ]
                 , text "US median for "
                 , mark [] [ text role.name ]
-                , text " on Salary.com, divided by 12 (months) and converted to EUR using a 10-year USD -> EUR average."
+                , text " on Salary.com, divided by 12 (months) and converted to EUR using a 10-year USD -> EUR average. "
+                , text "This value was fetched from Salary.com on "
+                , mark [] [ text careers_updated ]
+                , text "."
                 ]
             , ListGroup.li []
                 [ span
@@ -609,7 +618,10 @@ viewBreakdown role country tenure =
                     [ text "Compressed Cost of Living: " ]
                 , text "Numbeo Cost of Living in "
                 , mark [] [ text country.name ]
-                , text " compared to United States, compressed against our Affordability Ratio of 0.49."
+                , text " compared to United States, compressed against our Affordability Ratio of 0.49. "
+                , text "This value was fetched from Numbeo on "
+                , mark [] [ text countries_updated ]
+                , text "."
                 ]
             , ListGroup.li []
                 [ span

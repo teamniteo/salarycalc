@@ -1,5 +1,6 @@
 """Use a real browser to fetch config.yaml values."""
 
+from datetime import date
 from ruamel.yaml import RoundTripDumper
 from ruamel.yaml import RoundTripLoader
 from selenium import webdriver
@@ -117,6 +118,7 @@ def countries(
             compress_towards_affordability(numbeo_ratio, config["affordability"]), 2
         )
 
+    config["countries_updated"] = date.today().isoformat()
     pbar.close()
 
 
@@ -148,6 +150,7 @@ def salaries(
         base_salary = round(us_salary / 12 / config["eur_to_usd_10_year_avg"])
         role["baseSalary"] = base_salary
 
+    config["careers_updated"] = date.today().isoformat()
     pbar.close()
 
 

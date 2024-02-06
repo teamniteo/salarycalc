@@ -17,6 +17,8 @@ import Json.Decode as Decode
 type alias Config =
     { countries : List Country
     , careers : List Career
+    , countries_updated : String
+    , careers_updated : String
     }
 
 
@@ -58,10 +60,12 @@ type alias Config =
 -}
 configDecoder : Decode.Decoder Config
 configDecoder =
-    Decode.map2
+    Decode.map4
         Config
         (Decode.field "countries" countriesDecoder)
         (Decode.field "careers" careersDecoder)
+        (Decode.field "careers_updated" Decode.string)
+        (Decode.field "countries_updated" Decode.string)
 
 
 {-| A helper for configDecoder
