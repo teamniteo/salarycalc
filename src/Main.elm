@@ -729,9 +729,24 @@ humanizeTenure years =
 -}
 humanizeCommitmentBonus : Float -> String
 humanizeCommitmentBonus bonus =
-    (bonus
-        |> (*) 100
-        |> round
-        |> String.fromInt
-    )
-        ++ "%"
+    let
+        scaledBonus =
+            bonus * 100
+
+        bonusText =
+            String.fromFloat scaledBonus
+
+        dotIndex =
+            String.indexes "." bonusText
+
+        endIndex =
+            case List.head dotIndex of
+                -- Keep two decimal places
+                Just index ->
+                    index + 3
+
+                -- No decimal point found
+                Nothing ->
+                    String.length bonusText
+    in
+    String.slice 0 endIndex bonusText ++ "%"
