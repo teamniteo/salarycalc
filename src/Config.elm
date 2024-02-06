@@ -17,8 +17,8 @@ import Json.Decode as Decode
 type alias Config =
     { countries : List Country
     , careers : List Career
-    , countries_updated : String
     , careers_updated : String
+    , countries_updated : String
     }
 
 
@@ -30,6 +30,8 @@ type alias Config =
 
     Decode.decodeString configDecoder """
       {
+        "careers_updated" : "1999-01-01",
+        "countries_updated" : "2000-01-01",
         "countries" : [
           {
             "name": "Spain",
@@ -50,7 +52,10 @@ type alias Config =
       }
     """
     --> Ok
-    -->     { countries = [ Country "Spain" 1.87 ]
+    -->     {
+    -->     careers_updated = "1999-01-01"
+    -->     , countries_updated = "2000-01-01"
+    -->     , countries = [ Country "Spain" 1.87 ]
     -->     , careers =
     -->         [ Career "Design"
     -->             [ Role "Junior Designer" 2345 ]

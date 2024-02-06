@@ -56,6 +56,8 @@ testInitHappyPath =
         json =
             """
               {
+                "careers_updated": "1999-01-01",
+                "countries_updated": "2000-01-01",
                 "countries": [
                   {
                     "name": "Netherlands",
@@ -119,6 +121,8 @@ testInitHappyPath =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1999-01-01"
+                            , countries_updated = "2000-01-01"
                             }
         )
 
@@ -129,6 +133,8 @@ testInitQueryString =
         json =
             """
               {
+                "careers_updated": "1999-01-01",
+                "countries_updated": "2000-01-01",
                 "countries": [
                   {
                     "name": "Netherlands",
@@ -192,6 +198,8 @@ testInitQueryString =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1999-01-01"
+                            , countries_updated = "2000-01-01"
                             }
         )
 
@@ -202,6 +210,8 @@ testInitInvalidQueryString =
         json =
             """
               {
+                "careers_updated": "1999-01-01",
+                "countries_updated": "2000-01-01",
                 "countries": [
                   {
                     "name": "Netherlands",
@@ -268,6 +278,8 @@ testInitInvalidQueryString =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1999-01-01"
+                            , countries_updated = "2000-01-01"
                             }
         )
 
@@ -310,6 +322,8 @@ testInitMissingCountries =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1970-01-01"
+                            , countries_updated = "1970-01-01"
                             }
         )
 
@@ -357,6 +371,8 @@ testInitMissingCareers =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1970-01-01"
+                            , countries_updated = "1970-01-01"
                             }
         )
 
@@ -409,6 +425,8 @@ testInitMissingRoles =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1970-01-01"
+                            , countries_updated = "1970-01-01"
                             }
         )
 
@@ -450,6 +468,8 @@ testInitInvalidConfig =
                             , roleDropdown = Dropdown.initialState
                             , countryDropdown = Dropdown.initialState
                             , tenureDropdown = Dropdown.initialState
+                            , careers_updated = "1970-01-01"
+                            , countries_updated = "1970-01-01"
                             }
         )
 
@@ -550,12 +570,12 @@ testHumanizeCommitmentBonus =
                     |> Expect.equal "0%"
         , test "0.011" <|
             \_ ->
-                humanizeCommitmentBonus 0.011
-                    |> Expect.equal "1%"
+                humanizeCommitmentBonus 0.0101
+                    |> Expect.equal "1.01%"
         , test "0.125" <|
             \_ ->
                 humanizeCommitmentBonus 0.125
-                    |> Expect.equal "13%"
+                    |> Expect.equal "12.5%"
         ]
 
 
@@ -608,6 +628,8 @@ hideWarnings =
                     , roleDropdown = Dropdown.initialState
                     , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
+                    , careers_updated = "1970-01-01"
+                    , countries_updated = "1970-01-01"
                     }
                     |> Tuple.first
                     |> .warnings
@@ -626,6 +648,8 @@ hideWarnings =
                     , roleDropdown = Dropdown.initialState
                     , countryDropdown = Dropdown.initialState
                     , tenureDropdown = Dropdown.initialState
+                    , careers_updated = "1970-01-01"
+                    , countries_updated = "1970-01-01"
                     }
                     |> Tuple.first
                     |> .warnings
