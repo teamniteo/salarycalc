@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/teamniteo/salarycalc.svg?style=svg)](https://circleci.com/gh/teamniteo/salarycalc)
+[![GitHub Actions](https://github.com/teamniteo/salarycalc/actions/workflows/ci.yml/badge.svg)](https://github.com/teamniteo/salarycalc/actions/workflows/ci.yml)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/cccd17ab-57b5-48f2-8f5d-203432b99502/deploy-status)](https://app.netlify.com/sites/salarycalculator/deploys)
 
 # Niteo Salary Calculator
