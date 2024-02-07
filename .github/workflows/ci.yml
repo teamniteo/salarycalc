@@ -55,10 +55,14 @@ jobs:
           cache: niteo-public
           auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
 
-      - name: Authenticate with registry
+
+      - name: Create .npmrc file to publish to npm
+        uses: actions/setup-node@v3
         with:
-          NPM_TOKEN = '${{ secrets.NPM_TOKEN }}'
-        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/salarycalc/.npmrc
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Publish the package to NPM
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: nix-shell --run "npm version --no-git-tag-version prerelease --preid $(date +%Y-%m-%dT%H-%M-%S) && make dist && npm publish" # yamllint disable-line
