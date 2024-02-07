@@ -55,7 +55,6 @@ jobs:
           cache: niteo-public
           auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
 
-
       - name: Create .npmrc file to publish to npm
         uses: actions/setup-node@v3
         with:
@@ -66,3 +65,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: nix-shell --run "npm version --no-git-tag-version prerelease --preid $(date +%Y-%m-%dT%H-%M-%S) && make dist && npm publish" # yamllint disable-line
+
+      - name: Purge jsdeliver cache
+        run: curl https://purge.jsdelivr.net/npm/salarycalc/dist/salary-calculator.js  # yamllint disable-line

@@ -6,6 +6,9 @@
     "build": "make dist",
     "test": "make test"
   },
+  "files": [
+    "dist/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/teamniteo/salarycalc.git"
