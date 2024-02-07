@@ -6,7 +6,7 @@
 # by the 10-year average of EUR -> USD exchange rate from ofx.com.
 # We get a monthly base salary in EUR.
 eur_to_usd_10_year_avg: 1.188703
-careers_updated: '2023-13-31'
+careers_updated: '2023-12-31'
 careers:
 
 -   name: Design
