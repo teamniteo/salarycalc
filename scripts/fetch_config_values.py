@@ -1,11 +1,10 @@
 """Use a real browser to fetch config.yaml values."""
 
 from datetime import date
+from playwright.sync_api import Page
+from playwright.sync_api import sync_playwright
 from ruamel.yaml import RoundTripDumper
 from ruamel.yaml import RoundTripLoader
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
 from tqdm import tqdm
 
 import argparse
@@ -15,62 +14,45 @@ import time
 
 
 def usd_to_eur_10_year_average(
-    driver: webdriver.firefox.webdriver.WebDriver,
+    page: Page,
     config: ruamel.yaml.comments.CommentedMap,
 ) -> None:
     """Update the eur_to_usd_10_year_arg value in config.yaml."""
-
-    pbar = tqdm(total=9)
+    pbar = tqdm(total=8)
     pbar.set_description("Processing eur_to_usd_10_year_avg")
 
     # Load OFX.com
-    driver.get(
+    page.goto(
         "https://www.ofx.com/en-us/forex-news/historical-exchange-rates/yearly-average-rates/"  # noqa: 501
     )
     pbar.update()
 
-    # Select EUR as base currency
-    driver.find_element(
-        By.CSS_SELECTOR, "div.historical-rates--camparison--base"
-    ).click()
-    driver.find_element_by_xpath('//li[text()="EUR Euro"]').click()
-    pbar.update()
-
-    # Select USD as target currency
-    driver.find_element(
-        By.CSS_SELECTOR, "div.historical-rates--camparison--target"
-    ).click()
-    driver.find_element_by_xpath('//li[text()="USD US Dollar"]').click()
+    # Swap USD -> EUR to EUR -> USD
+    page.locator("button#historical-rate-swap-button").click()
     pbar.update()
 
     # Select yearly frequency
-    driver.find_element_by_id("historicalrates-frequency-yearly").click()
+    page.get_by_label("Yearly").check()
     pbar.update()
 
     # Choose all-time reporting period
     # There is a bug in their site where you cannot select `All` before
     # you select something else
-    driver.find_element_by_xpath(
-        '//select[contains(@class, "historical-rates--period")]/..'
-    ).click()
-    driver.find_element_by_xpath('//li[text()="Last 10 years"]').click()
-    driver.find_element_by_xpath(
-        '//select[contains(@class, "historical-rates--period")]/..'
-    ).click()
-    driver.find_element_by_xpath('//li[text()="All"]').click()
+    # page.get_by_text("All time", exact=True).click()
     pbar.update()
 
     # Click `Retrieve Data` button
-    driver.find_element(By.CSS_SELECTOR, "button.historical-rates--submit").click()
+    page.get_by_role("button", name="Retrieve data").click()
     pbar.update()
 
-    # Wait for data to load
+    # Wait for data to reload
     time.sleep(3)
     pbar.update()
 
     # Extract the Average Rate
-    avg_value = driver.find_element(By.CSS_SELECTOR, "tbody.fresh").text
-    avg = round(float(avg_value.replace("Average ", "")), 2)
+    average_cell = page.get_by_role("cell", name="Average")
+    next_cell = average_cell.locator("+ td")
+    avg = round(float(next_cell.inner_text()), 6)
     pbar.update()
 
     config["eur_to_usd_10_year_avg"] = avg
@@ -80,7 +62,7 @@ def usd_to_eur_10_year_average(
 
 
 def countries(
-    driver: webdriver.firefox.webdriver.WebDriver,
+    page: Page,
     config: ruamel.yaml.comments.CommentedMap,
 ) -> None:
     """Update the Cost of Living values in config.yaml."""
@@ -92,26 +74,29 @@ def countries(
         pbar.update()
 
         # Load numbeo
-        driver.get(
+        page.goto(
             "https://www.numbeo.com/cost-of-living/compare_countries_result.jsp?"
             f"country1=United+States&country2={country['name']}"
         )
 
         # Extract Cost of Living Plus Rent Index
-        difference_text = driver.find_element_by_css_selector(
+        difference_text = page.locator(
             ".table_indices_diff "
             "> tbody:nth-child(1) "
             "> tr:nth-child(3) "
             "> td:nth-child(1)"
-        ).text
+        ).inner_text()
 
-        # 'Consumer Prices Including Rent in Netherlands are 2.05% lower than
+        # 'Cost of Living Including Rent in Netherlands is 2.05% lower than
         # in United States'
-        difference = float(
-            difference_text.split("are")[1].split(" ")[1].replace("%", "")
-        )
+        difference = float(difference_text.split(" is ")[1].split("%")[0])
 
-        numbeo_ratio = 1 - (difference / 100)
+        if "lower" in difference_text:
+            numbeo_ratio = 1 - (difference / 100)
+        elif "higher" in difference_text:
+            numbeo_ratio = 1 + (difference / 100)
+        else:
+            raise ValueError("Unknown difference_text")
 
         country["cost_of_living"] = round(numbeo_ratio, 2)
         country["compressed_cost_of_living"] = round(
@@ -123,7 +108,7 @@ def countries(
 
 
 def salaries(
-    driver: webdriver.firefox.webdriver.WebDriver,
+    page: Page,
     config: ruamel.yaml.comments.CommentedMap,
 ) -> None:
     """Update the baseSalary values in config.yaml."""
@@ -136,16 +121,22 @@ def salaries(
     pbar = tqdm(total=len(roles))
     pbar.set_description("Processing roles")
 
+    # kill popups
+    page.goto("https://www.salary.com/tools/salary-calculator/web-designer-i")
+
+    page.locator("#sal-demoform-popup").get_by_role("img").first.click()
+    page.get_by_role("button", name="Close").click()
+
     for role in roles:
         pbar.update()
 
-        # Load numbeo
-        driver.get(
+        # Load salary.com
+        page.goto(
             f"https://www.salary.com/tools/salary-calculator/{role['salary_com_key']}"
         )
 
         # Extract Cost of Living Plus Rent Index
-        us_salary_text = driver.find_element(By.CSS_SELECTOR, "#top_salary_value").text
+        us_salary_text = page.locator("#top_salary_value").text_content()
         us_salary = int(us_salary_text.replace(",", "").replace("$", ""))
         base_salary = round(us_salary / 12 / config["eur_to_usd_10_year_avg"])
         role["baseSalary"] = base_salary
@@ -165,19 +156,19 @@ def compress_towards_affordability(cost_of_living, affordability):
 def main(argv=sys.argv) -> None:
     """Update salaries."""
 
-    argparse.ArgumentParser(usage=("pipenv run python fetch_config_values.py"))
+    argparse.ArgumentParser(usage=("python3.11 fetch_config_values.py"))
 
-    options = Options()
-    options.headless = True
+    print("Starting Chrome and loading up config.yml")
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
 
-    print("Starting Firefox and loading up config.yml")
-    with webdriver.Firefox(options=options) as driver:
         with open("config.yml") as file:
             config = ruamel.yaml.load(file, Loader=RoundTripLoader)
 
-            usd_to_eur_10_year_average(driver, config)
-            countries(driver, config)
-            salaries(driver, config)
+            usd_to_eur_10_year_average(page, config)
+            countries(page, config)
+            salaries(page, config)
 
         with open("config.yml", "w") as file:
             ruamel.yaml.dump(config, file, indent=4, Dumper=RoundTripDumper)

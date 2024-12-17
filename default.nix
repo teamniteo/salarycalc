@@ -22,7 +22,6 @@ let
       yarnPkg
 
       # Python helper scripts
-      geckodriver
       poetry
       poetryEnv
 
@@ -44,6 +43,8 @@ let
 
       dest=./node_modules
       ${copyGeneratedFiles}
+
+      export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
     '';
   };
 
@@ -81,6 +82,12 @@ let
       old: {
         buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools ];
       });
+
+      pyee = super.pyee.overridePythonAttrs (
+        old: {
+          patchPhase = ":";
+        }
+      );
 
     });
   };

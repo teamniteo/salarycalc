@@ -20,8 +20,10 @@ python = "^3.11"
 
 "ruamel.yaml" = "*"
 requests = "*"
-selenium = "*"
 tqdm = "*"
+
+# This version must match the playwright-browsers version in $PLAYWRIGHT_BROWSERS_PATH
+playwright = "==1.47.0"
 
 [tool.poetry.dev-dependencies]
 black = "*"
