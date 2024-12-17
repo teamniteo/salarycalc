@@ -100,6 +100,12 @@ Additionally, to not have to remember to run `nix-shell` you can install `http:/
 
     It will also run tests (with coverage analysis) and linters.
 
+### Preparing for new year
+
+1. Run `make config` to update the base salaries and location factors.
+1. Run `make dist` to build the new version of the Salary Calculator.
+1. Staging: Go to JSFiddle and paste `dist/index.html` into HTML section, `dist/index.js` into JS section and click `Run`.
+
 ### Contributing
 
 Thanks for your interest in our project. We are open to learn about any issues and for your pull requests.
