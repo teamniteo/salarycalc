@@ -110,3 +110,7 @@ Additionally, to not have to remember to run `nix-shell` you can install `http:/
 ### Contributing
 
 Thanks for your interest in our project. We are open to learn about any issues and for your pull requests.
+
+## We're hiring!
+
+At Niteo we regularly contribute back to the Open Source community. If you do too, we'd like to invite you to [join our team](https://niteo.co/careers)!
