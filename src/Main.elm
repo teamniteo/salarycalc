@@ -31,13 +31,14 @@ import Browser
 import Career exposing (Career, Role)
 import Config
 import Country exposing (Country)
-import Html exposing (Html, div, mark, p, span, table, td, text, tr)
-import Html.Attributes exposing (class, id, rowspan)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, input, mark, p, span, table, td, text, tr)
+import Html.Attributes exposing (class, id, placeholder, rowspan, value)
+import Html.Events exposing (onClick, onInput, stopPropagationOn)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
 import Result.Extra as Result
 import Salary
+import String
 import Url exposing (fromString)
 import Url.Parser as UrlParser exposing ((<?>), parse)
 import Url.Parser.Query as QueryParser exposing (int, map3, string)
@@ -66,6 +67,9 @@ init flags =
                     , tenureDropdown = Dropdown.initialState
                     , careers_updated = "1970-01-01"
                     , countries_updated = "1970-01-01"
+                    , countrySearchTerm = ""
+                    , roleSearchTerm = ""
+                    , tenureSearchTerm = ""
                     }
 
                 Ok config ->
@@ -169,6 +173,9 @@ init flags =
                     , tenureDropdown = Dropdown.initialState
                     , careers_updated = config.careers_updated
                     , countries_updated = config.countries_updated
+                    , countrySearchTerm = ""
+                    , roleSearchTerm = ""
+                    , tenureSearchTerm = ""
                     }
     in
     ( model
@@ -197,6 +204,10 @@ type Msg
     | CountrySelected Country
     | TenureSelected Int
     | AccordionMsg Accordion.State
+    | CountrySearchTermChanged String
+    | RoleSearchTermChanged String
+    | TenureSearchTermChanged String
+    | NoOp
 
 
 type Field
@@ -224,6 +235,9 @@ type alias Model =
     , tenureDropdown : Dropdown.State
     , careers_updated : String
     , countries_updated : String
+    , countrySearchTerm : String
+    , roleSearchTerm : String
+    , tenureSearchTerm : String
     }
 
 
@@ -255,6 +269,7 @@ update msg model =
                 , warnings =
                     model.warnings
                         |> List.filter (\warning -> warning.field /= RoleField)
+                , roleSearchTerm = ""
               }
             , Cmd.none
             )
@@ -265,15 +280,28 @@ update msg model =
                 , warnings =
                     model.warnings
                         |> List.filter (\warning -> warning.field /= CountryField)
+                , countrySearchTerm = ""
               }
             , Cmd.none
             )
 
         TenureSelected years ->
-            ( { model | tenure = years }, Cmd.none )
+            ( { model | tenure = years, tenureSearchTerm = "" }, Cmd.none )
 
         AccordionMsg state ->
             ( { model | accordionState = state }, Cmd.none )
+
+        CountrySearchTermChanged searchTerm ->
+            ( { model | countrySearchTerm = searchTerm }, Cmd.none )
+
+        RoleSearchTermChanged searchTerm ->
+            ( { model | roleSearchTerm = searchTerm }, Cmd.none )
+
+        TenureSearchTermChanged searchTerm ->
+            ( { model | tenureSearchTerm = searchTerm }, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -385,13 +413,56 @@ viewHeader model =
                         |> text
                     ]
             , items =
-                model.careers
-                    |> List.map
-                        (\{ name, roles } ->
-                            Dropdown.header [ text (name ++ " Career") ]
-                                :: List.map roleItem roles
-                        )
-                    |> List.concat
+                let
+                    searchInput =
+                        Dropdown.customItem
+                            (div
+                                [ class "px-3 py-2"
+                                , stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+                                ]
+                                [ input
+                                    [ placeholder "Search roles..."
+                                    , value model.roleSearchTerm
+                                    , onInput RoleSearchTermChanged
+                                    , class "form-control form-control-sm"
+                                    ]
+                                    []
+                                ]
+                            )
+
+                    roleItems =
+                        if String.isEmpty model.roleSearchTerm then
+                            model.careers
+                                |> List.map
+                                    (\{ name, roles } ->
+                                        Dropdown.header [ text (name ++ " Career") ]
+                                            :: List.map roleItem roles
+                                    )
+                                |> List.concat
+
+                        else
+                            model.careers
+                                |> List.map
+                                    (\{ name, roles } ->
+                                        let
+                                            filteredRoles =
+                                                roles
+                                                    |> List.filter
+                                                        (\role ->
+                                                            String.toLower role.name
+                                                                |> String.contains (String.toLower model.roleSearchTerm)
+                                                        )
+                                        in
+                                        if List.isEmpty filteredRoles then
+                                            []
+
+                                        else
+                                            Dropdown.header [ text (name ++ " Career") ]
+                                                :: List.map roleItem filteredRoles
+                                    )
+                                |> List.concat
+                in
+                searchInput :: Dropdown.divider :: roleItems
             }
         , text " living in "
         , Dropdown.dropdown model.countryDropdown
@@ -405,8 +476,40 @@ viewHeader model =
                         |> text
                     ]
             , items =
-                model.countries
-                    |> List.map countryItem
+                let
+                    filteredCountries =
+                        if String.isEmpty model.countrySearchTerm then
+                            model.countries
+
+                        else
+                            model.countries
+                                |> List.filter
+                                    (\country ->
+                                        String.toLower country.name
+                                            |> String.contains (String.toLower model.countrySearchTerm)
+                                    )
+
+                    searchInput =
+                        Dropdown.customItem
+                            (div
+                                [ class "px-3 py-2"
+                                , stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+                                ]
+                                [ input
+                                    [ placeholder "Search countries..."
+                                    , value model.countrySearchTerm
+                                    , onInput CountrySearchTermChanged
+                                    , class "form-control form-control-sm"
+                                    ]
+                                    []
+                                ]
+                            )
+
+                    countryItems =
+                        filteredCountries
+                            |> List.map countryItem
+                in
+                searchInput :: Dropdown.divider :: countryItems
             }
         , text " with a tenure at Niteo of "
         , Dropdown.dropdown model.tenureDropdown
@@ -419,22 +522,43 @@ viewHeader model =
                         |> text
                     ]
             , items =
-                [ tenureItem 0
-                , tenureItem 1
-                , tenureItem 2
-                , tenureItem 3
-                , tenureItem 4
-                , tenureItem 5
-                , tenureItem 6
-                , tenureItem 7
-                , tenureItem 8
-                , tenureItem 9
-                , tenureItem 10
-                , tenureItem 11
-                , tenureItem 12
-                , tenureItem 15
-                , tenureItem 20
-                ]
+                let
+                    allYears =
+                        [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20 ]
+
+                    searchInput =
+                        Dropdown.customItem
+                            (div
+                                [ class "px-3 py-2"
+                                , stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
+                                ]
+                                [ input
+                                    [ placeholder "Search years..."
+                                    , value model.tenureSearchTerm
+                                    , onInput TenureSearchTermChanged
+                                    , class "form-control form-control-sm"
+                                    ]
+                                    []
+                                ]
+                            )
+
+                    filteredYears =
+                        if String.isEmpty model.tenureSearchTerm then
+                            allYears
+
+                        else
+                            allYears
+                                |> List.filter
+                                    (\years ->
+                                        String.fromInt years
+                                            |> String.contains model.tenureSearchTerm
+                                    )
+
+                    tenureItems =
+                        filteredYears
+                            |> List.map tenureItem
+                in
+                searchInput :: Dropdown.divider :: tenureItems
             }
         , viewPluralizedYears model.tenure
         ]
