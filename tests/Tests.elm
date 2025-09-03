@@ -123,6 +123,9 @@ testInitHappyPath =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1999-01-01"
                             , countries_updated = "2000-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -200,6 +203,9 @@ testInitQueryString =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1999-01-01"
                             , countries_updated = "2000-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -280,6 +286,9 @@ testInitInvalidQueryString =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1999-01-01"
                             , countries_updated = "2000-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -324,6 +333,9 @@ testInitMissingCountries =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1970-01-01"
                             , countries_updated = "1970-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -373,6 +385,9 @@ testInitMissingCareers =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1970-01-01"
                             , countries_updated = "1970-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -427,6 +442,9 @@ testInitMissingRoles =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1970-01-01"
                             , countries_updated = "1970-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -470,6 +488,9 @@ testInitInvalidConfig =
                             , tenureDropdown = Dropdown.initialState
                             , careers_updated = "1970-01-01"
                             , countries_updated = "1970-01-01"
+                            , countrySearchTerm = ""
+                            , roleSearchTerm = ""
+                            , tenureSearchTerm = ""
                             }
         )
 
@@ -630,6 +651,9 @@ hideWarnings =
                     , tenureDropdown = Dropdown.initialState
                     , careers_updated = "1970-01-01"
                     , countries_updated = "1970-01-01"
+                    , countrySearchTerm = ""
+                    , roleSearchTerm = ""
+                    , tenureSearchTerm = ""
                     }
                     |> Tuple.first
                     |> .warnings
@@ -650,6 +674,9 @@ hideWarnings =
                     , tenureDropdown = Dropdown.initialState
                     , careers_updated = "1970-01-01"
                     , countries_updated = "1970-01-01"
+                    , countrySearchTerm = ""
+                    , roleSearchTerm = ""
+                    , tenureSearchTerm = ""
                     }
                     |> Tuple.first
                     |> .warnings
