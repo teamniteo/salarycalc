@@ -28,6 +28,7 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Dropdown as Dropdown
 import Bootstrap.ListGroup as ListGroup
 import Browser
+import Browser.Dom as Dom
 import Career exposing (Career, Role)
 import Config
 import Country exposing (Country)
@@ -39,6 +40,7 @@ import Maybe.Extra as Maybe
 import Result.Extra as Result
 import Salary
 import String
+import Task
 import Url exposing (fromString)
 import Url.Parser as UrlParser exposing ((<?>), parse)
 import Url.Parser.Query as QueryParser exposing (int, map3, string)
@@ -245,22 +247,22 @@ type alias Model =
 -- UPDATE
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RoleDropdownChanged state ->
             ( { model | roleDropdown = state }
-            , Cmd.none
+            , Task.attempt (\_ -> NoOp) (Dom.focus "role-search-input")
             )
 
         CountryDropdownChanged state ->
             ( { model | countryDropdown = state }
-            , Cmd.none
+            , Task.attempt (\_ -> NoOp) (Dom.focus "country-search-input")
             )
 
         TenureDropdownChanged state ->
             ( { model | tenureDropdown = state }
-            , Cmd.none
+            , Task.attempt (\_ -> NoOp) (Dom.focus "tenure-search-input")
             )
 
         RoleSelected role ->
@@ -421,7 +423,8 @@ viewHeader model =
                                 , stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
                                 ]
                                 [ input
-                                    [ placeholder "Search roles..."
+                                    [ id "role-search-input"
+                                    , placeholder "Search roles..."
                                     , value model.roleSearchTerm
                                     , onInput RoleSearchTermChanged
                                     , class "form-control form-control-sm"
@@ -496,7 +499,8 @@ viewHeader model =
                                 , stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
                                 ]
                                 [ input
-                                    [ placeholder "Search countries..."
+                                    [ id "country-search-input"
+                                    , placeholder "Search countries..."
                                     , value model.countrySearchTerm
                                     , onInput CountrySearchTermChanged
                                     , class "form-control form-control-sm"
@@ -533,7 +537,8 @@ viewHeader model =
                                 , stopPropagationOn "click" (Decode.succeed ( NoOp, True ))
                                 ]
                                 [ input
-                                    [ placeholder "Search years..."
+                                    [ id "tenure-search-input"
+                                    , placeholder "Search years..."
                                     , value model.tenureSearchTerm
                                     , onInput TenureSearchTermChanged
                                     , class "form-control form-control-sm"
