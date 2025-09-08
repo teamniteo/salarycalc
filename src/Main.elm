@@ -5,6 +5,7 @@ module Main exposing
     , Msg(..)
     , Query
     , Warning
+    , handleKeyDown
     , humanizeCommitmentBonus
     , humanizeTenure
     , init
@@ -34,7 +35,7 @@ import Config
 import Country exposing (Country)
 import Html exposing (Html, div, input, mark, p, span, table, td, text, tr)
 import Html.Attributes exposing (class, id, placeholder, rowspan, value)
-import Html.Events exposing (onClick, onInput, stopPropagationOn)
+import Html.Events exposing (on, onClick, onInput, stopPropagationOn)
 import Json.Decode as Decode
 import Maybe.Extra as Maybe
 import Result.Extra as Result
@@ -72,6 +73,9 @@ init flags =
                     , countrySearchTerm = ""
                     , roleSearchTerm = ""
                     , tenureSearchTerm = ""
+                    , roleSelectedIndex = 0
+                    , countrySelectedIndex = 0
+                    , tenureSelectedIndex = 0
                     }
 
                 Ok config ->
@@ -178,6 +182,9 @@ init flags =
                     , countrySearchTerm = ""
                     , roleSearchTerm = ""
                     , tenureSearchTerm = ""
+                    , roleSelectedIndex = 0
+                    , countrySelectedIndex = 0
+                    , tenureSelectedIndex = 0
                     }
     in
     ( model
@@ -209,6 +216,9 @@ type Msg
     | CountrySearchTermChanged String
     | RoleSearchTermChanged String
     | TenureSearchTermChanged String
+    | RoleKeyDown String
+    | CountryKeyDown String
+    | TenureKeyDown String
     | NoOp
 
 
@@ -240,6 +250,9 @@ type alias Model =
     , countrySearchTerm : String
     , roleSearchTerm : String
     , tenureSearchTerm : String
+    , roleSelectedIndex : Int
+    , countrySelectedIndex : Int
+    , tenureSelectedIndex : Int
     }
 
 
@@ -247,21 +260,72 @@ type alias Model =
 -- UPDATE
 
 
+onKeyDown : (String -> msg) -> Html.Attribute msg
+onKeyDown tagger =
+    on "keydown" (Decode.map tagger keyDecoder)
+
+
+keyDecoder : Decode.Decoder String
+keyDecoder =
+    Decode.field "key" Decode.string
+
+
+handleKeyDown : String -> List a -> Int -> ( Int, Maybe a )
+handleKeyDown key items currentIndex =
+    let
+        itemCount =
+            List.length items
+
+        getItemAt index =
+            items
+                |> List.drop index
+                |> List.head
+    in
+    case key of
+        "ArrowDown" ->
+            let
+                newIndex =
+                    if currentIndex < itemCount - 1 then
+                        currentIndex + 1
+
+                    else
+                        currentIndex
+            in
+            ( newIndex, Nothing )
+
+        "ArrowUp" ->
+            let
+                newIndex =
+                    if currentIndex > 0 then
+                        currentIndex - 1
+
+                    else
+                        currentIndex
+            in
+            ( newIndex, Nothing )
+
+        "Enter" ->
+            ( currentIndex, getItemAt currentIndex )
+
+        _ ->
+            ( currentIndex, Nothing )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RoleDropdownChanged state ->
-            ( { model | roleDropdown = state }
+            ( { model | roleDropdown = state, roleSelectedIndex = 0 }
             , Task.attempt (\_ -> NoOp) (Dom.focus "role-search-input")
             )
 
         CountryDropdownChanged state ->
-            ( { model | countryDropdown = state }
+            ( { model | countryDropdown = state, countrySelectedIndex = 0 }
             , Task.attempt (\_ -> NoOp) (Dom.focus "country-search-input")
             )
 
         TenureDropdownChanged state ->
-            ( { model | tenureDropdown = state }
+            ( { model | tenureDropdown = state, tenureSelectedIndex = 0 }
             , Task.attempt (\_ -> NoOp) (Dom.focus "tenure-search-input")
             )
 
@@ -272,8 +336,10 @@ update msg model =
                     model.warnings
                         |> List.filter (\warning -> warning.field /= RoleField)
                 , roleSearchTerm = ""
+                , roleDropdown = Dropdown.initialState
+                , countryDropdown = Dropdown.initialState
               }
-            , Cmd.none
+            , Task.attempt (\_ -> NoOp) (Dom.focus "country-search-input")
             )
 
         CountrySelected country ->
@@ -283,8 +349,10 @@ update msg model =
                     model.warnings
                         |> List.filter (\warning -> warning.field /= CountryField)
                 , countrySearchTerm = ""
+                , countryDropdown = Dropdown.initialState
+                , tenureDropdown = Dropdown.initialState
               }
-            , Cmd.none
+            , Task.attempt (\_ -> NoOp) (Dom.focus "tenure-search-input")
             )
 
         TenureSelected years ->
@@ -294,13 +362,118 @@ update msg model =
             ( { model | accordionState = state }, Cmd.none )
 
         CountrySearchTermChanged searchTerm ->
-            ( { model | countrySearchTerm = searchTerm }, Cmd.none )
+            ( { model | countrySearchTerm = searchTerm, countrySelectedIndex = 0 }, Cmd.none )
 
         RoleSearchTermChanged searchTerm ->
-            ( { model | roleSearchTerm = searchTerm }, Cmd.none )
+            ( { model | roleSearchTerm = searchTerm, roleSelectedIndex = 0 }, Cmd.none )
 
         TenureSearchTermChanged searchTerm ->
-            ( { model | tenureSearchTerm = searchTerm }, Cmd.none )
+            ( { model | tenureSearchTerm = searchTerm, tenureSelectedIndex = 0 }, Cmd.none )
+
+        RoleKeyDown key ->
+            let
+                allRoles =
+                    model.careers
+                        |> List.map .roles
+                        |> List.concat
+
+                filteredRoles =
+                    if String.isEmpty model.roleSearchTerm then
+                        allRoles
+
+                    else
+                        allRoles
+                            |> List.filter
+                                (\role ->
+                                    String.toLower role.name
+                                        |> String.contains (String.toLower model.roleSearchTerm)
+                                )
+            in
+            handleKeyDown key filteredRoles model.roleSelectedIndex
+                |> (\( newIndex, maybeRole ) ->
+                        case maybeRole of
+                            Just role ->
+                                ( { model
+                                    | role = Just role
+                                    , warnings = model.warnings |> List.filter (\warning -> warning.field /= RoleField)
+                                    , roleSearchTerm = ""
+                                    , roleSelectedIndex = 0
+                                    , roleDropdown = Dropdown.initialState
+                                    , countryDropdown = Dropdown.initialState
+                                  }
+                                , Task.attempt (\_ -> NoOp) (Dom.focus "country-search-input")
+                                )
+
+                            Nothing ->
+                                ( { model | roleSelectedIndex = newIndex }, Cmd.none )
+                   )
+
+        CountryKeyDown key ->
+            let
+                filteredCountries =
+                    if String.isEmpty model.countrySearchTerm then
+                        model.countries
+
+                    else
+                        model.countries
+                            |> List.filter
+                                (\country ->
+                                    String.toLower country.name
+                                        |> String.contains (String.toLower model.countrySearchTerm)
+                                )
+            in
+            handleKeyDown key filteredCountries model.countrySelectedIndex
+                |> (\( newIndex, maybeCountry ) ->
+                        case maybeCountry of
+                            Just country ->
+                                ( { model
+                                    | country = Just country
+                                    , warnings = model.warnings |> List.filter (\warning -> warning.field /= CountryField)
+                                    , countrySearchTerm = ""
+                                    , countrySelectedIndex = 0
+                                    , countryDropdown = Dropdown.initialState
+                                    , tenureDropdown = Dropdown.initialState
+                                  }
+                                , Task.attempt (\_ -> NoOp) (Dom.focus "tenure-search-input")
+                                )
+
+                            Nothing ->
+                                ( { model | countrySelectedIndex = newIndex }, Cmd.none )
+                   )
+
+        TenureKeyDown key ->
+            let
+                allYears =
+                    [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20 ]
+
+                filteredYears =
+                    if String.isEmpty model.tenureSearchTerm then
+                        allYears
+
+                    else
+                        allYears
+                            |> List.filter
+                                (\years ->
+                                    String.fromInt years
+                                        |> String.contains model.tenureSearchTerm
+                                )
+            in
+            handleKeyDown key filteredYears model.tenureSelectedIndex
+                |> (\( newIndex, maybeYears ) ->
+                        case maybeYears of
+                            Just years ->
+                                ( { model
+                                    | tenure = years
+                                    , tenureSearchTerm = ""
+                                    , tenureSelectedIndex = 0
+                                    , tenureDropdown = Dropdown.initialState
+                                  }
+                                , Cmd.none
+                                )
+
+                            Nothing ->
+                                ( { model | tenureSelectedIndex = newIndex }, Cmd.none )
+                   )
 
         NoOp ->
             ( model, Cmd.none )
@@ -392,15 +565,38 @@ viewWarnings warnings =
 viewHeader : Model -> List (Html Msg)
 viewHeader model =
     let
-        roleItem role =
-            Dropdown.buttonItem [ onClick (RoleSelected role) ] [ text role.name ]
+        roleItem index role =
+            let
+                attributes =
+                    if index == model.roleSelectedIndex then
+                        [ onClick (RoleSelected role), class "active" ]
 
-        countryItem country =
-            Dropdown.buttonItem [ onClick (CountrySelected country) ] [ text country.name ]
+                    else
+                        [ onClick (RoleSelected role) ]
+            in
+            Dropdown.buttonItem attributes [ text role.name ]
 
-        tenureItem years =
-            Dropdown.buttonItem [ onClick (TenureSelected years) ]
-                [ humanizeTenure years |> text ]
+        countryItem index country =
+            let
+                attributes =
+                    if index == model.countrySelectedIndex then
+                        [ onClick (CountrySelected country), class "active" ]
+
+                    else
+                        [ onClick (CountrySelected country) ]
+            in
+            Dropdown.buttonItem attributes [ text country.name ]
+
+        tenureItem index years =
+            let
+                attributes =
+                    if index == model.tenureSelectedIndex then
+                        [ onClick (TenureSelected years), class "active" ]
+
+                    else
+                        [ onClick (TenureSelected years) ]
+            in
+            Dropdown.buttonItem attributes [ humanizeTenure years |> text ]
     in
     [ p [ class "lead" ]
         [ text "I'm a "
@@ -427,6 +623,7 @@ viewHeader model =
                                     , placeholder "Search roles..."
                                     , value model.roleSearchTerm
                                     , onInput RoleSearchTermChanged
+                                    , onKeyDown RoleKeyDown
                                     , class "form-control form-control-sm"
                                     ]
                                     []
@@ -435,35 +632,55 @@ viewHeader model =
 
                     roleItems =
                         if String.isEmpty model.roleSearchTerm then
-                            model.careers
-                                |> List.map
-                                    (\{ name, roles } ->
-                                        Dropdown.header [ text (name ++ " Career") ]
-                                            :: List.map roleItem roles
-                                    )
-                                |> List.concat
+                            let
+                                allRoles =
+                                    model.careers
+                                        |> List.map .roles
+                                        |> List.concat
 
-                        else
-                            model.careers
-                                |> List.map
-                                    (\{ name, roles } ->
-                                        let
-                                            filteredRoles =
-                                                roles
-                                                    |> List.filter
-                                                        (\role ->
-                                                            String.toLower role.name
-                                                                |> String.contains (String.toLower model.roleSearchTerm)
-                                                        )
-                                        in
-                                        if List.isEmpty filteredRoles then
+                                indexedRoles =
+                                    allRoles
+                                        |> List.indexedMap Tuple.pair
+
+                                buildItems currentIndex careerList =
+                                    case careerList of
+                                        [] ->
                                             []
 
-                                        else
+                                        { name, roles } :: rest ->
+                                            let
+                                                roleCount =
+                                                    List.length roles
+
+                                                careerRoles =
+                                                    indexedRoles
+                                                        |> List.drop currentIndex
+                                                        |> List.take roleCount
+                                                        |> List.map (\( idx, role ) -> roleItem idx role)
+                                            in
                                             Dropdown.header [ text (name ++ " Career") ]
-                                                :: List.map roleItem filteredRoles
-                                    )
-                                |> List.concat
+                                                :: careerRoles
+                                                ++ buildItems (currentIndex + roleCount) rest
+                            in
+                            buildItems 0 model.careers
+
+                        else
+                            let
+                                allRoles =
+                                    model.careers
+                                        |> List.map .roles
+                                        |> List.concat
+
+                                filteredRoles =
+                                    allRoles
+                                        |> List.filter
+                                            (\role ->
+                                                String.toLower role.name
+                                                    |> String.contains (String.toLower model.roleSearchTerm)
+                                            )
+                            in
+                            filteredRoles
+                                |> List.indexedMap roleItem
                 in
                 searchInput :: Dropdown.divider :: roleItems
             }
@@ -503,6 +720,7 @@ viewHeader model =
                                     , placeholder "Search countries..."
                                     , value model.countrySearchTerm
                                     , onInput CountrySearchTermChanged
+                                    , onKeyDown CountryKeyDown
                                     , class "form-control form-control-sm"
                                     ]
                                     []
@@ -511,7 +729,7 @@ viewHeader model =
 
                     countryItems =
                         filteredCountries
-                            |> List.map countryItem
+                            |> List.indexedMap countryItem
                 in
                 searchInput :: Dropdown.divider :: countryItems
             }
@@ -541,6 +759,7 @@ viewHeader model =
                                     , placeholder "Search years..."
                                     , value model.tenureSearchTerm
                                     , onInput TenureSearchTermChanged
+                                    , onKeyDown TenureKeyDown
                                     , class "form-control form-control-sm"
                                     ]
                                     []
@@ -561,7 +780,7 @@ viewHeader model =
 
                     tenureItems =
                         filteredYears
-                            |> List.map tenureItem
+                            |> List.indexedMap tenureItem
                 in
                 searchInput :: Dropdown.divider :: tenureItems
             }

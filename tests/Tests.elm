@@ -1,6 +1,7 @@
 module Tests exposing
     ( tenureImpact
     , testCommitmentBonus
+    , testHandleKeyDown
     , testHumanizeCommitmentBonus
     , testHumanizeTenure
     , testInitHappyPath
@@ -10,6 +11,7 @@ module Tests exposing
     , testInitMissingCountries
     , testInitMissingRoles
     , testInitQueryString
+    , testKeyboardNavigation
     , testLookupByName
     , testSalary
     , testViewPluralizedYears
@@ -34,6 +36,7 @@ import Main
         , Flags
         , Msg(..)
         , Warning
+        , handleKeyDown
         , humanizeCommitmentBonus
         , humanizeTenure
         , init
@@ -126,6 +129,9 @@ testInitHappyPath =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -206,6 +212,9 @@ testInitQueryString =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -289,6 +298,9 @@ testInitInvalidQueryString =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -336,6 +348,9 @@ testInitMissingCountries =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -388,6 +403,9 @@ testInitMissingCareers =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -445,6 +463,9 @@ testInitMissingRoles =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -491,6 +512,9 @@ testInitInvalidConfig =
                             , countrySearchTerm = ""
                             , roleSearchTerm = ""
                             , tenureSearchTerm = ""
+                            , roleSelectedIndex = 0
+                            , countrySelectedIndex = 0
+                            , tenureSelectedIndex = 0
                             }
         )
 
@@ -654,6 +678,9 @@ hideWarnings =
                     , countrySearchTerm = ""
                     , roleSearchTerm = ""
                     , tenureSearchTerm = ""
+                    , roleSelectedIndex = 0
+                    , countrySelectedIndex = 0
+                    , tenureSelectedIndex = 0
                     }
                     |> Tuple.first
                     |> .warnings
@@ -677,10 +704,195 @@ hideWarnings =
                     , countrySearchTerm = ""
                     , roleSearchTerm = ""
                     , tenureSearchTerm = ""
+                    , roleSelectedIndex = 0
+                    , countrySelectedIndex = 0
+                    , tenureSelectedIndex = 0
                     }
                     |> Tuple.first
                     |> .warnings
                     |> Expect.equal [ Warning "foo" RoleField ]
+        ]
+
+
+testKeyboardNavigation : Test
+testKeyboardNavigation =
+    describe "Keyboard navigation works correctly"
+        [ test "ArrowDown increases selected index" <|
+            \_ ->
+                let
+                    model =
+                        { error = Nothing
+                        , warnings = []
+                        , countries =
+                            [ Country "Slovenia" 0.91
+                            , Country "Slovakia" 0.85
+                            ]
+                        , careers =
+                            [ Career "Technical"
+                                [ Role "Software Developer" 3500 ]
+                            ]
+                        , role = Just (Role "Software Developer" 3500)
+                        , country = Nothing
+                        , tenure = 2
+                        , accordionState = Accordion.initialState
+                        , roleDropdown = Dropdown.initialState
+                        , countryDropdown = Dropdown.initialState
+                        , tenureDropdown = Dropdown.initialState
+                        , careers_updated = "2022-01-01"
+                        , countries_updated = "2022-01-01"
+                        , countrySearchTerm = "slov"
+                        , roleSearchTerm = ""
+                        , tenureSearchTerm = ""
+                        , roleSelectedIndex = 0
+                        , countrySelectedIndex = 0
+                        , tenureSelectedIndex = 0
+                        }
+                in
+                update (CountryKeyDown "ArrowDown") model
+                    |> Tuple.first
+                    |> .countrySelectedIndex
+                    |> Expect.equal 1
+        , test "ArrowUp decreases selected index" <|
+            \_ ->
+                let
+                    model =
+                        { error = Nothing
+                        , warnings = []
+                        , countries =
+                            [ Country "Slovenia" 0.91
+                            , Country "Slovakia" 0.85
+                            ]
+                        , careers =
+                            [ Career "Technical"
+                                [ Role "Software Developer" 3500 ]
+                            ]
+                        , role = Just (Role "Software Developer" 3500)
+                        , country = Nothing
+                        , tenure = 2
+                        , accordionState = Accordion.initialState
+                        , roleDropdown = Dropdown.initialState
+                        , countryDropdown = Dropdown.initialState
+                        , tenureDropdown = Dropdown.initialState
+                        , careers_updated = "2022-01-01"
+                        , countries_updated = "2022-01-01"
+                        , countrySearchTerm = "slov"
+                        , roleSearchTerm = ""
+                        , tenureSearchTerm = ""
+                        , roleSelectedIndex = 0
+                        , countrySelectedIndex = 1
+                        , tenureSelectedIndex = 0
+                        }
+                in
+                update (CountryKeyDown "ArrowUp") model
+                    |> Tuple.first
+                    |> .countrySelectedIndex
+                    |> Expect.equal 0
+        , test "Enter selects the current item and closes dropdown" <|
+            \_ ->
+                let
+                    model =
+                        { error = Nothing
+                        , warnings = []
+                        , countries =
+                            [ Country "Slovenia" 0.91
+                            , Country "Slovakia" 0.85
+                            ]
+                        , careers =
+                            [ Career "Technical"
+                                [ Role "Software Developer" 3500 ]
+                            ]
+                        , role = Just (Role "Software Developer" 3500)
+                        , country = Nothing
+                        , tenure = 2
+                        , accordionState = Accordion.initialState
+                        , roleDropdown = Dropdown.initialState
+                        , countryDropdown = Dropdown.initialState
+                        , tenureDropdown = Dropdown.initialState
+                        , careers_updated = "2022-01-01"
+                        , countries_updated = "2022-01-01"
+                        , countrySearchTerm = "slov"
+                        , roleSearchTerm = ""
+                        , tenureSearchTerm = ""
+                        , roleSelectedIndex = 0
+                        , countrySelectedIndex = 0
+                        , tenureSelectedIndex = 0
+                        }
+
+                    updatedModel =
+                        update (CountryKeyDown "Enter") model
+                            |> Tuple.first
+                in
+                Expect.all
+                    [ .country >> Expect.equal (Just (Country "Slovenia" 0.91))
+                    , .countrySearchTerm >> Expect.equal ""
+                    , .countrySelectedIndex >> Expect.equal 0
+                    ]
+                    updatedModel
+        , test "Search term change resets selected index" <|
+            \_ ->
+                let
+                    model =
+                        { error = Nothing
+                        , warnings = []
+                        , countries =
+                            [ Country "Slovenia" 0.91
+                            , Country "Slovakia" 0.85
+                            ]
+                        , careers =
+                            [ Career "Technical"
+                                [ Role "Software Developer" 3500 ]
+                            ]
+                        , role = Just (Role "Software Developer" 3500)
+                        , country = Nothing
+                        , tenure = 2
+                        , accordionState = Accordion.initialState
+                        , roleDropdown = Dropdown.initialState
+                        , countryDropdown = Dropdown.initialState
+                        , tenureDropdown = Dropdown.initialState
+                        , careers_updated = "2022-01-01"
+                        , countries_updated = "2022-01-01"
+                        , countrySearchTerm = ""
+                        , roleSearchTerm = ""
+                        , tenureSearchTerm = ""
+                        , roleSelectedIndex = 0
+                        , countrySelectedIndex = 5
+                        , tenureSelectedIndex = 0
+                        }
+                in
+                update (CountrySearchTermChanged "test") model
+                    |> Tuple.first
+                    |> .countrySelectedIndex
+                    |> Expect.equal 0
+        ]
+
+
+testHandleKeyDown : Test
+testHandleKeyDown =
+    describe "handleKeyDown function works correctly"
+        [ test "ArrowDown increments index" <|
+            \_ ->
+                handleKeyDown "ArrowDown" [ "A", "B", "C" ] 0
+                    |> Expect.equal ( 1, Nothing )
+        , test "ArrowDown doesn't go past end" <|
+            \_ ->
+                handleKeyDown "ArrowDown" [ "A", "B", "C" ] 2
+                    |> Expect.equal ( 2, Nothing )
+        , test "ArrowUp decrements index" <|
+            \_ ->
+                handleKeyDown "ArrowUp" [ "A", "B", "C" ] 2
+                    |> Expect.equal ( 1, Nothing )
+        , test "ArrowUp doesn't go below zero" <|
+            \_ ->
+                handleKeyDown "ArrowUp" [ "A", "B", "C" ] 0
+                    |> Expect.equal ( 0, Nothing )
+        , test "Enter returns selected item" <|
+            \_ ->
+                handleKeyDown "Enter" [ "A", "B", "C" ] 1
+                    |> Expect.equal ( 1, Just "B" )
+        , test "Other keys do nothing" <|
+            \_ ->
+                handleKeyDown "Escape" [ "A", "B", "C" ] 1
+                    |> Expect.equal ( 1, Nothing )
         ]
 
 
