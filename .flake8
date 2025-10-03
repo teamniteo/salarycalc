@@ -10,12 +10,12 @@ ignore =
 # D204: 1 blank line required after class docstring
     D204,
 # D102: Missing docstring in __call__
-    /__call__/* : D102,
+    D102,
 # D107: Missing docstring in __init__
     D107,
 # D105: Missing docstring in magic method
-    /__iter__/* : D105,
-    /__next__/* : D105,
+    D105,
+    D105,
 # W503: line break before binary operator
     W503,
 # E231: missing whitespace after ','
