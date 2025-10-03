@@ -12,3 +12,4 @@ repl-temp-*
 .direnv/
 yarn-error.log
 .parcel-cache/
+scripts/__pycache__/

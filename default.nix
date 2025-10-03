@@ -1,38 +1,39 @@
 { pkgs ? import ./nix { } }:
 let
 
+  # Create a Python environment with playwright and all its dependencies
+  pythonWithPlaywright = pkgs.python313.withPackages (
+    ps: with ps; [
+      playwright
+    ]
+  );
+
   # The development shell definition
   devShell = pkgs.mkShell {
     buildInputs = with pkgs; [
       # common tooling
-      gitAndTools.pre-commit
       niv
-      vim
 
       # Elm app
       elmPackages.elm
       elmPackages.elm-format
       elmPackages.elm-analyse
-      elmPackages.elm-verify-examples
+      # elmPackages.elm-verify-examples  # currently broken in nixpkgs
       elmPackages.elm-test
-      elmPackages.elm-coverage
       elm2nix
       nodePackages.npm
       yarn
       yarnPkg
 
-      # Python helper scripts
-      poetry
-      poetryEnv
+      # Python stuff
+      python313
+      uv
+      (pre-commit.override { python3Packages = python313Packages; })
+      python313Packages.pre-commit-hooks
 
-    ]
-
-    # Currently, both firefox and firefox-bin are broken on Darwin (MacOS)
-    # so if you are on a MacBook, you have to manually install firefox.
-    # If https://github.com/NixOS/nixpkgs/issues/53979 gets fixed,
-    # we can remove this if.
-    ++ lib.optionals (!pkgs.stdenv.isDarwin) [
-      pkgs.firefox
+      # Support for Playwright
+      pythonWithPlaywright
+      nodejs
     ];
 
     shellHook = ''
@@ -44,6 +45,12 @@ let
       dest=./node_modules
       ${copyGeneratedFiles}
 
+      unset PYTHONPATH
+      uv sync --dev
+      . .venv/bin/activate
+
+      # Add Playwright and its dependencies to path
+      export PYTHONPATH="${pythonWithPlaywright}/${pythonWithPlaywright.sitePackages}:$PYTHONPATH"
       export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
     '';
   };

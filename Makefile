@@ -47,7 +47,7 @@ test: tests
 
 .PHONY: tests
 tests:
-	@elm-verify-examples
+	#@elm-verify-examples
 	@elm-test
 
 # Run development server
@@ -59,4 +59,4 @@ run:
 # Fetch salaries, location factors and currencies from the Internet
 .PHONY: config
 config:
-	@PWDEBUG=1 python3.11 scripts/fetch_config_values.py
+	@PWDEBUG=1 python scripts/fetch_config_values.py

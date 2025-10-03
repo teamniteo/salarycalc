@@ -1,21 +1,20 @@
-"""Use a real browser to fetch config.yaml values."""
+"""Use a real browser to fetch config.yaml values."""  # noqa: E902
 
 from datetime import date
 from playwright.sync_api import Page
 from playwright.sync_api import sync_playwright
-from ruamel.yaml import RoundTripDumper
-from ruamel.yaml import RoundTripLoader
+from ruamel.yaml import YAML
+from ruamel.yaml.comments import CommentedMap
 from tqdm import tqdm
 
 import argparse
-import ruamel.yaml
 import sys
 import time
 
 
 def usd_to_eur_10_year_average(
     page: Page,
-    config: ruamel.yaml.comments.CommentedMap,
+    config: CommentedMap,
 ) -> None:
     """Update the eur_to_usd_10_year_arg value in config.yaml."""
     pbar = tqdm(total=8)
@@ -63,7 +62,7 @@ def usd_to_eur_10_year_average(
 
 def countries(
     page: Page,
-    config: ruamel.yaml.comments.CommentedMap,
+    config: CommentedMap,
 ) -> None:
     """Update the Cost of Living values in config.yaml."""
 
@@ -109,7 +108,7 @@ def countries(
 
 def salaries(
     page: Page,
-    config: ruamel.yaml.comments.CommentedMap,
+    config: CommentedMap,
 ) -> None:
     """Update the baseSalary values in config.yaml."""
 
@@ -159,19 +158,23 @@ def main(argv=sys.argv) -> None:
     argparse.ArgumentParser(usage=("python3.11 fetch_config_values.py"))
 
     print("Starting Chrome and loading up config.yml")
+    yaml = YAML(typ="rt")  # Round-trip mode
+    yaml.preserve_quotes = True
+    yaml.indent(mapping=4, sequence=4, offset=2)
+
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
 
         with open("config.yml") as file:
-            config = ruamel.yaml.load(file, Loader=RoundTripLoader)
+            config = yaml.load(file)
 
-            usd_to_eur_10_year_average(page, config)
+            # usd_to_eur_10_year_average(page, config)
             countries(page, config)
             salaries(page, config)
 
         with open("config.yml", "w") as file:
-            ruamel.yaml.dump(config, file, indent=4, Dumper=RoundTripDumper)
+            yaml.dump(config, file)
     print("config.yml saved")
 
 
