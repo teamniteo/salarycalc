@@ -169,7 +169,7 @@ def main(argv=sys.argv) -> None:
         with open("config.yml") as file:
             config = yaml.load(file)
 
-            # usd_to_eur_10_year_average(page, config)
+            usd_to_eur_10_year_average(page, config)
             countries(page, config)
             salaries(page, config)
 

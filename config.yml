@@ -45,12 +45,12 @@ careers:
         salary_com_key: digital-marketing-director
   - name: Operations
     roles:
-      - name: Tech Support I
-        baseSalary: 4886
-        salary_com_key: technical-support-analyst-i
-      - name: Tech Support II
-        baseSalary: 6158
-        salary_com_key: technical-support-analyst-ii
+      - name: Customer Support
+        baseSalary: 3035
+        salary_com_key: customer-support-representative
+      - name: Technical Support
+        baseSalary: 4453
+        salary_com_key: technical-customer-support-specialist-i
       - name: Support Manager
         baseSalary: 5795
         salary_com_key: it-project-manager-i
