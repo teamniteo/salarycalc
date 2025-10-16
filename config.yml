@@ -46,8 +46,8 @@ careers:
   - name: Operations
     roles:
       - name: Customer Support
-        baseSalary: 3035
-        salary_com_key: customer-support-representative
+        baseSalary: 3527
+        salary_com_key: customer-support-specialist
       - name: Technical Support
         baseSalary: 4453
         salary_com_key: technical-customer-support-specialist-i
