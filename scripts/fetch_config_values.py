@@ -40,8 +40,7 @@ def usd_to_eur_10_year_average(
     # page.get_by_text("All time", exact=True).click()
     pbar.update()
 
-    # Click `Retrieve Data` button
-    page.get_by_role("button", name="Retrieve data").click()
+    page.get_by_role("button", name="View historical exchange rates").click()
     pbar.update()
 
     # Wait for data to reload
@@ -49,9 +48,9 @@ def usd_to_eur_10_year_average(
     pbar.update()
 
     # Extract the Average Rate
-    average_cell = page.get_by_role("cell", name="Average")
-    next_cell = average_cell.locator("+ td")
-    avg = round(float(next_cell.inner_text()), 6)
+    avg_stat = page.locator(".opt-historical-results__stat__icon--avg")
+    avg_value = avg_stat.locator(".opt-historical-results__stat__value")
+    avg = round(float(avg_value.inner_text()), 6)
     pbar.update()
 
     config["eur_to_usd_10_year_avg"] = avg
