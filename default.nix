@@ -13,6 +13,7 @@ let
     buildInputs = with pkgs; [
       # common tooling
       niv
+      gh-actions-lock
 
       # Elm app
       elmPackages.elm

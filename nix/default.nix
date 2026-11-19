@@ -4,7 +4,7 @@
 
 let
   overlay = _: _: {
-
+    inherit (import sources.nixpkgs-unstable { }) gh-actions-lock;
   };
 in
 import sources.nixpkgs {
