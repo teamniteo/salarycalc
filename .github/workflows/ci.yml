@@ -29,19 +29,21 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: teamniteo/gha-actions/nix@v2
+      - uses: actions/checkout@v3.7.0
+      - uses: teamniteo/gha-actions/nix@v45
         with:
           cache: niteo-public
           auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
 
       - run: nix-shell --run "make lint all=true"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - run: nix-shell --run "make tests"
 
       - run: nix-shell --run "make dist"
 
-      - uses: teamniteo/gha-actions/uncommitted-changes@v2
+      - uses: teamniteo/gha-actions/uncommitted-changes@v45
 
   publish:
     name: Publish to NPM
@@ -49,14 +51,14 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: teamniteo/gha-actions/nix@v2
+      - uses: actions/checkout@v3.7.0
+      - uses: teamniteo/gha-actions/nix@v45
         with:
           cache: niteo-public
           auth_token: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
 
       - name: Create .npmrc file to publish to npm
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.9.1
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'

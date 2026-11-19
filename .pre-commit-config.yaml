@@ -85,3 +85,12 @@ repos:
         language: system
         files: .*\.elm
         types: [file]
+
+      - id: actions-lock
+        name: Verify actions.lock
+        description: Check every action is locked, and every lock still matches upstream
+        entry: gh-actions-lock --verify
+        language: system
+        files: ^\.github/workflows/|(^|/)action\.ya?ml$
+        pass_filenames: false
+        verbose: true
